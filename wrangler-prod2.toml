@@ -1,0 +1,6 @@
+name = "java-sql-ai-tutorial-cn"
+main = "worker_gz.js"
+compatibility_date = "2024-09-23"
+
+[placement]
+mode = "smart"
