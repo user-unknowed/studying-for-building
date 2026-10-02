@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>09 华为ICT大赛实践赛·云赛道备赛指南 · Java · SQL · Python AI 教程</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<header class="topnav">
+  <div class="brand">Java · SQL · Python AI 教程<small>从原理到实战</small></div>
+  <nav><a href="01.html">01 JavaSE 基础知</a><a href="02.html">02 Java 与 SQL</a><a href="03.html">03 SQL 数据库深度讲</a><a href="04.html">04 学习报告：Java </a><a href="05.html">05 JavaEE 企业级</a><a href="06.html">06 Java 上位机开发</a><a href="07.html">07 JavaEE 上位机</a><a href="08.html">08 Python 与 A</a><a href="09.html" class="active">09 ICT大赛云赛道</a></nav>
+  <a class="src" href="https://github.com/user-unknowed/studying-for-building" target="_blank">📦 源码仓库</a>
+</header>
+<div class="layout">
+  <aside class="sidebar">
+    <h4>本节目录</h4>
+    <ul><ul>
+<li><a href="#ict">一、赛事速览：华为ICT大赛是什么</a></li>
+<li><a href="#_2">二、赛道体系与云赛道定位</a></li>
+<li><a href="#_3">三、第十一届赛程时间线与赛制</a><ul>
+<li><a href="#31">3.1 赛程时间线（中国区）</a></li>
+<li><a href="#32-3-1">3.2 队伍构成与报名须知</a></li>
+<li><a href="#33">3.3 中国区晋级路径</a></li>
+<li><a href="#34-8">3.4 全球总决赛：8 小时综合实验</a></li>
+</ul>
+</li>
+<li><a href="#_4">四、云赛道考点地图</a><ul>
+<li><a href="#41">4.1 三个技术方向</a></li>
+<li><a href="#42-hcia-cloud-service-v35">4.2 备考主线：HCIA-Cloud Service V3.5 大纲</a></li>
+<li><a href="#43">4.3 近年考点变化</a></li>
+</ul>
+</li>
+<li><a href="#_5">五、实验能力要求与真题结构</a></li>
+<li><a href="#_6">六、分阶段备赛计划</a></li>
+<li><a href="#_7">七、官方资源清单</a></li>
+<li><a href="#_8">八、与本站课程的衔接</a></li>
+<li><a href="#_9">九、注意事项与官方口径</a></li>
+<li><a href="#_10">参考资料</a></li>
+</ul></ul>
+  </aside>
+  <main class="content">
+    <div class="meta" style="color:#d97706;font-weight:600">第 09 章 · 🏆</div>
+    <h1 style="border-bottom:3px solid #d97706;padding-bottom:10px">华为ICT大赛实践赛·云赛道备赛指南</h1>
+    <div class="meta">赛制赛程 · 考点地图 · 分阶段备赛 · 官方资源 · 2026-2027 第十一届</div>
+    <blockquote>
+<p>整理日期：2026-10-02 ｜ 依据华为官方渠道与高校官方通知的公开资料整理，事实均标注来源（见文末参考资料）。</p>
+<p>目标读者：准备参加第十一届（2026-2027 赛季）华为ICT大赛实践赛<b>云赛道</b>的在校大学生团队。</p>
+</blockquote>
+<hr>
+<h2 id="ict">一、赛事速览：华为ICT大赛是什么</h2>
+<ul>
+<li><b>主办方与历史</b>：华为自 2015 年起主办的面向全球高校师生的年度 ICT 赛事，定位为国际化竞技和交流平台。</li>
+<li><b>规模</b>：截至第十届累计参赛 <b>118 万人以上</b>，覆盖院校 2000+、国家和地区 100+。</li>
+<li><b>认可度</b>：在中国被纳入<b>全国普通高校大学生竞赛项目榜单</b>；在海外被纳入 UNESCO 全球技能学院关键伙伴旗舰项目。</li>
+<li><b>第十届（2025-2026）数据</b>：全球 22 万余人报名（页面显示 226,732 人），其中中国区 154,527 人为最大赛区；49 个国家和地区的 177 支队伍晋级全球总决赛（2026 年 6 月 2-5 日，深圳）。</li>
+<li><b>当前状态</b>：第十一届（2026-2027）已启动，并官宣将在中国赛区新增<b>昇腾 AI 算子开发赛道</b>。</li>
+</ul>
+<hr>
+<h2 id="_2">二、赛道体系与云赛道定位</h2>
+<p>大赛以三大赛道为主体（另有教学赛、挑战赛、精英赛等面向教师或定向群体的赛道）：</p>
+<table>
+<thead>
+<tr>
+<th>赛道</th>
+<th>面向范围</th>
+<th>考察重点与形式</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><b>实践赛</b>（网络、云、基础软件、昇腾AI 四条赛道）</td>
+<td>全球（昇腾AI 仅面向中国）</td>
+<td>ICT 理论知识储备、上机实践能力、团队合作能力；<b>理论考试 + 综合实验</b>，基于考试得分排名</td>
+</tr>
+<tr>
+<td><b>创新赛</b></td>
+<td>全球</td>
+<td>AI 与 ICT 技术综合应用与创新能力，按赛题实现解决方案或完成 AI 训练、推理及智能体开发</td>
+</tr>
+<tr>
+<td><b>编程赛</b>（仓颉编程赛道）</td>
+<td>仅中国</td>
+<td>仓颉语言特性：现代语言特性、AI 与智能体应用、现代软件工程</td>
+</tr>
+</tbody>
+</table>
+<p><b>本站聚焦的"实践赛·云赛道"</b>：与网络、基础软件、昇腾AI 赛道共用"理论考试 + 综合实验"的考核框架；全球总决赛阶段直接在<b>华为云</b>平台上完成综合实验（网络赛道使用 eNSP 模拟器、昇腾AI 赛道使用华为云及香橙派开发板）。</p>
+<hr>
+<h2 id="_3">三、第十一届赛程时间线与赛制</h2>
+<h3 id="31">3.1 赛程时间线（中国区）</h3>
+<p>第十一届实践赛为四级赛制——省赛资格赛、省赛、全国总决赛、全球总决赛：</p>
+<table>
+<thead>
+<tr>
+<th>阶段</th>
+<th>时间</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><b>实践赛报名</b></td>
+<td>2026 年 8 月 31 日 — 10 月 31 日</td>
+<td>在华为人才在线报名（含信息补录）</td>
+</tr>
+<tr>
+<td><b>省赛资格赛（实验）</b></td>
+<td>2026 年 9 月 18 日 — 11 月 8 日</td>
+<td>线上实验窗口，与报名期重叠——<b>越早报名，可训练时间越长</b></td>
+</tr>
+<tr>
+<td><b>省赛资格赛（理论）</b></td>
+<td>2026 年 11 月 14-15 日</td>
+<td>线上答题</td>
+</tr>
+<tr>
+<td><b>省赛</b></td>
+<td>2026 年 12 月</td>
+<td>省内选拔，角逐全国总决赛名额</td>
+</tr>
+<tr>
+<td><b>全国总决赛</b></td>
+<td>2027 年 3 月</td>
+<td>全国阶段综合考核</td>
+</tr>
+<tr>
+<td><b>全球总决赛</b></td>
+<td>2027 年 5 月</td>
+<td>8 小时综合实验（以第十届形式为参考）</td>
+</tr>
+</tbody>
+</table>
+<h3 id="32-3-1">3.2 队伍构成与报名须知</h3>
+<ul>
+<li>实践赛为<b>团队赛</b>：每队由 <b>3 名学生 + 1 名指导教师</b>组成，且须来自<b>同一所高校</b>。</li>
+<li>参赛对象限定为华为 ICT 学院（或有意愿成为 ICT 学院）的高教及高职院校在校学生。</li>
+<li>报名入口填写基础信息后，还需在赛事介绍页补录"<b>二级学院、赛道信息、指导老师</b>"并提交；截止日仍未补录的将被视为无法参赛。</li>
+<li>指导老师由学生在报名中填写，不单独报名；考试期间不能进入考场。</li>
+</ul>
+<h3 id="33">3.3 中国区晋级路径</h3>
+<p>按可核实的最近一届中国区官方参赛 FAQ（2022-2023 届），中国区实践赛为"省赛 → 全国总决赛 → 全球总决赛"三级赛制：</p>
+<ol>
+<li><b>省初赛</b>：以<b>个人</b>为单位报名比赛；</li>
+<li><b>同校组队</b>：初赛结束后同校自行组队（3 人一队），按团队总分角逐省决赛名额；</li>
+<li><b>省决赛</b>：以队伍为单位比赛，按团队总分角逐全国总决赛名额（部分省份初赛/决赛合并举办）；</li>
+<li><b>全国总决赛</b>：省赛优胜队伍出战；</li>
+<li><b>全球总决赛</b>：与各国代表队同台角逐。</li>
+</ol>
+<h3 id="34-8">3.4 全球总决赛：8 小时综合实验</h3>
+<p>以第十届官方规则为准，实践赛全球总决赛的形式是备赛强度的"锚点"：</p>
+<ul>
+<li>比赛形式为 <b>8 小时综合实验</b>（第十届答题时段 09:30-17:30），云赛道直接在<b>华为云</b>上实验；</li>
+<li>赛题为<b>全英文</b>，可使用在线翻译工具；</li>
+<li>比赛期间<b>仅允许使用试卷中提供的参考链接和文档</b>；</li>
+<li>组委会统一提供电脑，禁止携带任何电子设备进入考场；</li>
+<li>3 人队伍协作完成赛题任务，最终提交<b>一份完整答卷</b>。</li>
+</ul>
+<hr>
+<h2 id="_4">四、云赛道考点地图</h2>
+<h3 id="41">4.1 三个技术方向</h3>
+<p>第十一届云赛道考核内容经高校官方通知转发，以"三个技术方向"概括（大连理工大学通知表述为"云服务、云原生、AI"，燕山大学通知表述为"云、大数据、AI"，两校均注明知识点分布详见官网各赛道考试大纲）：</p>
+<table>
+<thead>
+<tr>
+<th>方向</th>
+<th>官方概述点名的考点</th>
+<th>解读</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><b>云技术域</b></td>
+<td>云计算基础知识、华为云产品与服务、华为云解决方案、上云迁移、<b>容器与 K8S</b></td>
+<td>理论与实验的主战场，对应计算/存储/网络/运维等云服务的知识与实操</td>
+</tr>
+<tr>
+<td><b>AI 方向</b></td>
+<td>AI 技术与应用、机器学习、深度学习、计算机视觉、自然语言处理、<b>大语言模型</b>、华为云 <b>ModelArts</b>、<b>盘古大模型</b>、AI Agent、AI 编程</td>
+<td>考点已达大模型与智能体层次，超出入门认证的简介深度，需专项补充</td>
+</tr>
+<tr>
+<td><b>大数据方向</b></td>
+<td>燕山大学通知将"大数据"列为三方向之一</td>
+<td>具体知识点分布以官网考试大纲为准</td>
+</tr>
+</tbody>
+</table>
+<h3 id="42-hcia-cloud-service-v35">4.2 备考主线：HCIA-Cloud Service V3.5 大纲</h3>
+<p>云技术域考点与 <b>HCIA-Cloud Service V3.5</b>（考试代码 H13-811，官方大纲页 2026-05 更新）的知识模块高度重合，可作为备考主线。该认证的官方知识模块与权重：</p>
+<table>
+<thead>
+<tr>
+<th>知识模块</th>
+<th>权重</th>
+<th>覆盖内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>云基础介绍</td>
+<td>15%</td>
+<td>云计算基础、公有云介绍、华为云介绍</td>
+</tr>
+<tr>
+<td>计算云服务</td>
+<td>20%</td>
+<td>ECS、IMS、AS、BMS、<b>CCE（云容器引擎）</b>等</td>
+</tr>
+<tr>
+<td>网络云服务</td>
+<td>20%</td>
+<td>VPC、弹性公网 IP、ELB、VPN、NAT 网关等</td>
+</tr>
+<tr>
+<td>存储云服务</td>
+<td>20%</td>
+<td>EVS、OBS、SFS、云备份服务等</td>
+</tr>
+<tr>
+<td>华为云运维基础</td>
+<td>15%</td>
+<td>IAM、SMN、CES、LTS、CTS 等运维服务</td>
+</tr>
+<tr>
+<td>更多云服务</td>
+<td>10%</td>
+<td>数据库类、安全类、CDN、<b>人工智能及大数据服务简介</b>、API 网关</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><b>注意边界</b>：该认证大纲对 AI 与大数据仅"简介"级覆盖（权重 10%），而云赛道 AI 方向要求掌握大语言模型、AI Agent、AI 编程等——<b>只按认证大纲备考不足以覆盖云赛道 AI 考点</b>，必须在认证主线之外补充 AI 专项学习（本站第 08 章 Python 与 AI 大模型可直接衔接）。</p>
+</blockquote>
+<h3 id="43">4.3 近年考点变化</h3>
+<ul>
+<li><b>AI 权重上升</b>：大语言模型、AI Agent、AI 编程、盘古大模型、ModelArts 等已直接写入第十一届云赛道考核概述；上一届曾单设的昇腾AI 赛道（仅面向中国大陆）在第十一届实践赛赛项中调整为网络、云、基础软件三项，AI 考点并入云赛道。</li>
+<li><b>云原生成为明确考点</b>：容器与 K8S 写入本届考核概述，训练重心应向容器与 K8S 倾斜；2023-2024 赛季的"云 / 大数据 / AI"三方向已调整为"云服务 / 云原生 / AI"。</li>
+</ul>
+<hr>
+<h2 id="_5">五、实验能力要求与真题结构</h2>
+<p>官方真题解析书（华为ICT大赛组委会编写，人民邮电出版社 2024 年 11 月出版）显示，全球总决赛真题按 Cloud、Big Data、AI 模块组织，包含<b>任务设计背景、权重（Weighting）、考试平台（Exam Platform）、场景、网络拓扑、考试资源与任务（Exam Tasks）</b>等完整结构；省赛初赛、复赛真题按技术方向分模块命题；全国总决赛为理论考试（分高职组、本科组）+ 实验考试。</p>
+<p>由此归纳四条核心能力要求：</p>
+<ol>
+<li><b>理论广度</b>：三个技术方向知识点全覆盖，不留盲区；</li>
+<li><b>华为云实操速度与准确性</b>：全球总决赛直接在华为云上实验，沙箱实验是日常练手手段；</li>
+<li><b>英文题面与文档内检索能力</b>：全英文赛题，且仅允许使用试卷提供的参考链接和文档——"在给定文档里快速找到答案"本身就是被考察能力；</li>
+<li><b>团队分工与长时间作战能力</b>：3 人队伍 8 小时协作提交一份答卷，需要赛前演练分工与节奏。</li>
+</ol>
+<hr>
+<h2 id="_6">六、分阶段备赛计划</h2>
+<table>
+<thead>
+<tr>
+<th>阶段</th>
+<th>时间窗口</th>
+<th>关键动作</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><b>起步期</b></td>
+<td>即时 — 10 月 31 日报名截止</td>
+<td>同校 3+1 组队并在华为人才在线完成报名与信息补录；以官方考试大纲划定复习范围；用华为云学堂学习路径补齐理论基础。<b>实验窗口 9 月 18 日已开始，与报名期重叠，越早报名训练时间越长。</b></td>
+</tr>
+<tr>
+<td><b>资格赛期</b></td>
+<td>9 月 18 日 — 11 月 15 日</td>
+<td><b>实验线</b>：在沙箱实验中练熟华为云核心服务（ECS/VPC/EIP/OBS 等）的开通、组网与配置流程；<b>理论线</b>：按云服务、云原生、AI 三个方向逐域过关（云计算基础、华为云产品与服务、上云迁移、容器与 K8S、机器学习、深度学习、大语言模型、ModelArts 等）。观察信号：能否在 11 月 8 日实验窗口结束前独立完成典型云上场景的部署与排障。</td>
+</tr>
+<tr>
+<td><b>冲刺期</b></td>
+<td>12 月省赛 — 2027 年 5 月全球总决赛</td>
+<td>以官方真题解析书为梯度做全真演练；按全球总决赛强度组织 8 小时限时全真模拟（英文题面 + 仅用试卷内文档 + 3 人协作一份答卷）。</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="_7">七、官方资源清单</h2>
+<table>
+<thead>
+<tr>
+<th>资源 / 平台</th>
+<th>承载内容</th>
+<th>备赛用法</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><b>华为人才在线</b><br>e.huawei.com/cn/talent</td>
+<td>第十一届实践赛中国区官方页面：赛程、晋级说明、各赛道考试大纲、报名入口</td>
+<td>报名与大纲的唯一权威口径，赛季内定期查看</td>
+</tr>
+<tr>
+<td><b>大赛官网 / 大赛手册</b></td>
+<td>《华为ICT大赛手册》《全球总决赛参赛 &amp; 参会指导书》下载，2026-2027 赛季入口已上线</td>
+<td>通读赛制与全球总决赛规则</td>
+</tr>
+<tr>
+<td><b>报名后"学习空间"</b></td>
+<td>赛事介绍页顶部入口：各阶段比赛大纲、在线学习课程、往年真题</td>
+<td>报名成功后第一时间进入，领取官方备赛包</td>
+</tr>
+<tr>
+<td><b>华为 ICT 学院</b></td>
+<td>参赛资格通道（ICT 学院院校在校学生）；配套课程体系与校内组织支持</td>
+<td>确认本校 ICT 学院身份，对接校内选拔与课程资源</td>
+</tr>
+<tr>
+<td><b>华为云学堂</b><br>edu.huaweicloud.com</td>
+<td>学习路径 = 在线课程 + 实验练习 + 开发者认证；沙箱实验在隔离环境提供华为云资源实操</td>
+<td>理论学习与华为云实操的主训练场（例：GaussDB 开发工程师路径 3 阶段 19 门课 32 个实验；"基于云服务实现花卉识别"沙箱实验练 ECS + VPC + EIP + 神经网络）</td>
+</tr>
+<tr>
+<td><b>官方真题解析书</b></td>
+<td>《华为ICT大赛实践赛云赛道真题解析》（358 页，2024-11 出版）：2023-2024 赛季省赛初赛至全球总决赛全部阶段真题与考点分解，第 1 章即云赛道赛制与考试大纲</td>
+<td>熟悉题型结构与难度梯度，冲刺期全真演练</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="_8">八、与本站课程的衔接</h2>
+<p>备赛策略：<b>用本站打语言与数据基础，用华为云学堂补华为云产品与平台操作</b>。本站已有内容与云赛道考点的对应关系：</p>
+<table>
+<thead>
+<tr>
+<th>本站章节</th>
+<th>已有基础</th>
+<th>衔接的云赛道训练</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><b>02 / 03 章（Java 与 SQL、SQL 深度）</b></td>
+<td>JDBC、SQL 语法、索引、事务、窗口函数</td>
+<td>华为云学堂 GaussDB 路径："GaussDB SQL 及常规操作"、"GaussDB 数据库高级 SQL"、"数据库查询性能优化—索引优化"等实验</td>
+</tr>
+<tr>
+<td><b>08 章（Python 与 AI 大模型）</b></td>
+<td>张量、Autograd、注意力机制、Transformer、推理服务化</td>
+<td>AI 方向考点（机器学习、深度学习、大语言模型、ModelArts）；沙箱实验中的神经网络模型构建（如花卉识别实验）</td>
+</tr>
+<tr>
+<td><b>01 / 05 章（JavaSE、JavaEE）</b></td>
+<td>OOP、并发、Servlet、REST、事务</td>
+<td>云学堂"Java 对数据库基本操作"、"金融场景下 GaussDB Java 编程综合实践"等实验；上云迁移与云上应用部署的工程直觉</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><b>建议路径</b>：先读完 03 章练 SQL 硬功夫 → 08 章补 AI 原理 → 云学堂 GaussDB 学习路径 + ModelArts 实验 → 真题解析书全真演练。</p>
+</blockquote>
+<hr>
+<h2 id="_9">九、注意事项与官方口径</h2>
+<ul>
+<li><b>官方不设收费培训</b>：华为明确提示"主办方未设置任何形式的收费培训，请勿相信任何承诺比赛奖项的收费辅导"。</li>
+<li><b>信息渠道</b>：各省初赛时间和地点通过华为ICT学院公众号推送，报名结束后以短信和邮件发送；联系邮箱是获取大赛信息的唯一通道，务必填写正确并及时查收。</li>
+<li><b>大纲为准</b>：理论题型、实验题库、知识点分值分布官方未公开，均以官网各赛道考试大纲为准；本指南中的考点清单来自高校转发的官方考核概述。</li>
+<li><b>谨慎看待传言</b>："获奖可得认证书、招聘绿卡"等激励未在官方页面中确认；已核实的官方额外激励为"ICT 商业精英优秀人才应届生权益卡"（第十届面向中国 10 位同学）。</li>
+<li><b>届次口径</b>：赛程时间线为第十一届中国区官方口径；中国区晋级路径细则采用 2022-2023 届官方 FAQ；全球总决赛形式采用第十届官方规则——后两者为可核实的最近届次完整说明。</li>
+</ul>
+<hr>
+<h2 id="_10">参考资料</h2>
+<ol>
+<li><a href="https://chuangxin.dlut.edu.cn/info/1020/16867.htm" target="_blank">关于组织参加第十一届华为ICT大赛报名通知</a> — 大连理工大学创新创业学院，2026-09-11</li>
+<li><a href="https://cxcy.ysu.edu.cn/info/1043/4140.htm" target="_blank">关于举办第十一届华为ICT大赛中国实践赛校内选拔赛的通知</a> — 燕山大学创新创业教育与指导中心，2026-09-20</li>
+<li><a href="https://e.huawei.com/cn/talent/ict-academy/#/ict-contest/" target="_blank">ICT大赛（华为人才在线官方页面）</a> — 华为</li>
+<li><a href="https://www.huawei.com/minisite/ict-competition-2025-2026-global/cn/index.html" target="_blank">华为ICT大赛2025-2026全球总决赛官网</a> — 华为</li>
+<li><a href="https://www.huawei.com/cn/news/2026/6/ict-competition-global" target="_blank">第十届华为ICT大赛收官新闻</a> — 华为官网，2026-06-09</li>
+<li><a href="https://e.huawei.com/cn/talent/news/#/details?consultationId=2601" target="_blank">华为ICT大赛2022-2023中国区参赛FAQ</a> — 华为人才在线，2022-10-20</li>
+<li><a href="https://e.huawei.com/cn/talent/#/cert/product-details?certifiedProductId=817&authenticationLevel=CTYPE_CARE_HCIA&technicalField=PSC&version=3.5" target="_blank">HCIA-Cloud Service 认证（V3.5 考试大纲）</a> — 华为，2026-05-16</li>
+<li><a href="https://edu.huaweicloud.com/programs/gd.html" target="_blank">GaussDB 开发工程师学习路径</a> — 华为云学堂</li>
+<li><a href="https://lab.connect.huaweicloud.com/experiment-detail_4067" target="_blank">基于云服务实现花卉识别（沙箱实验）</a> — 华为云学堂</li>
+<li><a href="https://www.ptpress.com.cn/publishing/book/e74511da-4e87-44fc-a806-5a75c51bd574" target="_blank">《华为ICT大赛实践赛云赛道真题解析》</a> — 人民邮电出版社（华为ICT大赛组委会著），2024-11</li>
+</ol>
+    <div class="pager"><a href="08.html"><div class="dir">← 上一章</div><div class="ttl">Python 与 AI 大模型：从原理到 Transformer</div></a></div>
+  </main>
+</div>
+</body>
+</html>

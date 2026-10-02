@@ -21,6 +21,7 @@
 | 06 | [Java 上位机开发实战](https://java-sql-ai-tutorial-b7y.pages.dev/06.html) | 串口 · Modbus · 数据采集 · 入库 · 控制与报警 |
 | 07 | [JavaEE 上位机：网页监控看板](https://java-sql-ai-tutorial-b7y.pages.dev/07.html) | Servlet · 嵌入式 Tomcat · REST · 零依赖 SVG 看板 |
 | 08 | [Python 与 AI 大模型：从原理到 Transformer](https://java-sql-ai-tutorial-b7y.pages.dev/08.html) | 张量 · Autograd · 注意力 · GPU 并行 · 推理服务化 |
+| 09 | [华为ICT大赛实践赛·云赛道备赛指南](https://java-sql-ai-tutorial-b7y.pages.dev/09.html) | 赛制赛程 · 考点地图 · 分阶段备赛 · 官方资源 |
 
 ## 建议学习路线
 
@@ -30,6 +31,7 @@
 4. **JavaEE 服务端** → 05 章（先原生 Jakarta EE，后 Spring Boot）
 5. **上位机 / 工业采集** → 06、07 章（先桌面版，再网页版）
 6. **Python 与 AI 大模型** → 08 章（张量、Autograd、手写 MiniGPT、GPU 并行、vLLM 服务化）
+7. **竞赛备赛** → 09 章（华为ICT大赛云赛道：赛程、考点地图、分阶段计划，衔接 03 章 SQL 与 08 章 AI 基础）
 
 每一步遵循同一原则：**先读文档懂原理，再跑代码看真实结果**。
 
@@ -39,6 +41,7 @@
 - **SQL**：MySQL / PostgreSQL / 窗口函数 / 索引优化 / MVCC
 - **Python**：PyTorch / NumPy / Transformer / vLLM
 - **工业**：Modbus TCP/RTU / 串口通信 / 数据采集 / SVG 看板
+- **竞赛**：华为ICT大赛实践赛云赛道（华为云 / 容器与 K8S / ModelArts / GaussDB）
 - **部署**：Cloudflare Pages（边缘 CDN 加速 + 缓存策略）
 
 ## 部署架构
@@ -46,7 +49,7 @@
 ```
 源码 (/workspace/site/)
   ├── index.html          # 首页
-  ├── 01.html ~ 08.html   # 8 章教程
+  ├── 01.html ~ 09.html   # 9 章教程
   ├── assets/style.css    # 样式
   └── _headers            # Cloudflare Pages 缓存规则
         │
