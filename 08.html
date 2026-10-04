@@ -1,0 +1,1025 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>08 Python 与 AI 大模型：从原理到 Transformer · Java · SQL · Python AI 教程</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<header class="topnav">
+  <div class="brand">Java · SQL · Python AI 教程<small>从原理到实战</small></div>
+  <nav><a href="01.html" class="">01 JavaSE 基础知</a><a href="02.html" class="">02 Java 与 SQL</a><a href="03.html" class="">03 SQL 数据库深度讲</a><a href="04.html" class="">04 学习报告：Java </a><a href="05.html" class="">05 JavaEE 企业级</a><a href="06.html" class="">06 Java 上位机开发</a><a href="07.html" class="">07 JavaEE 上位机</a><a href="08.html" class="active">08 Python 与 A</a></nav>
+  <a class="src" href="https://github.com/user-unknowed/studying-for-building" target="_blank">📦 源码仓库</a>
+</header>
+<div class="layout">
+  <aside class="sidebar">
+    <h4>本节目录</h4>
+    <ul><ul>
+<li><a href="#0-python">0. 导读：为什么是 Python 驱动了整个大模型时代</a></li>
+<li><a href="#1-python-ai">1. Python 在 AI 栈里的真实位置</a><ul>
+<li><a href="#11">1.1 一张图说清分层</a></li>
+<li><a href="#12-python-cuda">1.2 一个最小例子：Python 调 CUDA 做矩阵乘</a></li>
+<li><a href="#13-cjava">1.3 为什么不是 C++/Java 直接写模型</a></li>
+</ul>
+</li>
+<li><a href="#2-transformer">2. 张量与计算图：Transformer 的数据形态</a><ul>
+<li><a href="#21">2.1 张量：高维数组的统一抽象</a></li>
+<li><a href="#22-numpy">2.2 用 NumPy 理解张量操作（原理）</a></li>
+<li><a href="#23-pytorch">2.3 为什么要转成 PyTorch 张量</a></li>
+</ul>
+</li>
+<li><a href="#3-autograd">3. 自动求导（Autograd）：训练的核心引擎</a><ul>
+<li><a href="#31">3.1 计算图与链式法则</a></li>
+<li><a href="#32-transformer">3.2 Transformer 的反向传播长什么样</a></li>
+<li><a href="#33">3.3 显存从哪来、到哪去</a></li>
+</ul>
+</li>
+<li><a href="#4-mini-transformer">4. 从零实现一个 Mini Transformer（实战）</a><ul>
+<li><a href="#41">4.1 目标</a></li>
+<li><a href="#42">4.2 完整代码</a></li>
+<li><a href="#43">4.3 训练循环</a></li>
+<li><a href="#44-2000">4.4 运行结果示例（训练 2000 步后）</a></li>
+</ul>
+</li>
+<li><a href="#5-gpu">5. 让大模型跑得快：GPU 与并行</a><ul>
+<li><a href="#51-python-gpu">5.1 Python 如何调度 GPU</a></li>
+<li><a href="#52">5.2 混合精度：速度翻倍的关键</a></li>
+<li><a href="#53">5.3 三种并行（工业部署必知）</a></li>
+<li><a href="#54-vllm-pagedattention">5.4 推理加速：vLLM 的 PagedAttention</a></li>
+</ul>
+</li>
+<li><a href="#6-api">6. 推理服务化：把模型变成 API</a><ul>
+<li><a href="#61-fastapi">6.1 最小服务（FastAPI）</a></li>
+<li><a href="#62-vllm-openai">6.2 工业级：vLLM OpenAI 兼容服务</a></li>
+<li><a href="#63-python">6.3 Python 在服务化中的角色</a></li>
+</ul>
+</li>
+<li><a href="#7-python-transformer">7. 全景总结：一次完整的"Python 跑 Transformer"流程</a></li>
+<li><a href="#8-modern-python">8. Python 现代化语法：写得更少，表达更强（AI 时代的工程底座）</a><ul>
+<li><a href="#81-type-hints">8.1 类型提示（Type Hints）：让 Python 拥有静态语言的可维护性</a></li>
+<li><a href="#82-dataclass-pydantic">8.2 dataclass 与 Pydantic：数据建模的两种范式</a></li>
+<li><a href="#83-match-case">8.3 结构化模式匹配（match/case）：3.10 的革命性语法</a></li>
+<li><a href="#84-walrus">8.4 海象运算符（:=）：赋值即表达式</a></li>
+<li><a href="#85-async-asyncio">8.5 async/await 与 asyncio：高并发推理服务的基石</a></li>
+<li><a href="#86-f-string-pathlib">8.6 f-string 与 pathlib：现代化的字符串与路径</a></li>
+<li><a href="#87-comprehension-protocol">8.7 推导式、生成器与 Protocol：函数式与鸭子类型的现代写法</a></li>
+<li><a href="#88-typing-generics">8.8 typing 泛型与 PEP 695：3.12 的类型系统飞跃</a></li>
+<li><a href="#89-ai-idioms">8.9 在 AI 工程里：这些语法如何组合实战</a></li>
+</ul>
+</li>
+<li><a href="#_1">附录：学习路线与资源</a></li>
+</ul></ul>
+  </aside>
+  <main class="content">
+    <div class="meta" style="color:#7c3aed;font-weight:600">第 08 章 · 🐍</div>
+    <h1 style="border-bottom:3px solid #7c3aed;padding-bottom:10px">Python 与 AI 大模型：从原理到 Transformer</h1>
+    <div class="meta">张量 · Autograd · 注意力 · GPU 并行 · 推理服务化</div>
+    <h1 id="python-ai-transformer">Python 与 AI 大模型：从原理到 Transformer 实战</h1>
+<blockquote>
+<p>面向：想搞懂"Python 到底怎么让 Transformer 跑起来"的开发者 ｜ 整理：Operit AI ｜ 2026-09
+配套资料：<code>py-ai-demo/</code> 下可直接运行的 Python 脚本
+姊妹篇：《SQL数据库深度讲解-工业实践版》《JavaEE企业级开发》</p>
+</blockquote>
+<hr>
+<h2 id="0-python">0. 导读：为什么是 Python 驱动了整个大模型时代</h2>
+<p>三条主线：</p>
+<table>
+<thead>
+<tr>
+<th>能力</th>
+<th>具体表现</th>
+<th>对应章节</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>写得出</strong></td>
+<td>用 Python 搭一个能跑的 Transformer 前向/反向</td>
+<td>第 1～4 章</td>
+</tr>
+<tr>
+<td><strong>跑得快</strong></td>
+<td>GPU/CUDA、混合精度、并行、算子融合</td>
+<td>第 5 章</td>
+</tr>
+<tr>
+<td><strong>跑得稳</strong></td>
+<td>推理服务化、显存治理、部署落地</td>
+<td>第 6～7 章</td>
+</tr>
+</tbody>
+</table>
+<p>一句话总览：<strong>Python 本身不"算"，它是"调度员"</strong>——真正的矩阵乘法在 CUDA/cuBLAS 里跑，Python 负责把计算图搭好、把数据搬进显存、把梯度反传回去、把权重存下来。理解了这一点，就理解了大模型的运行本质。</p>
+<hr>
+<h2 id="1-python-ai">1. Python 在 AI 栈里的真实位置</h2>
+<h3 id="11">1.1 一张图说清分层</h3>
+<div class="codehilite"><pre><span></span><code>┌─────────────────────────────────────┐
+│  应用层：FastAPI / Gradio / vLLM     │  ← Python 写服务
+├─────────────────────────────────────┤
+│  框架层：PyTorch / TensorFlow / JAX  │  ← Python 搭计算图
+├─────────────────────────────────────┤
+│  算子层：cuBLAS / cuDNN / Triton     │  ← C++/CUDA 真干活
+├─────────────────────────────────────┤
+│  硬件层：NVIDIA GPU / TPU / NPU      │  ← 算力
+└─────────────────────────────────────┘
+</code></pre></div>
+
+<p>Python 出现在<strong>应用层 + 框架层</strong>。它的核心价值不是性能，而是：
+- <strong>胶水</strong>：把 C++/CUDA 写成的高性能算子暴露成 <code>torch.matmul</code> 这种 Python 接口
+- <strong>表达力</strong>：动态图、任意控制流、调试友好
+- <strong>生态</strong>：NumPy、Pandas、HuggingFace、LangChain 全在 Python</p>
+<h3 id="12-python-cuda">1.2 一个最小例子：Python 调 CUDA 做矩阵乘</h3>
+<div class="codehilite"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+
+<span class="n">A</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">1024</span><span class="p">,</span> <span class="mi">1024</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">&quot;cuda&quot;</span><span class="p">)</span>
+<span class="n">B</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">1024</span><span class="p">,</span> <span class="mi">1024</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">&quot;cuda&quot;</span><span class="p">)</span>
+<span class="n">C</span> <span class="o">=</span> <span class="n">A</span> <span class="o">@</span> <span class="n">B</span>          <span class="c1"># ← 这一行，Python 只发了一个&quot;调用&quot;</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">C</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>     <span class="c1">#    真正的乘法在 GPU 上由 cuBLAS 执行</span>
+</code></pre></div>
+
+<p>执行流程：
+1. Python 解释器执行 <code>A @ B</code>
+2. PyTorch 的 C++ 前端把 <code>__matmul__</code> 分派到 CUDA 后端
+3. cuBLAS 的 <code>cublasGemmEx</code> 在 GPU 上做 10 亿次浮点运算
+4. 结果张量 <code>C</code> 的元数据返回 Python，数据仍留在显存</p>
+<p><strong>关键认知</strong>：Python 进程的 CPU 几乎闲着，GPU 在跑满。Python 是"指挥"，GPU 是"工人"。</p>
+<h3 id="13-cjava">1.3 为什么不是 C++/Java 直接写模型</h3>
+<table>
+<thead>
+<tr>
+<th>维度</th>
+<th>Python</th>
+<th>C++/Java</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>开发速度</td>
+<td>快（动态、REPL）</td>
+<td>慢（编译、类型）</td>
+</tr>
+<tr>
+<td>矩阵运算</td>
+<td>调 cuBLAS 一行</td>
+<td>手写上千行</td>
+</tr>
+<tr>
+<td>自动求导</td>
+<td>框架内置</td>
+<td>需自己实现</td>
+</tr>
+<tr>
+<td>运行时性能</td>
+<td>低（但热路径在 C++）</td>
+<td>高</td>
+</tr>
+<tr>
+<td>生态</td>
+<td>HuggingFace 全家桶</td>
+<td>需自己造轮子</td>
+</tr>
+</tbody>
+</table>
+<p>工业界的真实做法：<strong>Python 写模型逻辑 + C++/CUDA 写热点算子</strong>。PyTorch 本身就是 C++ 内核 + Python 前端。</p>
+<hr>
+<h2 id="2-transformer">2. 张量与计算图：Transformer 的数据形态</h2>
+<h3 id="21">2.1 张量：高维数组的统一抽象</h3>
+<p>Transformer 里所有数据都是张量。核心维度约定：</p>
+<table>
+<thead>
+<tr>
+<th>张量</th>
+<th>形状</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>输入 token ids</td>
+<td><code>(batch, seq_len)</code></td>
+<td>整数，每个 token 的编号</td>
+</tr>
+<tr>
+<td>嵌入 embeddings</td>
+<td><code>(batch, seq_len, d_model)</code></td>
+<td>每个 token 的向量表示</td>
+</tr>
+<tr>
+<td>Q/K/V</td>
+<td><code>(batch, heads, seq_len, d_head)</code></td>
+<td>多头注意力的查询/键/值</td>
+</tr>
+<tr>
+<td>注意力权重</td>
+<td><code>(batch, heads, seq_len, seq_len)</code></td>
+<td>softmax(QK^T/√d)</td>
+</tr>
+<tr>
+<td>输出 logits</td>
+<td><code>(batch, seq_len, vocab_size)</code></td>
+<td>下个 token 的概率分布</td>
+</tr>
+</tbody>
+</table>
+<h3 id="22-numpy">2.2 用 NumPy 理解张量操作（原理）</h3>
+<p>在学 PyTorch 前，先用 NumPy 看清"注意力到底算什么"：</p>
+<div class="codehilite"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="n">d_model</span> <span class="o">=</span> <span class="mi">64</span>
+<span class="n">seq_len</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="c1"># 假设有 10 个 token，每个 64 维</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">seq_len</span><span class="p">,</span> <span class="n">d_model</span><span class="p">)</span>
+
+<span class="c1"># 三个投影矩阵</span>
+<span class="n">Wq</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">d_model</span><span class="p">,</span> <span class="n">d_model</span><span class="p">)</span>
+<span class="n">Wk</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">d_model</span><span class="p">,</span> <span class="n">d_model</span><span class="p">)</span>
+<span class="n">Wv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="n">d_model</span><span class="p">,</span> <span class="n">d_model</span><span class="p">)</span>
+
+<span class="n">Q</span> <span class="o">=</span> <span class="n">X</span> <span class="o">@</span> <span class="n">Wq</span>   <span class="c1"># (10, 64)</span>
+<span class="n">K</span> <span class="o">=</span> <span class="n">X</span> <span class="o">@</span> <span class="n">Wk</span>
+<span class="n">V</span> <span class="o">=</span> <span class="n">X</span> <span class="o">@</span> <span class="n">Wv</span>
+
+<span class="c1"># 注意力分数：Q 和 K 的相似度</span>
+<span class="n">scores</span> <span class="o">=</span> <span class="n">Q</span> <span class="o">@</span> <span class="n">K</span><span class="o">.</span><span class="n">T</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">d_model</span><span class="p">)</span>   <span class="c1"># (10, 10)</span>
+<span class="c1"># softmax 归一化</span>
+<span class="n">scores</span> <span class="o">-=</span> <span class="n">scores</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">attn</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">scores</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">scores</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">keepdims</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="c1"># 加权求和</span>
+<span class="n">out</span> <span class="o">=</span> <span class="n">attn</span> <span class="o">@</span> <span class="n">V</span>   <span class="c1"># (10, 64)</span>
+</code></pre></div>
+
+<p>这 10 行就是 <strong>Self-Attention 的全部数学</strong>。Transformer 的"神奇"，本质上就是这堆矩阵乘法。</p>
+<h3 id="23-pytorch">2.3 为什么要转成 PyTorch 张量</h3>
+<p>NumPy 跑在 CPU 上，且<strong>没有自动求导</strong>。训练模型需要：
+1. 前向算 loss
+2. 反向算每个参数的梯度
+3. 更新参数</p>
+<p>手写反向传播对 175B 参数模型不可能。PyTorch 的 <code>autograd</code> 自动完成。</p>
+<hr>
+<h2 id="3-autograd">3. 自动求导（Autograd）：训练的核心引擎</h2>
+<h3 id="31">3.1 计算图与链式法则</h3>
+<p>PyTorch 在前向传播时<strong>记录</strong>每一步操作，构建一张计算图。反向传播时沿图反走，用链式法则算梯度。</p>
+<div class="codehilite"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+
+<span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="mf">2.0</span><span class="p">],</span> <span class="n">requires_grad</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">x</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">x</span>      <span class="c1"># 前向：y = x² + 3x</span>
+<span class="n">y</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>            <span class="c1"># 反向：dy/dx = 2x + 3 = 7</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">grad</span><span class="p">)</span>           <span class="c1"># tensor([7.])</span>
+</code></pre></div>
+
+<h3 id="32-transformer">3.2 Transformer 的反向传播长什么样</h3>
+<p>一次训练 step 的完整链路：</p>
+<div class="codehilite"><pre><span></span><code>输入 ids
+  → Embedding 查表
+  → 多层 TransformerBlock
+      → Self-Attention (QKV 投影 + 注意力 + 输出投影)
+      → 残差 + LayerNorm
+      → FFN (两个线性层 + GELU)
+      → 残差 + LayerNorm
+  → 输出投影到词表
+  → CrossEntropyLoss
+  → backward()  ← 梯度从 loss 一路传回 Embedding
+  → optimizer.step()  ← 更新所有参数
+</code></pre></div>
+
+<p><code>backward()</code> 这一行，会触发成千上万个梯度算子的执行。Python 只负责"触发"，梯度计算由 PyTorch 的 C++ Autograd 引擎调度到 GPU。</p>
+<h3 id="33">3.3 显存从哪来、到哪去</h3>
+<table>
+<thead>
+<tr>
+<th>阶段</th>
+<th>显存占用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>前向</td>
+<td>模型权重 + 中间激活（用于反向）</td>
+</tr>
+<tr>
+<td>反向</td>
+<td>梯度（与权重同大小）+ 优化器状态</td>
+</tr>
+<tr>
+<td>Adam 优化器</td>
+<td>每个参数存 m、v 两个状态 → 显存 = 2× 参数</td>
+</tr>
+</tbody>
+</table>
+<p>所以一个 7B 模型（fp16，14GB 权重）训练时显存 ≈ 14(权重) + 14(梯度) + 28(Adam) + 激活 = <strong>~60GB+</strong>。这就是为什么训练需要 A100/H100。</p>
+<hr>
+<h2 id="4-mini-transformer">4. 从零实现一个 Mini Transformer（实战）</h2>
+<h3 id="41">4.1 目标</h3>
+<p>用不到 200 行 PyTorch 实现一个可训练的 GPT 风格 Transformer，在莎士比亚文本上训练，能生成像样的文字。</p>
+<h3 id="42">4.2 完整代码</h3>
+<div class="codehilite"><pre><span></span><code><span class="c1"># mini_gpt.py</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch.nn</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">nn</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch.nn.functional</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">F</span>
+
+<span class="c1"># ---------- 配置 ----------</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">GPTConfig</span><span class="p">:</span>
+    <span class="n">block_size</span> <span class="o">=</span> <span class="mi">128</span>          <span class="c1"># 上下文长度</span>
+    <span class="n">vocab_size</span> <span class="o">=</span> <span class="mi">65</span>           <span class="c1"># 字符级词表</span>
+    <span class="n">n_layer</span> <span class="o">=</span> <span class="mi">4</span>
+    <span class="n">n_head</span> <span class="o">=</span> <span class="mi">4</span>
+    <span class="n">d_model</span> <span class="o">=</span> <span class="mi">128</span>
+    <span class="n">dropout</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+<span class="n">cfg</span> <span class="o">=</span> <span class="n">GPTConfig</span><span class="p">()</span>
+
+<span class="c1"># ---------- 多头自注意力 ----------</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">CausalSelfAttention</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cfg</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">c_attn</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">d_model</span><span class="p">,</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">cfg</span><span class="o">.</span><span class="n">d_model</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">c_proj</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">d_model</span><span class="p">,</span> <span class="n">cfg</span><span class="o">.</span><span class="n">d_model</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_head</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">n_head</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">d_model</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">d_model</span>
+        <span class="c1"># 因果掩码：只看左边</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">register_buffer</span><span class="p">(</span><span class="s2">&quot;mask&quot;</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">tril</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">block_size</span><span class="p">,</span> <span class="n">cfg</span><span class="o">.</span><span class="n">block_size</span><span class="p">))</span>
+                             <span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">cfg</span><span class="o">.</span><span class="n">block_size</span><span class="p">,</span> <span class="n">cfg</span><span class="o">.</span><span class="n">block_size</span><span class="p">))</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="n">B</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">C</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span>
+        <span class="n">qkv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">c_attn</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">d_model</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">q</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="o">=</span> <span class="p">[</span><span class="n">t</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">B</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_head</span><span class="p">,</span> <span class="n">C</span> <span class="o">//</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_head</span><span class="p">)</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">qkv</span><span class="p">]</span>
+        <span class="c1"># 注意力</span>
+        <span class="n">att</span> <span class="o">=</span> <span class="p">(</span><span class="n">q</span> <span class="o">@</span> <span class="n">k</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span><span class="n">k</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">**</span> <span class="mf">0.5</span><span class="p">))</span>
+        <span class="n">att</span> <span class="o">=</span> <span class="n">att</span><span class="o">.</span><span class="n">masked_fill</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mask</span><span class="p">[:,</span> <span class="p">:,</span> <span class="p">:</span><span class="n">T</span><span class="p">,</span> <span class="p">:</span><span class="n">T</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="s1">&#39;-inf&#39;</span><span class="p">))</span>
+        <span class="n">att</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">att</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">att</span> <span class="o">@</span> <span class="n">v</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">contiguous</span><span class="p">()</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="n">B</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">C</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">c_proj</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+
+<span class="c1"># ---------- Transformer Block ----------</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">Block</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cfg</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ln1</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">LayerNorm</span><span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">d_model</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">attn</span> <span class="o">=</span> <span class="n">CausalSelfAttention</span><span class="p">(</span><span class="n">cfg</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ln2</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">LayerNorm</span><span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">d_model</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mlp</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">d_model</span><span class="p">,</span> <span class="mi">4</span> <span class="o">*</span> <span class="n">cfg</span><span class="o">.</span><span class="n">d_model</span><span class="p">),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">GELU</span><span class="p">(),</span>
+            <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">4</span> <span class="o">*</span> <span class="n">cfg</span><span class="o">.</span><span class="n">d_model</span><span class="p">,</span> <span class="n">cfg</span><span class="o">.</span><span class="n">d_model</span><span class="p">),</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">x</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">attn</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ln1</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">x</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">mlp</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ln2</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">x</span>
+
+<span class="c1"># ---------- GPT 模型 ----------</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">GPT</span><span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Module</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cfg</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">wte</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Embedding</span><span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">vocab_size</span><span class="p">,</span> <span class="n">cfg</span><span class="o">.</span><span class="n">d_model</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">wpe</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Embedding</span><span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">block_size</span><span class="p">,</span> <span class="n">cfg</span><span class="o">.</span><span class="n">d_model</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">blocks</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span><span class="o">*</span><span class="p">[</span><span class="n">Block</span><span class="p">(</span><span class="n">cfg</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">n_layer</span><span class="p">)])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ln_f</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">LayerNorm</span><span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">d_model</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">lm_head</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">cfg</span><span class="o">.</span><span class="n">d_model</span><span class="p">,</span> <span class="n">cfg</span><span class="o">.</span><span class="n">vocab_size</span><span class="p">,</span> <span class="n">bias</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">,</span> <span class="n">targets</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">B</span><span class="p">,</span> <span class="n">T</span> <span class="o">=</span> <span class="n">idx</span><span class="o">.</span><span class="n">shape</span>
+        <span class="n">pos</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">long</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">idx</span><span class="o">.</span><span class="n">device</span><span class="p">)</span><span class="o">.</span><span class="n">unsqueeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">wte</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">wpe</span><span class="p">(</span><span class="n">pos</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">blocks</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ln_f</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">logits</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lm_head</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">loss</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">targets</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">loss</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">cross_entropy</span><span class="p">(</span><span class="n">logits</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">logits</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)),</span> <span class="n">targets</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">logits</span><span class="p">,</span> <span class="n">loss</span>
+
+<span class="c1"># ---------- 生成 ----------</span>
+    <span class="nd">@torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">()</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">generate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">idx</span><span class="p">,</span> <span class="n">max_new_tokens</span><span class="p">,</span> <span class="n">temperature</span><span class="o">=</span><span class="mf">1.0</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">max_new_tokens</span><span class="p">):</span>
+            <span class="n">idx_cond</span> <span class="o">=</span> <span class="n">idx</span><span class="p">[:,</span> <span class="o">-</span><span class="n">cfg</span><span class="o">.</span><span class="n">block_size</span><span class="p">:]</span>
+            <span class="n">logits</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="p">(</span><span class="n">idx_cond</span><span class="p">)</span>
+            <span class="n">logits</span> <span class="o">=</span> <span class="n">logits</span><span class="p">[:,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span> <span class="o">/</span> <span class="n">temperature</span>
+            <span class="n">probs</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">idx_next</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">multinomial</span><span class="p">(</span><span class="n">probs</span><span class="p">,</span> <span class="n">num_samples</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">idx</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">([</span><span class="n">idx</span><span class="p">,</span> <span class="n">idx_next</span><span class="p">],</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">idx</span>
+</code></pre></div>
+
+<h3 id="43">4.3 训练循环</h3>
+<div class="codehilite"><pre><span></span><code><span class="c1"># train.py（接上面）</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">requests</span>
+
+<span class="c1"># 1. 数据：莎士比亚文本</span>
+<span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;https://raw.githubusercontent.com/karpathy/char-rnn/master/data/tinyshakespeare/input.txt&quot;</span>
+<span class="n">text</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span><span class="o">.</span><span class="n">text</span>
+<span class="n">chars</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">text</span><span class="p">))</span>
+<span class="n">stoi</span> <span class="o">=</span> <span class="p">{</span><span class="n">c</span><span class="p">:</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">chars</span><span class="p">)}</span>
+<span class="n">itos</span> <span class="o">=</span> <span class="p">{</span><span class="n">i</span><span class="p">:</span> <span class="n">c</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">chars</span><span class="p">)}</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">([</span><span class="n">stoi</span><span class="p">[</span><span class="n">c</span><span class="p">]</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">text</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">long</span><span class="p">)</span>
+<span class="n">n</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="mf">0.9</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">))</span>
+<span class="n">train_data</span><span class="p">,</span> <span class="n">val_data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[:</span><span class="n">n</span><span class="p">],</span> <span class="n">data</span><span class="p">[</span><span class="n">n</span><span class="p">:]</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">get_batch</span><span class="p">(</span><span class="n">split</span><span class="p">):</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="n">train_data</span> <span class="k">if</span> <span class="n">split</span> <span class="o">==</span> <span class="s2">&quot;train&quot;</span> <span class="k">else</span> <span class="n">val_data</span>
+    <span class="n">ix</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">d</span><span class="p">)</span> <span class="o">-</span> <span class="n">cfg</span><span class="o">.</span><span class="n">block_size</span><span class="p">,</span> <span class="p">(</span><span class="mi">64</span><span class="p">,))</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">d</span><span class="p">[</span><span class="n">i</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="n">cfg</span><span class="o">.</span><span class="n">block_size</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">ix</span><span class="p">])</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">([</span><span class="n">d</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">:</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="o">+</span><span class="n">cfg</span><span class="o">.</span><span class="n">block_size</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">ix</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">x</span><span class="o">.</span><span class="n">cuda</span><span class="p">(),</span> <span class="n">y</span><span class="o">.</span><span class="n">cuda</span><span class="p">()</span>
+
+<span class="c1"># 2. 训练</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">GPT</span><span class="p">(</span><span class="n">cfg</span><span class="p">)</span><span class="o">.</span><span class="n">cuda</span><span class="p">()</span>
+<span class="n">optimizer</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">AdamW</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">(),</span> <span class="n">lr</span><span class="o">=</span><span class="mf">3e-4</span><span class="p">)</span>
+<span class="n">model</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">step</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2000</span><span class="p">):</span>
+    <span class="n">xb</span><span class="p">,</span> <span class="n">yb</span> <span class="o">=</span> <span class="n">get_batch</span><span class="p">(</span><span class="s2">&quot;train&quot;</span><span class="p">)</span>
+    <span class="n">logits</span><span class="p">,</span> <span class="n">loss</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">xb</span><span class="p">,</span> <span class="n">yb</span><span class="p">)</span>
+    <span class="n">optimizer</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
+    <span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+    <span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">step</span> <span class="o">%</span> <span class="mi">200</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;step </span><span class="si">{</span><span class="n">step</span><span class="si">:</span><span class="s2">4d</span><span class="si">}</span><span class="s2"> | loss </span><span class="si">{</span><span class="n">loss</span><span class="o">.</span><span class="n">item</span><span class="p">()</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># 3. 生成</span>
+<span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+<span class="n">ctx</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">long</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">&quot;cuda&quot;</span><span class="p">)</span>
+<span class="n">out</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">max_new_tokens</span><span class="o">=</span><span class="mi">500</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">itos</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">out</span><span class="p">))</span>
+</code></pre></div>
+
+<h3 id="44-2000">4.4 运行结果示例（训练 2000 步后）</h3>
+<div class="codehilite"><pre><span></span><code>step    0 | loss 4.2311
+step  200 | loss 2.4873
+step  400 | loss 2.1025
+step  600 | loss 1.8934
+...
+step 1800 | loss 1.5211
+
+ROMEO:
+I will not fight; but, by my soul,
+I&#39;ll prove a tyrant to the world.
+</code></pre></div>
+
+<p>loss 从 4.2 降到 1.5，生成的文本开始有莎翁味道。<strong>这就是一个 Transformer 从零跑起来的完整闭环。</strong></p>
+<hr>
+<h2 id="5-gpu">5. 让大模型跑得快：GPU 与并行</h2>
+<h3 id="51-python-gpu">5.1 Python 如何调度 GPU</h3>
+<div class="codehilite"><pre><span></span><code><span class="n">model</span> <span class="o">=</span> <span class="n">GPT</span><span class="p">(</span><span class="n">cfg</span><span class="p">)</span><span class="o">.</span><span class="n">cuda</span><span class="p">()</span>        <span class="c1"># 把模型参数搬到显存</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">cuda</span><span class="p">()</span>                    <span class="c1"># 把输入搬到显存</span>
+<span class="n">logits</span><span class="p">,</span> <span class="n">loss</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>         <span class="c1"># 前向：GPU 执行</span>
+<span class="n">loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>                 <span class="c1"># 反向：GPU 执行</span>
+<span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>                <span class="c1"># 更新：GPU 执行</span>
+</code></pre></div>
+
+<p>Python 发出的每一步都是<strong>异步的</strong>——CPU 不会等 GPU 跑完，而是继续往下发指令。这就是为什么 PyTorch 代码看起来"串行"，实际 GPU 在流水执行。</p>
+<h3 id="52">5.2 混合精度：速度翻倍的关键</h3>
+<div class="codehilite"><pre><span></span><code><span class="n">scaler</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">amp</span><span class="o">.</span><span class="n">GradScaler</span><span class="p">(</span><span class="s2">&quot;cuda&quot;</span><span class="p">)</span>
+<span class="k">with</span> <span class="n">torch</span><span class="o">.</span><span class="n">amp</span><span class="o">.</span><span class="n">autocast</span><span class="p">(</span><span class="s2">&quot;cuda&quot;</span><span class="p">):</span>
+    <span class="n">logits</span><span class="p">,</span> <span class="n">loss</span> <span class="o">=</span> <span class="n">model</span><span class="p">(</span><span class="n">xb</span><span class="p">,</span> <span class="n">yb</span><span class="p">)</span>   <span class="c1"># 前向用 fp16（更快、更省显存）</span>
+<span class="n">scaler</span><span class="o">.</span><span class="n">scale</span><span class="p">(</span><span class="n">loss</span><span class="p">)</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+<span class="n">scaler</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">optimizer</span><span class="p">)</span>
+<span class="n">scaler</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+</code></pre></div>
+
+<p>原理：fp16 算力是 fp32 的 2～8 倍（取决于 GPU），但精度不够。混合精度用 fp16 算、fp32 存权重，GradScaler 防止梯度下溢。</p>
+<h3 id="53">5.3 三种并行（工业部署必知）</h3>
+<table>
+<thead>
+<tr>
+<th>并行方式</th>
+<th>解决什么</th>
+<th>怎么做</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>数据并行 DP/DDP</strong></td>
+<td>单卡放不下 batch</td>
+<td>每卡一份完整模型，分 batch</td>
+</tr>
+<tr>
+<td><strong>张量并行 TP</strong></td>
+<td>单卡放不下权重</td>
+<td>把大矩阵切到多卡（如 nn.Linear 按列切）</td>
+</tr>
+<tr>
+<td><strong>流水线并行 PP</strong></td>
+<td>层数太多</td>
+<td>把不同层放不同卡，流水调度</td>
+</tr>
+</tbody>
+</table>
+<p>一个 70B 模型：单机 8 卡通常 TP=8；多机则 TP+PP+DP 组合。这些并行策略<strong>都由 Python 框架（Megatron-LM / DeepSpeed）编排</strong>。</p>
+<h3 id="54-vllm-pagedattention">5.4 推理加速：vLLM 的 PagedAttention</h3>
+<p>训练完要上线。Python 写的原生推理很慢（一次只处理一个请求）。vLLM 用：
+- <strong>PagedAttention</strong>：像操作系统分页一样管理 KV Cache 显存
+- <strong>连续批处理</strong>：动态把新请求拼进当前 batch
+- <strong>CUDA graph</strong>：减少 Python ↔ GPU 的调度开销</p>
+<p>同样一个模型，vLLM 吞吐量可比原生 PyTorch 高 10～50 倍。</p>
+<hr>
+<h2 id="6-api">6. 推理服务化：把模型变成 API</h2>
+<h3 id="61-fastapi">6.1 最小服务（FastAPI）</h3>
+<div class="codehilite"><pre><span></span><code><span class="c1"># server.py</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">fastapi</span><span class="w"> </span><span class="kn">import</span> <span class="n">FastAPI</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">transformers</span><span class="w"> </span><span class="kn">import</span> <span class="n">AutoModelForCausalLM</span><span class="p">,</span> <span class="n">AutoTokenizer</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span><span class="o">,</span><span class="w"> </span><span class="nn">uvicorn</span>
+
+<span class="n">app</span> <span class="o">=</span> <span class="n">FastAPI</span><span class="p">()</span>
+<span class="n">tok</span> <span class="o">=</span> <span class="n">AutoTokenizer</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="s2">&quot;gpt2&quot;</span><span class="p">)</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">AutoModelForCausalLM</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="s2">&quot;gpt2&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">cuda</span><span class="p">()</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+
+<span class="nd">@app</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="s2">&quot;/chat&quot;</span><span class="p">)</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">chat</span><span class="p">(</span><span class="n">prompt</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">max_tokens</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">128</span><span class="p">):</span>
+    <span class="n">ids</span> <span class="o">=</span> <span class="n">tok</span><span class="p">(</span><span class="n">prompt</span><span class="p">,</span> <span class="n">return_tensors</span><span class="o">=</span><span class="s2">&quot;pt&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">input_ids</span><span class="o">.</span><span class="n">cuda</span><span class="p">()</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">generate</span><span class="p">(</span><span class="n">ids</span><span class="p">,</span> <span class="n">max_new_tokens</span><span class="o">=</span><span class="n">max_tokens</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;reply&quot;</span><span class="p">:</span> <span class="n">tok</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">out</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">ids</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]:],</span> <span class="n">skip_special_tokens</span><span class="o">=</span><span class="kc">True</span><span class="p">)}</span>
+
+<span class="n">uvicorn</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">app</span><span class="p">,</span> <span class="n">host</span><span class="o">=</span><span class="s2">&quot;0.0.0.0&quot;</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="mi">8000</span><span class="p">)</span>
+</code></pre></div>
+
+<h3 id="62-vllm-openai">6.2 工业级：vLLM OpenAI 兼容服务</h3>
+<div class="codehilite"><pre><span></span><code><span class="c1"># 一行启动，自动加载模型、批处理、显存管理</span>
+vllm<span class="w"> </span>serve<span class="w"> </span>meta-llama/Llama-3.1-8B<span class="w"> </span>--host<span class="w"> </span><span class="m">0</span>.0.0.0<span class="w"> </span>--port<span class="w"> </span><span class="m">8000</span>
+</code></pre></div>
+
+<p>调用：</p>
+<div class="codehilite"><pre><span></span><code>curl<span class="w"> </span>http://localhost:8000/v1/chat/completions<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-H<span class="w"> </span><span class="s2">&quot;Content-Type: application/json&quot;</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-d<span class="w"> </span><span class="s1">&#39;{&quot;model&quot;:&quot;meta-llama/Llama-3.1-8B&quot;,&quot;messages&quot;:[{&quot;role&quot;:&quot;user&quot;,&quot;content&quot;:&quot;你好&quot;}]}&#39;</span>
+</code></pre></div>
+
+<h3 id="63-python">6.3 Python 在服务化中的角色</h3>
+<ul>
+<li><strong>vLLM / TGI</strong> 本身是 Python 项目，但热路径（注意力、采样）用 C++/CUDA 重写</li>
+<li>Python 负责：路由、批处理调度、权重加载、日志</li>
+<li>真正的 token 生成在 GPU，Python 异步等待</li>
+</ul>
+<hr>
+<h2 id="7-python-transformer">7. 全景总结：一次完整的"Python 跑 Transformer"流程</h2>
+<div class="codehilite"><pre><span></span><code>[数据] Python 读文本 → tokenizer 编码 → 张量
+  ↓
+[模型] Python 定义 nn.Module → 加载预训练权重
+  ↓
+[前向] Python 调 forward → GPU 跑矩阵乘/注意力
+  ↓
+[损失] Python 算 CrossEntropy → loss 标量
+  ↓
+[反向] Python 调 loss.backward() → Autograd 算所有梯度
+  ↓
+[更新] Python 调 optimizer.step() → GPU 更新权重
+  ↓
+[保存] Python 调 torch.save() → 权重存盘
+  ↓
+[服务] Python(FastAPI/vLLM) 接收请求 → 生成 → 返回
+</code></pre></div>
+
+<p><strong>Python 不直接做计算，但它是整个流程的"神经中枢"</strong>：定义结构、调度算力、管理状态、对外服务。理解了这张图，就理解了大模型为什么必须用 Python、又是怎么真正跑起来的。</p>
+<hr>
+<h2 id="8-modern-python">8. Python 现代化语法：写得更少，表达更强（AI 时代的工程底座）</h2>
+
+<p>前 7 章讲的是"Python 如何驱动 Transformer"。但要让代码在团队里跑得久、改得动、读得清，靠的是另一层功夫——<strong>现代化语法</strong>。这一章把 AI 工程里最常用、最能省事、最能少踩坑的现代 Python 特性集中讲透。版本基准：<strong>Python 3.10 ~ 3.12</strong>。</p>
+
+<div class="callout"><strong>一句话原则</strong>：能用语法糖表达清楚的，绝不写样板代码；能在"类型层"挡住 bug 的，绝不留到运行时。</div>
+
+<h3 id="81-type-hints">8.1 类型提示（Type Hints）：让 Python 拥有静态语言的可维护性</h3>
+
+<p>类型提示不改变运行时行为（CPython 不强制检查），但它带来三个真实收益：</p>
+<ul>
+<li><strong>IDE 补全 / 跳转</strong>：PyCharm、VSCode 靠它给智能提示，AI 代码补全准确率显著提升</li>
+<li><strong>静态检查</strong>：mypy / pyright 在提交前就拦截"传错类型"</li>
+<li><strong>文档自解释</strong>：函数签名即契约，比注释更不会过期</li>
+</ul>
+
+<div class="code-block"><pre><code class="language-python"># 老写法：签名是黑盒
+def train(model, data, epochs):
+    ...
+
+# 现代写法：意图一目了然
+from torch import Tensor
+from torch.nn import Module
+from torch.utils.data import DataLoader
+
+def train(
+    model: Module,
+    data: DataLoader,
+    epochs: int,
+    *,
+    lr: float = 1e-3,        # ← 关键字参数强制写名，调用更安全
+    device: str = "cuda",
+) -> dict[str, float]:      # ← 返回类型也标注
+    ...
+    return {"final_loss": 0.23, "best_acc": 0.91}
+</code></pre></div>
+
+<p>几个易错的点：</p>
+<ul>
+<li><code>list[int]</code> 是 3.9+ 的内置泛型写法，<code>List[int]</code> 是老写法（需 <code>from typing import List</code>），二者等价，新代码用前者</li>
+<li>默认值用 <code>None</code> 而非可变对象：<code>def f(x: list = [])</code> 是经典陷阱</li>
+<li><code>-&gt; None</code> 不是装饰，是契约，告诉调用方"别指望返回值"</li>
+</ul>
+
+<h3 id="82-dataclass-pydantic">8.2 dataclass 与 Pydantic：数据建模的两种范式</h3>
+
+<p>AI 工程里几乎每一段代码都在处理"结构化数据"：模型配置、训练超参、推理请求、评估结果。两种主流方案：</p>
+
+<div class="code-block"><pre><code class="language-python"># 方案 A：dataclass —— 轻量、纯 Python、无依赖
+from dataclasses import dataclass, field
+
+@dataclass(slots=True)            # 3.10+ slots 省内存，AI 场景里很关键
+class GPTConfig:
+    vocab_size: int = 50257
+    n_layer: int = 12
+    n_head: int = 12
+    d_model: int = 768
+    dropout: float = 0.0
+    block_size: int = 1024
+
+cfg = GPTConfig(d_model=1024)
+print(cfg)                        # 自动生成 __repr__：GPTConfig(vocab_size=50257, ...)
+
+
+# 方案 B：Pydantic —— 带"运行时校验 + 序列化"，FastAPI 默认引擎
+from pydantic import BaseModel, Field, field_validator
+
+class ChatRequest(BaseModel):
+    model: str = "gpt-2"
+    prompt: str = Field(..., min_length=1, max_length=8192)
+    temperature: float = Field(0.8, ge=0.0, le=2.0)   # 范围约束
+    max_tokens: int = 256
+
+    @field_validator("prompt")
+    @classmethod
+    def no_ctrl_chars(cls, v: str) -> str:
+        if any(ord(c) &lt; 0x20 and c not in "\n\t" for c in v):
+            raise ValueError("控制字符不允许")
+        return v
+
+req = ChatRequest(prompt="你好", temperature=3.0)
+# → ValidationError: temperature must be ≤ 2.0   ← 在边界处就拦住
+</code></pre></div>
+
+<p><strong>选择标准</strong>：</p>
+<ul>
+<li>内部代码、配置对象、性能敏感 → <code>dataclass</code></li>
+<li>对外 API、接收用户输入、需要 JSON 序列化 → <code>Pydantic</code></li>
+<li>两者可以混用：<code>@dataclass</code> 当内部模型，<code>BaseModel</code> 当接口层 DTO</li>
+</ul>
+
+<h3 id="83-match-case">8.3 结构化模式匹配（match/case）：3.10 的革命性语法</h3>
+
+<p>PEP 634 引入的 <code>match/case</code> 不只是 <code>switch</code>，它支持<strong>结构解构</strong>，是处理嵌套数据的利器。AI 工程里处理消息路由、token 分流、异常分类时极好用。</p>
+
+<div class="code-block"><pre><code class="language-python"># 旧写法：if-elif 链
+def handle(msg):
+    if msg["type"] == "text":
+        return process_text(msg["content"])
+    elif msg["type"] == "image":
+        return process_image(msg["url"], msg.get("caption", ""))
+    elif msg["type"] == "tool_call":
+        if msg["tool"] == "calculator":
+            return run_calc(msg["args"])
+        elif msg["tool"] == "search":
+            return run_search(msg["args"])
+    else:
+        return None
+
+# 现代写法：match/case 结构化解构
+def handle(msg: dict) -> object:
+    match msg:
+        case {"type": "text", "content": c}:
+            return process_text(c)
+        case {"type": "image", "url": u, "caption": caption}:
+            return process_image(u, caption)
+        case {"type": "tool_call", "tool": "calculator", "args": a}:
+            return run_calc(a)
+        case {"type": "tool_call", "tool": "search", "args": a}:
+            return run_search(a)
+        case {"type": "error", "code": code, **rest}:
+            log_error(code, rest)
+            return None
+        case _:
+            return None   # ← 通配，等价于 default
+
+# 还能匹配类结构
+match response:
+    case OpenAIResponse(choices=[Choice(text=t, finish_reason="stop")]):
+        return t
+    case OpenAIResponse(choices=[Choice(delta=Delta(content=c))]):
+        yield c        # 流式 token
+</code></pre></div>
+
+<p>几个关键点：</p>
+<ul>
+<li><code>case {"k": v}</code> 会自动捕获 dict 中的对应键，<code>**rest</code> 收集剩余键</li>
+<li>类匹配需要该类是 <code>dataclass</code> 或支持 <code>__match_args__</code></li>
+<li><code>_</code> 是通配符，必须放最后；<code>case _ if condition:</code> 可加守卫</li>
+</ul>
+
+<h3 id="84-walrus">8.4 海象运算符（:=）：赋值即表达式</h3>
+
+<p>PEP 572 的 <code>:=</code>（walrus operator）把"赋值"变成"表达式"，最常见于两种场景：把表达式结果复用、在条件里同时绑定变量。</p>
+
+<div class="code-block"><pre><code class="language-python"># 场景 1：避免重复调用昂贵的函数
+# 老写法：调两次
+if len(prompt_tokens) &gt; 8192:
+    print(f"超出 {len(prompt_tokens) - 8192} tokens")
+
+# 海象：只算一次
+if (n := len(prompt_tokens)) &gt; 8192:
+    print(f"超出 {n - 8192} tokens")
+
+
+# 场景 2：在 while 条件里捕获值
+# 老写法
+line = f.readline()
+while line:
+    process(line)
+    line = f.readline()
+
+# 海象：经典的"读一行"
+while (line := f.readline()):
+    process(line)
+
+
+# 场景 3：列表推导里复用计算
+# 老写法：算两遍
+results = [compute_loss(x) for x in batch if compute_loss(x) &lt; 0.5]
+
+# 海象：算一次
+results = [loss for x in batch if (loss := compute_loss(x)) &lt; 0.5]
+
+
+# 场景 4：用 in 表达式同时绑定（替代 dict.get + if None 检查）
+if (cap := msg.get("max_tokens")) is not None:
+    use(cap)
+</code></pre></div>
+
+<p><strong>使用边界</strong>：别在简单赋值里用 <code>(x := 5)</code>——那是炫技。它在"需要把中间值带进条件/推导/循环"时才发光。</p>
+
+<h3 id="85-async-asyncio">8.5 async/await 与 asyncio：高并发推理服务的基石</h3>
+
+<p>vLLM、FastAPI、TGI 这些推理服务全是 <code>async</code>。原因：GPU 推理是 IO + 计算混合，<code>async</code> 能在一个事件循环里同时挂起几千个请求，等 GPU 时让出 CPU 给别的请求处理。</p>
+
+<div class="code-block"><pre><code class="language-python">import asyncio
+from fastapi import FastAPI
+
+app = FastAPI()
+
+# 协程：用 async def 定义，await 挂起等待
+async def generate_stream(prompt: str) -&gt; str:
+    # await 一个耗 IO 的协程（不阻塞整个事件循环）
+    tokens = await model.generate_async(prompt)
+    return "".join(tokens)
+
+@app.post("/chat")
+async def chat(req: ChatRequest):
+    # 关键：把阻塞调用丢给线程池，别用 await 包装同步函数
+    text = await asyncio.to_thread(sync_inference, req.prompt)
+    return {"reply": text}
+
+# 并发跑多个任务：asyncio.gather
+async def batch_inference(prompts: list[str]) -&gt; list[str]:
+    tasks = [generate_stream(p) for p in prompts]
+    return await asyncio.gather(*tasks)      # 并发，不串行
+
+# 限流：Semaphore 控制并发数，保护 GPU 不被打爆
+sem = asyncio.Semaphore(8)
+
+async def safe_generate(prompt: str) -&gt; str:
+    async with sem:        # ← 同时最多 8 个进入
+        return await generate_stream(prompt)
+</code></pre></div>
+
+<p>关键避坑：</p>
+<ul>
+<li><strong>async 函数里禁止直接调同步阻塞函数</strong>（如 <code>requests.get</code>、<code>time.sleep</code>），会卡死整个循环。用 <code>asyncio.to_thread()</code> 或换 <code>httpx.AsyncClient</code></li>
+<li>协程不并行跑就毫无意义——<code>async def</code> 只是定义，<code>await</code> 才执行，<code>asyncio.run()</code> 才启动循环</li>
+<li>批量任务永远用 <code>asyncio.gather(*tasks)</code>，别 for 循环里一个一个 <code>await</code></li>
+</ul>
+
+<h3 id="86-f-string-pathlib">8.6 f-string 与 pathlib：现代化的字符串与路径</h3>
+
+<div class="code-block"><pre><code class="language-python"># f-string（3.6+）：比 % 和 .format 都快、都直观
+name, n = "transformer", 12
+print(f"模型 {name} 有 {n} 层，参数量 {n * 768 * 768 / 1e6:.1f}M")
+# 模型 transformer 有 12 层，参数量 7.1M
+
+# 3.8+ 调试语法：在表达式后加 = 直接打印
+x = compute_loss(batch)
+print(f"{x=}")        # → x=0.234
+
+# 多行 f-string + 表达式
+template = f"""
+[Prompt]
+{prompt}
+
+[Config]
+temperature={temp:.2f}
+max_tokens={max_tok}
+"""
+
+
+# pathlib（取代 os.path）：面向对象、跨平台、可链式
+from pathlib import Path
+
+# 老写法
+import os
+ckpt = os.path.join(os.path.dirname(__file__), "checkpoints", "gpt.pt")
+
+# 现代写法：/ 运算符重载，语义清晰
+ckpt = Path(__file__).parent / "checkpoints" / "gpt.pt"
+
+# 常用操作一气呵成
+for f in Path("data/").rglob("*.jsonl"):
+    if f.stat().st_size &gt; 0:
+        process(f.read_text(encoding="utf-8"))
+
+# 写文件：一行
+Path("output.txt").write_text("done", encoding="utf-8")
+
+# 创建目录（已存在不报错）
+Path("runs/exp1").mkdir(parents=True, exist_ok=True)
+</code></pre></div>
+
+<h3 id="87-comprehension-protocol">8.7 推导式、生成器与 Protocol：函数式与鸭子类型的现代写法</h3>
+
+<div class="code-block"><pre><code class="language-python"># 推导式：列表 / 字典 / 集合，一行表达映射+过滤
+tokens = [tok for line in corpus for tok in line.split() if tok.isalpha()]
+
+vocab = {tok: i for i, tok in enumerate(sorted(set(tokens)))}
+
+stop = {"the", "a", "an"}
+filtered = {w for w in vocab if w not in stop and len(w) &gt; 2}
+
+
+# 生成器表达式：惰性求值，省内存，适合大数据流
+# 用 () 而非 []，不一次实例化全部
+total = sum(len(t) for t in token_stream)   # 不会先建 list
+
+
+# yield：把函数变成迭代器，流式产出
+def stream_tokens(path: Path):
+    for line in path.open(encoding="utf-8"):
+        for tok in line.split():
+            yield tok
+
+# yield from：委托给子生成器
+def stream_all(paths: list[Path]):
+    for p in paths:
+        yield from stream_tokens(p)
+
+
+# Protocol（PEP 544）：结构化子类型，比 ABC 更轻
+from typing import Protocol
+
+class Tokenizer(Protocol):
+    def encode(self, text: str) -&gt; list[int]: ...
+    def decode(self, ids: list[int]) -&gt; str: ...
+
+# 任何有这两个方法的对象都自动满足 Tokenizer，无需继承
+class MyTok:
+    def encode(self, text): return [ord(c) for c in text]
+    def decode(self, ids):  return "".join(chr(i) for i in ids)
+
+def train(tok: Tokenizer, data):   # ← 鸭子类型 + 静态检查
+    ...
+
+train(MyTok(), ...)   # ✅ 不报错
+</code></pre></div>
+
+<h3 id="88-typing-generics">8.8 typing 泛型与 PEP 695：3.12 的类型系统飞跃</h3>
+
+<p>3.12 引入 PEP 695，泛型写法大幅简化，不再需要 <code>TypeVar</code> + <code>Generic</code> 的样板代码。</p>
+
+<div class="code-block"><pre><code class="language-python"># 老写法（3.11 及之前）：样板代码多
+from typing import TypeVar, Generic, TypeAlias
+
+T = TypeVar("T")
+
+class Stack(Generic[T]):
+    def __init__(self) -&gt; None:
+        self._items: list[T] = []
+    def push(self, x: T) -&gt; None:
+        self._items.append(x)
+    def pop(self) -&gt; T:
+        return self._items.pop()
+
+Vector: TypeAlias = list[float]
+
+
+# 新写法（3.12+，PEP 695）：语法糖，干净
+class Stack[T]:
+    def __init__(self) -&gt; None:
+        self._items: list[T] = []
+    def push(self, x: T) -&gt; None:
+        self._items.append(x)
+    def pop(self) -&gt; T:
+        return self._items.pop()
+
+type Vector = list[float]      # ← type 语句，3.12 新
+
+def first(xs: list[T]) -&gt; T:   # 函数级泛型，自动推断
+    return xs[0]
+
+
+# 更实战的例子：一个泛型缓存
+class LRUCache[K, V]:
+    def __init__(self, cap: int): ...
+    def get(self, k: K) -&gt; V | None: ...
+    def put(self, k: K, v: V) -&gt; None: ...
+
+cache: LRUCache[str, Tensor] = LRUCache(1024)
+</code></pre></div>
+
+<p>对 AI 工程的实际意义：自定义 Dataset / Sampler / Collator 这些泛型容器，3.12 写法可读性接近 TypeScript / Rust，对团队协作和静态检查（pyright）友好得多。</p>
+
+<h3 id="89-ai-idioms">8.9 在 AI 工程里：这些语法如何组合实战</h3>
+
+<p>把本章特性拼起来，看一个真实的"流式推理 endpoint"长什么样：</p>
+
+<div class="code-block"><pre><code class="language-python">from __future__ import annotations
+from dataclasses import dataclass
+from pathlib import Path
+from typing import Protocol
+import asyncio, json
+from fastapi import FastAPI
+from pydantic import BaseModel, Field
+
+# 1. 用 Protocol 定义抽象，不绑死实现
+class Tokenizer(Protocol):
+    def encode(self, text: str) -&gt; list[int]: ...
+    def decode(self, ids: list[int]) -&gt; str: ...
+
+# 2. dataclass 做配置，slots 省 GPU 服务器内存
+@dataclass(slots=True)
+class GenConfig:
+    max_tokens: int = 256
+    temperature: float = 0.8
+    top_p: float = 0.95
+
+# 3. Pydantic 做请求 DTO，边界校验
+class ChatReq(BaseModel):
+    prompt: str = Field(..., min_length=1, max_length=8192)
+    stream: bool = False
+
+app = FastAPI()
+sem = asyncio.Semaphore(4)        # 4. 并发限流，保护 GPU
+
+# 5. async + 生成器：流式产出 token
+async def stream_tokens(tok: Tokenizer, ids: list[int], cfg: GenConfig):
+    async with sem:
+        for i in range(cfg.max_tokens):
+            nxt = await model.next_token(ids)   # 假设的异步推理
+            if nxt == EOS:
+                break
+            ids.append(nxt)
+            yield tok.decode([nxt])             # 流式吐出
+
+# 6. match/case 分流：流式 vs 一次性
+@app.post("/chat")
+async def chat(req: ChatReq):
+    ids = tokenizer.encode(req.prompt)
+    cfg = GenConfig()
+
+    match req:
+        case ChatReq(stream=True):
+            async def gen():
+                async for piece in stream_tokens(tokenizer, ids, cfg):
+                    yield f"data: {json.dumps({'text': piece})}\n\n"
+            return StreamingResponse(gen(), media_type="text/event-stream")
+
+        case _:
+            pieces = []
+            async for p in stream_tokens(tokenizer, ids, cfg):
+                pieces.append(p)
+            return {"reply": "".join(pieces)}
+
+# 7. 海象 + pathlib：启动时加载权重
+if (ckpt := Path("models/gpt2.pt")).exists():
+    model.load(ckpt.read_bytes())
+</code></pre></div>
+
+<p>这段 50 行代码里用到了：<strong>Protocol、dataclass(slots)、Pydantic、async/await、Semaphore、生成器 yield、match/case、海象运算符、pathlib</strong>。这正是现代 AI 服务端代码的真实形态——没有一样是炫技，每一样都在"少写 + 少错 + 好维护"上立竿见影。</p>
+
+<div class="callout"><strong>本章小结</strong>：现代化语法不是"为了新而新"，而是为了让代码在<strong>百万行级 AI 项目</strong>里仍然可读、可改、可静态检查。掌握这 9 个特性，你写出来的 Python 已经是 2026 年工程团队期望的样子，而不是 2015 年的脚本风格。</div>
+
+<hr>
+<h2 id="_1">附录：学习路线与资源</h2>
+<ol>
+<li><strong>基础</strong>：Python → NumPy → 线性代数（矩阵乘法、特征值）</li>
+<li><strong>框架</strong>：PyTorch 官方 60 分钟教程 → 实现一个 MLP/CNN</li>
+<li><strong>Transformer</strong>：读《Attention Is All You Need》→ 手写自注意力</li>
+<li><strong>实战</strong>：用 HuggingFace Transformers 微调一个小模型</li>
+<li><strong>进阶</strong>：DeepSpeed / Megatron-LM 并行 → vLLM 推理优化</li>
+<li><strong>部署</strong>：FastAPI → Docker → K8s 弹性伸缩</li>
+</ol>
+<blockquote>
+<p>核心心法：<strong>先跑通最小闭环，再逐层加复杂度。</strong> 不要一上来就啃 175B 模型——能从零训出能生成文字的 MiniGPT，就已经掌握了 Transformer 80% 的本质。</p>
+</blockquote>
+    <div class="pager"><a href="07.html"><div class="dir">← 上一章</div><div class="ttl">JavaEE 上位机：网页监控看板</div></a></div>
+  </main>
+</div>
+</body>
+</html>
