@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>02 Java 与 SQL 数据库深度融合 · Java · SQL · Python AI 教程</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<header class="topnav">
+  <div class="brand">Java · SQL · Python AI 教程<small>从原理到实战</small></div>
+  <nav><a href="01.html" class="">01 JavaSE 基础知</a><a href="02.html" class="active">02 Java 与 SQL</a><a href="03.html" class="">03 SQL 数据库深度讲</a><a href="04.html" class="">04 学习报告：Java </a><a href="05.html" class="">05 JavaEE 企业级</a><a href="06.html" class="">06 Java 上位机开发</a><a href="07.html" class="">07 JavaEE 上位机</a><a href="08.html" class="">08 Python 与 A</a></nav>
+  <a class="src" href="https://github.com/user-unknowed/studying-for-building" target="_blank">📦 源码仓库</a>
+</header>
+<div class="layout">
+  <aside class="sidebar">
+    <h4>本节目录</h4>
+    <ul><ul>
+<li><a href="#0">0. 先回答一个灵魂问题：为什么需要"两个东西"？</a></li>
+<li><a href="#1">1. 分工模型：大脑与仓库</a></li>
+<li><a href="#2-jdbcjava-database-connectivity">2. 桥：JDBC（Java Database Connectivity）</a></li>
+<li><a href="#3-orm">3. 映射：表 ↔ 对象（ORM 的起源）</a></li>
+<li><a href="#4-sql-step2">4. 安全：SQL 注入（Step2 真实攻击演示）</a></li>
+<li><a href="#5-step3">5. 一致性：事务（Step3 真实转账演示）</a></li>
+<li><a href="#6-step4">6. 效率：批处理与"落盘合并"（Step4 真实实测）</a></li>
+<li><a href="#7">7. 持久化：数据不属于任何程序</a></li>
+<li><a href="#8-jdbc-mybatis">8. 从 JDBC 到 MyBatis：工业上究竟怎么写</a></li>
+<li><a href="#9">9. 完整心智模型（一句话总结全课）</a></li>
+<li><a href="#10">10. 练习建议（改代码玩，从易到难）</a></li>
+<li><a href="#_1">附录：配套文件与运行方式</a></li>
+</ul></ul>
+  </aside>
+  <main class="content">
+    <div class="meta" style="color:#0ea5e9;font-weight:600">第 02 章 · 🔗</div>
+    <h1 style="border-bottom:3px solid #0ea5e9;padding-bottom:10px">Java 与 SQL 数据库深度融合</h1>
+    <div class="meta">JDBC · SQL 注入攻防 · 事务转账 · 批处理性能</div>
+    <h1 id="java-sql">Java 与 SQL 数据库 · 深度融合教学</h1>
+<blockquote>
+<p>目标：深刻理解 Java 和 SQL 数据库<strong>各自的意义</strong>、以及它们<strong>如何配合</strong>变成一个系统。
+全部代码已在工作区真实编译运行（<code>java-sql-demo/</code>），本文引用的是<strong>真实运行结果</strong>。
+整理：Operit AI ｜ 2026-09</p>
+</blockquote>
+<hr>
+<h2 id="0">0. 先回答一个灵魂问题：为什么需要"两个东西"？</h2>
+<p><strong>假设只有 Java，没有数据库：</strong>
+- 数据存在内存里 → 进程一停，数据全丢（没有持久化）；
+- 多用户同时改同一条数据 → 互相覆盖（没有并发控制）；
+- 想查"余额大于 1000 的客户按地区分组统计" → 手写几百行循环代码（没有声明式集合运算）。</p>
+<p><strong>假设只有数据库，没有 Java：</strong>
+- 业务规则无法优雅表达（积分怎么算？风控怎么判？）；
+- 无法对接界面、网络协议、第三方系统；
+- 没有面向对象、没有生态。</p>
+<p><strong>结论：</strong></p>
+<blockquote>
+<p>Java 管"怎么做业务"，数据库管"怎么守住数据"。
+两者分工协作，<strong>契约是 SQL + 事务</strong>。</p>
+</blockquote>
+<hr>
+<h2 id="1">1. 分工模型：大脑与仓库</h2>
+<table>
+<thead>
+<tr>
+<th>维度</th>
+<th>Java（应用层）</th>
+<th>SQL 数据库（数据层）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>管什么</td>
+<td>业务流程、规则判断、交互</td>
+<td>数据的存储、索引、并发、事务</td>
+</tr>
+<tr>
+<td>擅长</td>
+<td>面向对象、复杂逻辑、生态</td>
+<td>集合运算、持久化、一致性保证</td>
+</tr>
+<tr>
+<td>生命周期</td>
+<td>进程级（可重启、可多实例）</td>
+<td>数据级（比应用活得长）</td>
+</tr>
+<tr>
+<td>故障后果</td>
+<td>服务暂时不可用，数据没事</td>
+<td>数据损坏/丢失，灾难性</td>
+</tr>
+<tr>
+<td>一句话</td>
+<td>"怎么做事"</td>
+<td>"记住事实，并且不乱"</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="2-jdbcjava-database-connectivity">2. 桥：JDBC（Java Database Connectivity）</h2>
+<ul>
+<li>1997 年诞生，至今仍是 <strong>Java 访问一切数据库的底座</strong>；</li>
+<li><strong>面向接口编程的教科书案例</strong>：Java 代码只依赖 <code>java.sql.*</code> 接口，数据库厂商提供"驱动"实现；</li>
+<li>数据流向：</li>
+</ul>
+<div class="codehilite"><pre><span></span><code>Java 程序 → JDBC API → 驱动(jar包) → 数据库协议 → 数据库内核
+</code></pre></div>
+
+<ul>
+<li>JDBC URL 的格式（换数据库只改 URL 和驱动）：</li>
+<li><code>jdbc:mysql://host:3306/db</code></li>
+<li><code>jdbc:postgresql://host:5432/db</code></li>
+<li><code>jdbc:sqlite:data/bank.db</code></li>
+</ul>
+<p><strong>JDBC 六步</strong>（Step1 完整演示）：</p>
+<div class="codehilite"><pre><span></span><code><span class="n">Class</span><span class="p">.</span><span class="na">forName</span><span class="p">(</span><span class="s">&quot;org.sqlite.JDBC&quot;</span><span class="p">);</span><span class="w">                 </span><span class="c1">// 1. 加载驱动</span>
+<span class="k">try</span><span class="w"> </span><span class="p">(</span><span class="n">Connection</span><span class="w"> </span><span class="n">conn</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">DriverManager</span><span class="p">.</span><span class="na">getConnection</span><span class="p">(</span><span class="n">url</span><span class="p">))</span><span class="w"> </span><span class="p">{</span><span class="w">   </span><span class="c1">// 2. 建立连接</span>
+<span class="w">    </span><span class="n">PreparedStatement</span><span class="w"> </span><span class="n">ps</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">conn</span><span class="p">.</span><span class="na">prepareStatement</span><span class="p">(</span><span class="w">            </span><span class="c1">// 3. 创建语句对象</span>
+<span class="w">        </span><span class="s">&quot;INSERT INTO account(owner, balance) VALUES (?, ?)&quot;</span><span class="p">);</span>
+<span class="w">    </span><span class="n">ps</span><span class="p">.</span><span class="na">setString</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;张三&quot;</span><span class="p">);</span><span class="w">                                  </span><span class="c1">// 4. 绑定参数并执行</span>
+<span class="w">    </span><span class="n">ps</span><span class="p">.</span><span class="na">executeUpdate</span><span class="p">();</span>
+<span class="w">    </span><span class="n">ResultSet</span><span class="w"> </span><span class="n">rs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ps</span><span class="p">.</span><span class="na">executeQuery</span><span class="p">(</span><span class="s">&quot;SELECT * FROM account&quot;</span><span class="p">);</span><span class="w"> </span><span class="c1">// 5. 处理结果集</span>
+<span class="w">    </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">rs</span><span class="p">.</span><span class="na">next</span><span class="p">())</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="p">}</span>
+<span class="p">}</span><span class="w">                                                            </span><span class="c1">// 6. 自动关闭资源</span>
+</code></pre></div>
+
+<hr>
+<h2 id="3-orm">3. 映射：表 ↔ 对象（ORM 的起源）</h2>
+<p>这是理解 Java 与数据库关系的<strong>核心心智模型</strong>：</p>
+<div class="codehilite"><pre><span></span><code>数据库的表      &lt;===&gt;  Java 的类
+表中的一行      &lt;===&gt;  类的一个对象
+表中的一列      &lt;===&gt;  对象的字段
+外键引用        &lt;===&gt;  对象引用
+</code></pre></div>
+
+<p>Step1 真实运行结果——<code>ResultSet</code> 的每一行被"翻译"成 Java 对象：</p>
+<div class="codehilite"><pre><span></span><code>[4] SELECT 结果映射为 Java 对象:
+      Account{id=1, owner=&#39;张三&#39;, balance=1000.00}
+      Account{id=2, owner=&#39;李四&#39;, balance=500.00}
+</code></pre></div>
+
+<blockquote>
+<p><strong>阻抗失配（Object-Relational Impedance Mismatch）</strong>：
+对象有继承、引用、多态；关系表只有扁平的二维结构。
+这个"缝隙"就是 ORM 框架（MyBatis / Hibernate）存在的意义。</p>
+</blockquote>
+<hr>
+<h2 id="4-sql-step2">4. 安全：SQL 注入（Step2 真实攻击演示）</h2>
+<p><strong>原理</strong>：字符串拼接 SQL，让用户的"输入数据"越界成了"代码"。</p>
+<p>真实攻击结果（[危险] 字符串拼接写法）：</p>
+<div class="codehilite"><pre><span></span><code>输入: &#39; OR &#39;1&#39;=&#39;1
+SQL:  SELECT owner, balance FROM account WHERE owner = &#39;&#39; OR &#39;1&#39;=&#39;1&#39;
+     查到 → 张三, 余额 1000.0     ← 全表数据泄露！
+     查到 → 李四, 余额 500.0
+</code></pre></div>
+
+<p>同样这个输入，在 [安全] PreparedStatement 写法下：</p>
+<div class="codehilite"><pre><span></span><code>SQL: SELECT owner, balance FROM account WHERE owner = ?   (参数: &#39; OR &#39;1&#39;=&#39;1)
+     共 0 条                     ← 攻击字符串只是普通字符，毫无破坏力
+</code></pre></div>
+
+<p><strong>为什么预编译能免疫？</strong></p>
+<blockquote>
+<p>预编译让"SQL 结构"先定型上膛，参数永远是"子弹"——无论参数长什么样，都不会变成"枪的一部分"。</p>
+</blockquote>
+<p><strong>工业延伸</strong>：MyBatis 的 <code>#{}</code> 就是 PreparedStatement 占位符（安全）；<code>${}</code> 是字符串拼接（危险，仅限动态表名等白名单场景）。学到这里，你就能从原理上解释"为什么面试必问 #{} 和 ${} 的区别"。</p>
+<hr>
+<h2 id="5-step3">5. 一致性：事务（Step3 真实转账演示）</h2>
+<p><strong>场景</strong>：张三转 100 元给李四 = 两条 UPDATE，必须<strong>同生共死</strong>。</p>
+<p><strong>真实运行结果回顾：</strong></p>
+<table>
+<thead>
+<tr>
+<th>场景</th>
+<th>过程</th>
+<th>结果</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>① 正常转账</td>
+<td>扣款 + 收款 → commit</td>
+<td>张三 900 / 李四 600，总资产不变 ✓</td>
+</tr>
+<tr>
+<td>② 收款方不存在 → rollback</td>
+<td>扣款后失败 → 全部回滚</td>
+<td>张三 900 不变，钱没少 ✓</td>
+</tr>
+<tr>
+<td>③ <strong>没有事务</strong>保护</td>
+<td>扣款成功（自动提交）后系统故障</td>
+<td>张三 800，<strong>100 元凭空消失</strong> ✗</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Java 事务标准模板</strong>（工业代码的骨架）：</p>
+<div class="codehilite"><pre><span></span><code><span class="n">conn</span><span class="p">.</span><span class="na">setAutoCommit</span><span class="p">(</span><span class="kc">false</span><span class="p">);</span><span class="w">          </span><span class="c1">// 开启事务</span>
+<span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// ... 扣款 UPDATE ...</span>
+<span class="w">    </span><span class="c1">// ... 收款 UPDATE ...</span>
+<span class="w">    </span><span class="n">conn</span><span class="p">.</span><span class="na">commit</span><span class="p">();</span><span class="w">                  </span><span class="c1">// 全部成功才提交</span>
+<span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">SQLException</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">conn</span><span class="p">.</span><span class="na">rollback</span><span class="p">();</span><span class="w">                </span><span class="c1">// 任何失败全部回滚</span>
+<span class="w">    </span><span class="k">throw</span><span class="w"> </span><span class="n">e</span><span class="p">;</span>
+<span class="p">}</span><span class="w"> </span><span class="k">finally</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">conn</span><span class="p">.</span><span class="na">setAutoCommit</span><span class="p">(</span><span class="kc">true</span><span class="p">);</span><span class="w">       </span><span class="c1">// 恢复默认模式</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p><strong>为什么事务必须由数据库提供？</strong>
+因为只有数据库知道"这两条 UPDATE 是一个整体"——崩溃恢复、并发隔离、锁管理都发生在数据库层，Java 单方面保证不了。</p>
+<p><strong>工业延伸</strong>：Spring 的 <code>@Transactional</code> 注解，本质就是把上面这段模板代码用 AOP 自动包在了方法外面。</p>
+<hr>
+<h2 id="6-step4">6. 效率：批处理与"落盘合并"（Step4 真实实测）</h2>
+<p><strong>1000 条插入，三种写法的真实耗时：</strong></p>
+<table>
+<thead>
+<tr>
+<th>写法</th>
+<th>耗时</th>
+<th>原因</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>(a) 逐条执行</td>
+<td>5324 ms</td>
+<td>每条 autocommit = 一次磁盘 fsync</td>
+</tr>
+<tr>
+<td>(b) 批处理（无事务）</td>
+<td>5045 ms</td>
+<td>网络/接口开销省了，但落盘次数没省</td>
+</tr>
+<tr>
+<td>(c) <strong>批处理 + 事务</strong></td>
+<td><strong>9 ms</strong></td>
+<td>1000 次 fsync 合并成 1 次</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>约 <strong>600 倍</strong> 的差距。这是本次实操最震撼的数字——同样的 Java 代码能力，
+懂不懂数据库的落盘机制，性能天壤之别。</p>
+</blockquote>
+<p><strong>工业标配</strong>：数据导入、日志批量写、ETL，全部使用"批处理 + 事务"。
+（在网络数据库如 MySQL 上，批处理还能额外减少网络往返次数，差距会更明显。）</p>
+<hr>
+<h2 id="7">7. 持久化：数据不属于任何程序</h2>
+<p>Step4 之后，我们用 <strong>Python</strong> 读取了 <strong>Java 写的</strong>数据库文件：</p>
+<div class="codehilite"><pre><span></span><code>== 用 Python 直接读取 Java 写下的数据库文件 ==
+account 表:
+   (1, &#39;张三&#39;, 800.0)
+   (2, &#39;李四&#39;, 600.0)
+tx_log 条数: 1000
+</code></pre></div>
+
+<p><strong>架构直觉</strong>（本课最重要的认知升级）：</p>
+<ul>
+<li>数据库不是"Java 程序的一部分"，而是<strong>独立的一层</strong>；</li>
+<li>Java 进程可以重启、可以多实例、甚至可以换成 Go/Python 重写——<strong>数据安然无恙</strong>；</li>
+<li>所以架构上叫它"<strong>数据层（Data Layer）</strong>"：应用是"租客"，数据是"房子"。</li>
+</ul>
+<hr>
+<h2 id="8-jdbc-mybatis">8. 从 JDBC 到 MyBatis：工业上究竟怎么写</h2>
+<table>
+<thead>
+<tr>
+<th>阶段</th>
+<th>工具</th>
+<th>解决了什么</th>
+<th>新代价</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>手工时代</td>
+<td>JDBC</td>
+<td>能连数据库了</td>
+<td>样板代码多、易写注入</td>
+</tr>
+<tr>
+<td>轻封装</td>
+<td>Spring JdbcTemplate</td>
+<td>消灭样板代码</td>
+<td>SQL 仍散落各处</td>
+</tr>
+<tr>
+<td><strong>半自动 ORM</strong></td>
+<td><strong>MyBatis</strong></td>
+<td>SQL 与 Java 分离、映射自动化</td>
+<td>XML/注解配置</td>
+</tr>
+<tr>
+<td>全自动 ORM</td>
+<td>JPA / Hibernate</td>
+<td>基本不写 SQL</td>
+<td>复杂查询易失控</td>
+</tr>
+<tr>
+<td>增强</td>
+<td>MyBatis-Plus</td>
+<td>单表 CRUD 零 SQL</td>
+<td>只适合简单场景</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>连接池（HikariCP）</strong>：连接是稀缺资源，工业上绝不"用完就关"，而是池化复用；</li>
+<li>学习路径建议：<strong>原理从 JDBC 学起（你已经完成），工程用 MyBatis / MyBatis-Plus，读别人的代码也不怕 JPA</strong>。</li>
+</ul>
+<hr>
+<h2 id="9">9. 完整心智模型（一句话总结全课）</h2>
+<div class="codehilite"><pre><span></span><code>用户请求
+   ↓
+Java 业务逻辑（事务边界、校验、流程）      ← Spring Boot / 你的代码
+   ↓
+JDBC / MyBatis（SQL + 参数）              ← 桥梁：契约是 SQL
+   ↓
+数据库（索引 / 事务 / 锁 / MVCC）          ← MySQL / PostgreSQL / SQLite
+   ↓
+结果集 → Java 对象 → 返回响应
+</code></pre></div>
+
+<blockquote>
+<p>口诀：<strong>Java 管逻辑，库管数据；接口是 SQL，契约是事务。</strong>
+分层各司其职——少了哪一层，都撑不起一个真实系统。</p>
+</blockquote>
+<hr>
+<h2 id="10">10. 练习建议（改代码玩，从易到难）</h2>
+<ol>
+<li><strong>Step1 加功能</strong>：实现 <code>findByName(String name)</code>，返回单个 <code>Account</code> 对象；</li>
+<li><strong>Step3 加业务</strong>：给转账加"余额不足"校验。思考：先 SELECT 查余额再判断，还是直接用
+   <code>UPDATE ... WHERE balance &gt;= ?</code> 让数据库来判？哪个更安全？为什么？</li>
+<li><strong>Step4 改参数</strong>：把 N 改成 10000 再看差距；再试试"只加批处理、去掉事务"验证结论；</li>
+<li><strong>挑战</strong>：用两个线程模拟"同时给同一个人转账"，观察数据库的并发行为；</li>
+<li><strong>进阶</strong>：如果有 MySQL 环境，把 URL 换成 <code>jdbc:mysql://...</code>，体会
+   "换数据库只改一行代码"——这就是 JDBC 抽象层的意义。</li>
+</ol>
+<hr>
+<h2 id="_1">附录：配套文件与运行方式</h2>
+<div class="codehilite"><pre><span></span><code>java-sql-demo/
+├── src/Step1_JdbcBasics.java     # JDBC 六步 + CRUD + 对象映射
+├── src/Step2_SqlInjection.java   # SQL 注入攻防
+├── src/Step3_Transaction.java    # 转账事务
+├── src/Step4_BatchPerf.java      # 批处理性能
+├── lib/sqlite-jdbc.jar           # JDBC 驱动
+├── data/bank.db                  # 真实数据文件（Java 写、Python 可读）
+├── out/                          # 编译产物
+├── README.md                     # 编译运行说明
+└── run_output.txt                # 本次运行输出存档
+</code></pre></div>
+
+<p>运行方式（终端）：</p>
+<div class="codehilite"><pre><span></span><code><span class="nb">cd</span><span class="w"> </span>java-sql-demo
+javac<span class="w"> </span>-encoding<span class="w"> </span>UTF-8<span class="w"> </span>-d<span class="w"> </span>out<span class="w"> </span>-cp<span class="w"> </span>lib/sqlite-jdbc.jar<span class="w"> </span>src/*.java
+java<span class="w"> </span>-Dfile.encoding<span class="o">=</span>UTF-8<span class="w"> </span>-cp<span class="w"> </span><span class="s1">&#39;lib/sqlite-jdbc.jar:out&#39;</span><span class="w"> </span>Step1_JdbcBasics<span class="w"> </span>data/bank.db
+<span class="c1"># ... Step2 / Step3 / Step4 同理</span>
+</code></pre></div>
+
+<p><strong>下一步学习衔接</strong>：MyBatis 实战 → 连接池调优 → Spring Boot + MySQL 整合项目（可随时开讲）。</p>
+    <div class="pager"><a href="01.html"><div class="dir">← 上一章</div><div class="ttl">JavaSE 基础知识点</div></a><a href="03.html" style="text-align:right"><div class="dir">下一章 →</div><div class="ttl">SQL 数据库深度讲解（工业实践版）</div></a></div>
+  </main>
+</div>
+</body>
+</html>
