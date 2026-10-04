@@ -3,13 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>09 华为ICT大赛·网络赛道备赛实战 · Java · SQL · Python AI 教程</title>
+<title>09 华为ICT大赛·云赛道备赛实战 · Java · SQL · Python AI 教程</title>
 <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
 <header class="topnav">
   <div class="brand">Java · SQL · Python AI 教程<small>从原理到实战</small></div>
-  <nav><a href="01.html" class="">01 JavaSE 基础知</a><a href="02.html" class="">02 Java 与 SQL</a><a href="03.html" class="">03 SQL 数据库深度讲</a><a href="04.html" class="">04 学习报告：Java </a><a href="05.html" class="">05 JavaEE 企业级</a><a href="06.html" class="">06 Java 上位机开发</a><a href="07.html" class="">07 JavaEE 上位机</a><a href="08.html" class="">08 Python 与 A</a><a href="09.html" class="active">09 华为ICT大赛·网络</a></nav>
+  <nav><a href="01.html" class="">01 JavaSE 基础知</a><a href="02.html" class="">02 Java 与 SQL</a><a href="03.html" class="">03 SQL 数据库深度讲</a><a href="04.html" class="">04 学习报告：Java </a><a href="05.html" class="">05 JavaEE 企业级</a><a href="06.html" class="">06 Java 上位机开发</a><a href="07.html" class="">07 JavaEE 上位机</a><a href="08.html" class="">08 Python 与 A</a><a href="09.html" class="active">09 华为ICT大赛·云赛道</a></nav>
   <a class="src" href="https://github.com/user-unknowed/studying-for-building" target="_blank">📦 源码仓库</a>
 </header>
 <div class="layout">
@@ -22,48 +22,52 @@
 <li><a href="#12">1.2 七大赛事体系</a></li>
 </ul>
 </li>
-<li><a href="#2">2. 网络赛道：考点地图</a><ul>
-<li><a href="#21">2.1 四个技术方向</a></li>
-<li><a href="#22-hcia-datacom">2.2 对应认证：HCIA-Datacom</a></li>
+<li><a href="#2">2. 云赛道：考点地图</a><ul>
+<li><a href="#21">2.1 技术方向</a></li>
+<li><a href="#22-hcia-cloud-service">2.2 对应认证：HCIA-Cloud Service</a></li>
 <li><a href="#23">2.3 比赛形式</a></li>
 </ul>
 </li>
-<li><a href="#3">3. 路由器与交换机：通俗原理</a><ul>
-<li><a href="#31">3.1 交换机：同一个小区里的快递员</a></li>
-<li><a href="#32">3.2 路由器：不同城市之间的邮局</a></li>
-<li><a href="#33">3.3 两者区别速记</a></li>
-<li><a href="#34">3.4 一张图理解数据流向</a></li>
-<li><a href="#35">3.5 三层交换机：快递员兼邮局分拣员</a></li>
+<li><a href="#3">3. 云计算通俗原理</a><ul>
+<li><a href="#31">3.1 虚拟化：一台物理服务器切成多台云服务器</a></li>
+<li><a href="#32-iaaspaassaas">3.2 三种服务模型：IaaS、PaaS、SaaS</a></li>
+<li><a href="#33">3.3 三种部署模式</a></li>
+<li><a href="#34">3.4 弹性：把算力当水电用</a></li>
+<li><a href="#35">3.5 三种存储：块、文件、对象</a></li>
+<li><a href="#36-web">3.6 一张图理解一个云上 Web 架构</a></li>
 </ul>
 </li>
-<li><a href="#4">4. 核心知识点详解</a><ul>
-<li><a href="#41-vlan">4.1 VLAN：把一个大网络切成多个小网络</a></li>
-<li><a href="#42-stpmstp">4.2 STP/MSTP：防止环路又保留冗余</a></li>
-<li><a href="#43-ospf">4.3 OSPF：动态路由协议的主力</a></li>
-<li><a href="#44">4.4 静态路由与默认路由</a></li>
-<li><a href="#45-acl">4.5 ACL：访问控制列表</a></li>
-<li><a href="#46-nat">4.6 NAT：网络地址转换</a></li>
-<li><a href="#47-vpn">4.7 网络安全：防火墙与 VPN</a></li>
-<li><a href="#48-wlan">4.8 WLAN：无线局域网</a></li>
+<li><a href="#4">4. 核心知识点详解：华为云服务</a><ul>
+<li><a href="#41-ecs">4.1 ECS 弹性云服务器</a></li>
+<li><a href="#42-vpc">4.2 VPC、子网与安全组：云上的网络底座</a></li>
+<li><a href="#43-evs">4.3 EVS 云硬盘与备份</a></li>
+<li><a href="#44-obs">4.4 OBS 对象存储</a></li>
+<li><a href="#45-rds">4.5 RDS 关系型数据库</a></li>
+<li><a href="#46-elb">4.6 ELB 弹性负载均衡</a></li>
+<li><a href="#47-as">4.7 AS 弹性伸缩</a></li>
+<li><a href="#48-ims">4.8 IMS 镜像服务</a></li>
+<li><a href="#49-cce-kubernetes">4.9 CCE 云容器引擎与 Kubernetes（比赛拉开差距的部分）</a></li>
+<li><a href="#410-iam">4.10 IAM 身份认证管理</a></li>
+<li><a href="#411-ces-lts">4.11 云监控 CES 与日志 LTS</a></li>
+<li><a href="#412-modelartsai">4.12 ModelArts：AI 开发平台</a></li>
 </ul>
 </li>
-<li><a href="#5-ensp">5. 实验环境：eNSP 入门</a><ul>
-<li><a href="#51-ensp">5.1 eNSP 是什么</a></li>
-<li><a href="#52">5.2 常用设备</a></li>
-<li><a href="#53">5.3 基本操作流程</a></li>
-<li><a href="#54-display">5.4 常用 display 命令</a></li>
-<li><a href="#55">5.5 排障思路（比赛关键能力）</a></li>
+<li><a href="#5">5. 实验环境：华为云控制台实操入门</a><ul>
+<li><a href="#51">5.1 实验平台与账号</a></li>
+<li><a href="#52">5.2 通用实验七步法</a></li>
+<li><a href="#53">5.3 必做实验清单（练到肌肉记忆）</a></li>
+<li><a href="#54">5.4 云上排障五步法（比赛关键能力）</a></li>
 </ul>
 </li>
 <li><a href="#6">6. 备赛最大难点与突破策略</a><ul>
-<li><a href="#61">6.1 最大难点：广度与深度的矛盾</a></li>
+<li><a href="#61">6.1 最大难点</a></li>
 <li><a href="#62">6.2 突破策略</a></li>
 </ul>
 </li>
 <li><a href="#7">7. 分阶段备赛计划</a><ul>
 <li><a href="#4-6">第一阶段：打基础（4-6 周）</a></li>
 <li><a href="#4-6_1">第二阶段：专项突破（4-6 周）</a></li>
-<li><a href="#4_1">第三阶段：整网实战（4 周）</a></li>
+<li><a href="#4_1">第三阶段：整架构实战（4 周）</a></li>
 <li><a href="#2-3">第四阶段：冲刺模拟（2-3 周）</a></li>
 </ul>
 </li>
@@ -71,14 +75,14 @@
 </ul></ul>
   </aside>
   <main class="content">
-    <div class="meta" style="color:#0d9488;font-weight:600">第 09 章 · 🏆</div>
-    <h1 style="border-bottom:3px solid #0d9488;padding-bottom:10px">华为ICT大赛·网络赛道备赛实战</h1>
-    <div class="meta">赛制赛程 · 路由器与交换机原理 · VLAN/OSPF/STP · eNSP 实验 · 备赛策略</div>
-    <h1 id="ict">华为ICT大赛实践赛·网络赛道备赛实战教程</h1>
+    <div class="meta" style="color:#0284c7;font-weight:600">第 09 章 · ☁️</div>
+    <h1 style="border-bottom:3px solid #0284c7;padding-bottom:10px">华为ICT大赛·云赛道备赛实战</h1>
+    <div class="meta">赛制赛程 · 华为云核心服务 · ECS/VPC/OBS/RDS/CCE · 控制台实操 · 备赛策略</div>
+    <h1 id="ict">华为ICT大赛实践赛·云赛道备赛实战教程</h1>
 <blockquote>
-<p>面向：准备参加华为ICT大赛实践赛<strong>网络赛道</strong>的在校大学生团队 ｜ 整理日期：2026-10-04
-核心内容：赛制赛程 · 网络赛道考点地图 · 路由器与交换机通俗原理 · 核心知识点详解 · eNSP 实验入门 · 备赛难点与分阶段计划
-资料依据：华为ICT大赛官网、华为人才在线认证大纲、高校官方报名通知的公开资料</p>
+<p>面向：准备参加华为ICT大赛实践赛<strong>云赛道</strong>的在校大学生团队 ｜ 整理日期：2026-10-04
+核心内容：赛制赛程 · 云赛道考点地图 · 云计算通俗原理 · 华为云核心服务详解 · 控制台实操入门 · 备赛难点与分阶段计划
+资料依据：华为ICT大赛官网、华为人才在线认证大纲、华为云官方文档的公开资料</p>
 </blockquote>
 <hr>
 <h2 id="0">0. 导读：这篇教程帮你解决什么问题</h2>
@@ -94,13 +98,13 @@
 <tbody>
 <tr>
 <td><strong>看得懂</strong></td>
-<td>搞懂路由器、交换机在网络里到底干什么</td>
+<td>搞懂云计算、虚拟化和华为云几十个服务之间的关系</td>
 <td>第 3 章</td>
 </tr>
 <tr>
 <td><strong>配得出</strong></td>
-<td>掌握 VLAN、OSPF、STP 等核心协议的配置思路</td>
-<td>第 4 章</td>
+<td>掌握 ECS、VPC、OBS、RDS、CCE 等核心服务的控制台实操</td>
+<td>第 4、5 章</td>
 </tr>
 <tr>
 <td><strong>打得赢</strong></td>
@@ -109,7 +113,7 @@
 </tr>
 </tbody>
 </table>
-<p>一句话总览：<strong>网络赛道考的不是"背知识点"，而是"在压力下把一张网络配通、配稳、排障快"</strong>。路由器和交换机是这套网络的两块基石——先把它们的角色吃透，再往上叠加协议，最后用 eNSP 反复练到肌肉记忆。</p>
+<p>一句话总览：<strong>云赛道考的不是"背服务名词"，而是"在压力下用华为云把一套系统架构搭起来、调通、排错"</strong>。云上的每一块积木——计算、存储、网络、数据库、容器——先把它们的角色吃透，再往上组装架构，最后在控制台里反复练到肌肉记忆。</p>
 <hr>
 <h2 id="1-ict">1. 华为ICT大赛是什么</h2>
 <h3 id="11">1.1 主办方与历史</h3>
@@ -178,14 +182,14 @@
 </thead>
 <tbody>
 <tr>
-<td><strong>网络</strong></td>
+<td>网络</td>
 <td>eNSP 模拟器</td>
 <td>数通、DCN、安全、WLAN</td>
 </tr>
 <tr>
-<td>云</td>
-<td>华为云</td>
-<td>云服务、云原生、AI</td>
+<td><strong>云</strong></td>
+<td><strong>华为云</strong></td>
+<td><strong>云服务、云原生、AI</strong></td>
 </tr>
 <tr>
 <td>基础软件</td>
@@ -200,12 +204,12 @@
 </tbody>
 </table>
 <blockquote>
-<p>本教程聚焦<strong>实践赛·网络赛道</strong>——也是高校参赛最广、资料最成熟的赛道。</p>
+<p>本教程聚焦<strong>实践赛·云赛道</strong>——全程在真实的华为云控制台上操作，与将来实习、工作用云的场景最接近。</p>
 </blockquote>
 <hr>
-<h2 id="2">2. 网络赛道：考点地图</h2>
-<h3 id="21">2.1 四个技术方向</h3>
-<p>根据第十一届高校官方通知，网络赛项涵盖四大技术方向：</p>
+<h2 id="2">2. 云赛道：考点地图</h2>
+<h3 id="21">2.1 技术方向</h3>
+<p>根据往届赛题与高校官方通知，云赛项涵盖以下技术方向：</p>
 <table>
 <thead>
 <tr>
@@ -216,30 +220,45 @@
 </thead>
 <tbody>
 <tr>
-<td><strong>数通（路由与交换）</strong></td>
-<td>VLAN、MSTP、Eth-Trunk、静态路由、OSPF、BGP、IPv6、路由策略</td>
+<td><strong>云计算基础</strong></td>
+<td>虚拟化、IaaS/PaaS/SaaS、公有/私有/混合云、华为云控制台与计费</td>
+<td>⭐⭐</td>
+</tr>
+<tr>
+<td><strong>计算服务</strong></td>
+<td>ECS 生命周期、规格选择、镜像 IMS、弹性伸缩 AS</td>
+<td>⭐⭐⭐</td>
+</tr>
+<tr>
+<td><strong>存储服务</strong></td>
+<td>EVS 云硬盘、OBS 对象存储、SFS 文件系统、快照与备份</td>
+<td>⭐⭐⭐</td>
+</tr>
+<tr>
+<td><strong>网络服务</strong></td>
+<td>VPC、子网、安全组、EIP、ELB、DNS</td>
+<td>⭐⭐⭐⭐</td>
+</tr>
+<tr>
+<td><strong>数据库服务</strong></td>
+<td>RDS（MySQL/PostgreSQL）、高可用与备份、GaussDB 入门</td>
+<td>⭐⭐⭐⭐</td>
+</tr>
+<tr>
+<td><strong>云原生（容器）</strong></td>
+<td>容器原理、CCE 集群、Kubernetes 核心对象、SWR 镜像仓库</td>
 <td>⭐⭐⭐⭐⭐</td>
 </tr>
 <tr>
-<td><strong>DCN（数据中心网络）</strong></td>
-<td>数据中心网络架构、VXLAN、CE 系列交换机配置</td>
-<td>⭐⭐⭐⭐</td>
-</tr>
-<tr>
-<td><strong>网络安全</strong></td>
-<td>华为防火墙、安全策略、VPN（IPSec/SSL）、ACL、AAA、NAT</td>
-<td>⭐⭐⭐⭐</td>
-</tr>
-<tr>
-<td><strong>WLAN</strong></td>
-<td>WLAN 组网架构、AC+AP 配置、射频管理、漫游</td>
+<td><strong>AI 与运维</strong></td>
+<td>ModelArts 预置模型、云监控 CES、IAM 权限</td>
 <td>⭐⭐⭐</td>
 </tr>
 </tbody>
 </table>
-<p><strong>数通是绝对主力</strong>，占比最高、也是其他方向的基础。备赛应先把数通打透，再补安全和 WLAN。</p>
-<h3 id="22-hcia-datacom">2.2 对应认证：HCIA-Datacom</h3>
-<p>网络赛道考点与华为 <strong>HCIA-Datacom</strong>（数据通信工程师）认证高度重合，可作为备考主线。HCIA-Datacom V1.0 知识模块：</p>
+<p><strong>计算 + 存储 + 网络 + 数据库是底盘</strong>：四者打通才能搭出任何架构，也是每道综合题的骨架。<strong>容器（CCE）是拉开差距的部分</strong>，AI 服务（ModelArts）常作为附加题出现。备赛应先把底盘打透，再攻容器与 AI。</p>
+<h3 id="22-hcia-cloud-service">2.2 对应认证：HCIA-Cloud Service</h3>
+<p>云赛道考点与华为 <strong>HCIA-Cloud Service</strong>（云服务工程师）认证高度重合，可作为备考主线。核心知识模块：</p>
 <table>
 <thead>
 <tr>
@@ -249,413 +268,771 @@
 </thead>
 <tbody>
 <tr>
-<td>网络参考模型</td>
-<td>OSI/TCP-IP 模型、数据封装</td>
+<td>云计算基础</td>
+<td>虚拟化概念、服务模型、部署模式、华为云概览</td>
 </tr>
 <tr>
-<td>华为 VRP 系统</td>
-<td>设备操作系统基础、命令行</td>
+<td>华为云基础操作</td>
+<td>控制台、区域与可用区、计费模式</td>
 </tr>
 <tr>
-<td>以太网交换</td>
-<td>二层转发、MAC 地址表</td>
+<td>计算服务</td>
+<td>ECS、IMS 镜像、AS 弹性伸缩</td>
 </tr>
 <tr>
-<td>VLAN</td>
-<td>Access/Trunk/Hybrid 端口、VLAN 间路由</td>
-</tr>
-<tr>
-<td>生成树</td>
-<td>STP/RSTP/MSTP 原理与配置</td>
-</tr>
-<tr>
-<td>链路聚合</td>
-<td>Eth-Trunk 手工模式/LACP 模式</td>
-</tr>
-<tr>
-<td>IP 路由基础</td>
-<td>直连/静态/默认路由</td>
-</tr>
-<tr>
-<td>OSPF</td>
-<td>单区域 OSPF 配置</td>
-</tr>
-<tr>
-<td>IPv6</td>
-<td>地址、无状态自动配置、OSPFv3</td>
-</tr>
-<tr>
-<td>ACL</td>
-<td>基本/高级 ACL</td>
-</tr>
-<tr>
-<td>AAA</td>
-<td>认证、授权、计费</td>
-</tr>
-<tr>
-<td>NAT</td>
-<td>静态/动态 NAT、NAPT</td>
+<td>存储服务</td>
+<td>EVS、OBS、SFS、CBR 云备份</td>
 </tr>
 <tr>
 <td>网络服务</td>
-<td>DHCP、DNS、FTP</td>
+<td>VPC、ELB、EIP、DNS</td>
 </tr>
 <tr>
-<td>WLAN 基础</td>
-<td>组网架构、AC+AP</td>
+<td>数据库服务</td>
+<td>RDS、DDS、GaussDB 基础</td>
 </tr>
 <tr>
-<td>网络管理</td>
-<td>SNMP、系统日志</td>
+<td>运维管理</td>
+<td>CES 监控、LTS 日志、IAM 身份管理</td>
 </tr>
 </tbody>
 </table>
 <blockquote>
-<p>边界提示：HCIA 只覆盖入门，比赛会涉及 HCIP 级别的 OSPF 多区域、BGP、路由策略、IPSec VPN 等，需在认证主线之上拔高。</p>
+<p>边界提示：HCIA 只覆盖入门。比赛会涉及 CCE/Kubernetes、ModelArts、跨服务架构设计等 HCIP 级别内容，需在认证主线之上拔高。</p>
 </blockquote>
 <h3 id="23">2.3 比赛形式</h3>
 <ul>
-<li><strong>省赛资格赛</strong>：线上实验 + 线上理论答题</li>
-<li><strong>省赛/全国总决赛</strong>：综合实验</li>
-<li><strong>全球总决赛</strong>：<strong>8 小时综合实验</strong>（09:30-17:30），网络赛道使用 eNSP 模拟器</li>
-<li>3 人队伍协作，提交一份完整答卷</li>
+<li><strong>省赛资格赛</strong>：线上理论答题 + 线上实验（华为云沙箱环境，限时操作）</li>
+<li><strong>省赛/全国总决赛</strong>：综合实验——读题后在控制台限时完成整套云上架构</li>
+<li><strong>全球总决赛</strong>：<strong>8 小时综合实验</strong>（09:30-17:30），全程在华为云控制台操作，英文题面</li>
+<li>3 人队伍协作，共用一套比赛环境，提交一份完整答卷</li>
 </ul>
 <hr>
-<h2 id="3">3. 路由器与交换机：通俗原理</h2>
-<p>这是网络赛道最核心的基础概念。用最通俗的方式讲清楚。</p>
-<h3 id="31">3.1 交换机：同一个小区里的快递员</h3>
-<p><strong>一句话定义</strong>：交换机负责在<strong>同一个局域网（同一个网段）内</strong>把数据准确送到目标设备。</p>
-<p><strong>打比方</strong>：想象一个小区，每栋楼、每户人家都有门牌号（MAC 地址）。快递员（交换机）记住每个门牌号对应哪一户，包裹来了直接送到对的人家，不会挨家挨户敲门。</p>
-<p><strong>核心工作机制</strong>：</p>
+<h2 id="3">3. 云计算通俗原理</h2>
+<p>这是云赛道最核心的基础概念。用最通俗的方式讲清楚。</p>
+<h3 id="31">3.1 虚拟化：一台物理服务器切成多台云服务器</h3>
+<p><strong>一句话定义</strong>：虚拟化把一台物理服务器的 CPU、内存、磁盘、网卡，切分成若干台相互隔离的"虚拟机"，每台都能像独立服务器一样开机、装系统、跑程序。</p>
+<p><strong>打比方</strong>：一栋大楼（物理服务器）传统上只有一户住，白天房间空着、利用率极低。物业把大楼隔成很多小公寓（虚拟机）分租出去，每户水电表独立（资源隔离），用多少付多少。</p>
+<p><strong>核心机制</strong>：</p>
 <ol>
-<li><strong>学习 MAC 地址</strong>：交换机收到一个数据帧，会把源 MAC 地址和接收端口记录到 MAC 地址表</li>
-<li><strong>转发决策</strong>：查目标 MAC 地址在表里有没有记录
-   - 有 → 只从对应端口发出去（单播）
-   - 没有 → 从除接收端口外的所有端口发出去（泛洪）</li>
-<li><strong>二层转发</strong>：工作在 OSI 第二层（数据链路层），只看 MAC 地址，不看 IP</li>
+<li><strong>Hypervisor（虚拟化层）</strong>：位于硬件与操作系统之间的"二房东"，负责分配 CPU 时间片、内存页、磁盘块和网卡带宽。华为云底层基于 KVM</li>
+<li><strong>资源隔离</strong>：每台 ECS 独享分配到的 vCPU/内存，一台虚拟机崩溃不影响其他虚拟机</li>
+<li><strong>弹性调度</strong>：虚拟机本质是"文件 + 配置"，可以跨物理机热迁移、随时变更规格</li>
 </ol>
-<p><strong>交换机的关键能力</strong>：</p>
+<h3 id="32-iaaspaassaas">3.2 三种服务模型：IaaS、PaaS、SaaS</h3>
+<p><strong>打比方</strong>——想吃披萨的三种方式：</p>
 <table>
 <thead>
 <tr>
-<th>能力</th>
-<th>作用</th>
+<th>模型</th>
+<th>比喻</th>
+<th>你管理什么</th>
+<th>华为云代表</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>MAC 地址学习</td>
-<td>自动建立端口-MAC 映射</td>
+<td>自建机房</td>
+<td>在家从头做：和面、买烤箱、生火</td>
+<td>全部：机房、硬件、系统、应用</td>
+<td>传统 IDC</td>
 </tr>
 <tr>
-<td>单播转发</td>
-<td>精确投递，不干扰其他端口</td>
+<td><strong>IaaS</strong></td>
+<td>租厨房：水电和烤箱有人管，你只管做披萨</td>
+<td>操作系统、中间件、应用</td>
+<td>ECS、EVS、VPC</td>
 </tr>
 <tr>
-<td>广播隔离（VLAN）</td>
-<td>把一个大网络逻辑隔成多个小网络</td>
+<td><strong>PaaS</strong></td>
+<td>买半成品：饼底酱料都备好，你只管加料烤</td>
+<td>应用和数据</td>
+<td>CCE、RDS、ModelArts</td>
 </tr>
 <tr>
-<td>环路防止（STP）</td>
-<td>自动阻断冗余链路，防止广播风暴</td>
+<td><strong>SaaS</strong></td>
+<td>下馆子：坐下就吃</td>
+<td>什么都不管，用就行</td>
+<td>WeLink、钉钉</td>
 </tr>
 </tbody>
 </table>
-<h3 id="32">3.2 路由器：不同城市之间的邮局</h3>
-<p><strong>一句话定义</strong>：路由器负责在<strong>不同网络之间</strong>选择最佳路径，把数据送到目的地。</p>
-<p><strong>打比方</strong>：你从北京寄信到上海，邮局（路由器）不关心你在北京市内怎么走，只负责选一条北京到上海的最佳路线（高铁或飞机）。路由器就是网络世界的"邮局分拣中心"。</p>
-<p><strong>核心工作机制</strong>：</p>
-<ol>
-<li><strong>查路由表</strong>：路由器收到一个 IP 数据包，根据目标 IP 查路由表</li>
-<li><strong>最长前缀匹配</strong>：选择掩码最长的匹配条目（最精确的路由）</li>
-<li><strong>转发到下一跳</strong>：把数据包从对应接口发出去，交给下一个路由器或目标网络</li>
-<li><strong>三层转发</strong>：工作在 OSI 第三层（网络层），看 IP 地址</li>
-</ol>
-<p><strong>路由器的关键能力</strong>：</p>
+<p><strong>比赛视角</strong>：云赛道实验横跨 IaaS 和 PaaS——既要在 ECS 上自己装系统装软件，也要用 RDS 免去自建数据库、用 CCE 免去自建 K8s 集群。</p>
+<h3 id="33">3.3 三种部署模式</h3>
 <table>
 <thead>
 <tr>
-<th>能力</th>
-<th>作用</th>
+<th>模式</th>
+<th>谁用</th>
+<th>特点</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>路由选择</td>
-<td>用 OSPF/BGP 等协议动态学习最优路径</td>
+<td>公有云</td>
+<td>多家租户共享</td>
+<td>按需付费、分钟级开通、弹性最强（比赛就考这个）</td>
 </tr>
 <tr>
-<td>网络互联</td>
-<td>连接不同网段/不同网络</td>
+<td>私有云</td>
+<td>单一机构独享</td>
+<td>数据可控、定制化强、成本高（华为云 Stack）</td>
 </tr>
 <tr>
-<td>广播域隔离</td>
-<td>不转发二层广播包，控制广播范围</td>
-</tr>
-<tr>
-<td>ACL/NAT</td>
-<td>访问控制、地址转换（安全与共享上网）</td>
+<td>混合云</td>
+<td>两边都要</td>
+<td>敏感业务放私有云、弹性业务放公有云</td>
 </tr>
 </tbody>
 </table>
-<h3 id="33">3.3 两者区别速记</h3>
-<table>
-<thead>
-<tr>
-<th>对比项</th>
-<th>交换机 Switch</th>
-<th>路由器 Router</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>工作层次</td>
-<td>第二层（数据链路层）</td>
-<td>第三层（网络层）</td>
-</tr>
-<tr>
-<td>寻址依据</td>
-<td>MAC 地址</td>
-<td>IP 地址</td>
-</tr>
-<tr>
-<td>作用范围</td>
-<td>同一局域网内</td>
-<td>不同网络之间</td>
-</tr>
-<tr>
-<td>关键表</td>
-<td>MAC 地址表</td>
-<td>路由表</td>
-</tr>
-<tr>
-<td>转发方式</td>
-<td>二层交换（硬件转发，快）</td>
-<td>三层路由（查路由表）</td>
-</tr>
-<tr>
-<td>比喻</td>
-<td>小区快递员</td>
-<td>城际邮局</td>
-</tr>
-<tr>
-<td>典型设备</td>
-<td>华为 S 系列交换机</td>
-<td>华为 AR 系列路由器</td>
-</tr>
-</tbody>
-</table>
-<h3 id="34">3.4 一张图理解数据流向</h3>
-<div class="codehilite"><pre><span></span><code>PC1 ──┐                                         ┌── PC3
-      ├── [交换机A] ── [路由器] ── [交换机B] ──┤
-PC2 ──┘    (同VLAN内    (不同网段间     (同VLAN内   ├── PC4
-            直接转发)     选路转发)      直接转发)
-</code></pre></div>
-
+<h3 id="34">3.4 弹性：把算力当水电用</h3>
+<p>传统机房：预估双十一流量 → 提前 3 个月采购服务器 → 大促过后全部闲置。
+云计算：配一条 AS 策略 → CPU 超 70% 自动加机器 → 流量回落自动释放，按量计费。</p>
+<p><strong>两种弹性</strong>：</p>
 <ul>
-<li>PC1 发给 PC2：<strong>只走交换机A</strong>，不需要路由器（同网段）</li>
-<li>PC1 发给 PC3：<strong>交换机A → 路由器 → 交换机B</strong>（跨网段，必须经过路由器）</li>
+<li><strong>纵向弹性（Scale Up/Down）</strong>：单台机器升配/降配（ECS 变更规格）</li>
+<li><strong>横向弹性（Scale Out/In）</strong>：机器数量加减（AS + ELB 是标配组合）</li>
 </ul>
-<h3 id="35">3.5 三层交换机：快递员兼邮局分拣员</h3>
-<p>现代网络中还有<strong>三层交换机</strong>——它把交换机的二层转发和路由器的三层路由功能合二为一，常用于企业网核心层。它的路由转发由 ASIC 硬件完成，比传统路由器的 CPU 转发快得多。比赛中常考三层交换机做 VLAN 间路由。</p>
-<hr>
-<h2 id="4">4. 核心知识点详解</h2>
-<h3 id="41-vlan">4.1 VLAN：把一个大网络切成多个小网络</h3>
-<p><strong>为什么需要 VLAN</strong>：一个大交换机下所有设备在同一个广播域，广播包泛滥、安全无法隔离。VLAN 把交换机逻辑上分成多个"虚拟局域网"。</p>
-<p><strong>三种端口类型</strong>：</p>
-<table>
-<thead>
-<tr>
-<th>端口类型</th>
-<th>收发数据时</th>
-<th>典型用途</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Access</td>
-<td>只能属于一个 VLAN，收发不带标签的数据</td>
-<td>连接终端（PC、打印机）</td>
-</tr>
-<tr>
-<td>Trunk</td>
-<td>允许多个 VLAN 通过，收发带 802.1Q 标签的数据</td>
-<td>交换机之间互联</td>
-</tr>
-<tr>
-<td>Hybrid</td>
-<td>灵活配置哪些 VLAN 带标签、哪些不带</td>
-<td>华为特有，灵活组网</td>
-</tr>
-</tbody>
-</table>
-<p><strong>VLAN 间路由</strong>：不同 VLAN 之间默认不能通信，需要三层设备（路由器或三层交换机）做单臂路由或 VLANIF 接口。</p>
-<div class="codehilite"><pre><span></span><code># 华为 VRP 配置示例：创建 VLAN 并配置 Access 端口
-system-view
-vlan 10
- name DEPT-SALES
-quit
-interface GigabitEthernet 0/0/1
- port link-type access
- port default vlan 10
-quit
-</code></pre></div>
-
-<h3 id="42-stpmstp">4.2 STP/MSTP：防止环路又保留冗余</h3>
-<p><strong>问题</strong>：交换机之间接两条线做冗余，会形成环路，导致广播风暴、MAC 地址表震荡。</p>
-<p><strong>STP（生成树协议）</strong>：逻辑上阻断一条链路，物理上保留冗余；当主链路故障时，自动放开备份链路。</p>
-<p><strong>MSTP（多生成树）</strong>：华为设备默认使用，支持 VLAN 负载分担——不同 VLAN 走不同的生成树实例，充分利用冗余链路。</p>
-<p><strong>端口状态</strong>：Disabled → Blocking → Listening → Learning → Forwarding</p>
-<h3 id="43-ospf">4.3 OSPF：动态路由协议的主力</h3>
-<p><strong>OSPF（开放式最短路径优先）</strong>是链路状态路由协议，用 SPF 算法计算最短路径。比赛中单区域 OSPF 是必考点。</p>
-<p><strong>核心概念</strong>：
-- <strong>Router ID</strong>：路由器在 OSPF 域中的唯一标识（通常用环回口 IP）
-- <strong>区域 Area</strong>：单区域用 Area 0（骨干区域）
-- <strong>邻居关系</strong>：通过 Hello 包发现邻居，建立邻接后同步 LSDB（链路状态数据库）
-- <strong>度量值 Cost</strong>：基于带宽，越小越优</p>
-<div class="codehilite"><pre><span></span><code># 华为 VRP 配置示例：单区域 OSPF
-system-view
-interface LoopBack 0
- ip address 1.1.1.1 255.255.255.255
-quit
-ospf 1 router-id 1.1.1.1
- area 0
-  network 192.168.1.0 0.0.0.255
-  network 1.1.1.1 0.0.0.0
- quit
-quit
-</code></pre></div>
-
-<h3 id="44">4.4 静态路由与默认路由</h3>
-<p><strong>静态路由</strong>：管理员手动指定的路由，简单可靠，但不适应拓扑变化。</p>
-<div class="codehilite"><pre><span></span><code>ip route-static 192.168.2.0 255.255.255.0 192.168.1.2
-#                目标网络        掩码          下一跳
-</code></pre></div>
-
-<p><strong>默认路由</strong>：<code>0.0.0.0 0.0.0.0</code>，当路由表没有更精确的匹配时使用，常用于连接 ISP 的出口。</p>
-<h3 id="45-acl">4.5 ACL：访问控制列表</h3>
-<p><strong>基本 ACL（2000-2999）</strong>：只匹配源 IP 地址
-<strong>高级 ACL（3000-3999）</strong>：匹配源/目的 IP、协议、端口号</p>
-<div class="codehilite"><pre><span></span><code># 高级 ACL：禁止 192.168.1.0 网段访问服务器的 80 端口
-acl number 3000
- rule 5 deny tcp source 192.168.1.0 0.0.0.255 destination 10.0.0.1 0 destination-port eq 80
- rule 10 permit ip
-quit
-interface GigabitEthernet 0/0/1
- traffic-filter inbound acl 3000
-quit
-</code></pre></div>
-
-<h3 id="46-nat">4.6 NAT：网络地址转换</h3>
-<p>让内网多个设备共享一个公网 IP 上网。</p>
+<h3 id="35">3.5 三种存储：块、文件、对象</h3>
 <table>
 <thead>
 <tr>
 <th>类型</th>
-<th>用途</th>
+<th>比喻</th>
+<th>华为云服务</th>
+<th>典型场景</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>静态 NAT</td>
-<td>一对一固定映射（服务器对外发布）</td>
+<td>块存储</td>
+<td>整块硬盘，格式化后只能给一台机器用</td>
+<td>EVS 云硬盘</td>
+<td>ECS 系统盘/数据盘</td>
 </tr>
 <tr>
-<td>动态 NAT</td>
-<td>地址池多对多</td>
+<td>文件存储</td>
+<td>共享网盘，多机可同时挂载</td>
+<td>SFS 弹性文件服务</td>
+<td>共享目录、高性能计算</td>
 </tr>
 <tr>
-<td>NAPT（PAT）</td>
-<td>多对一，用端口号区分（最常用）</td>
+<td>对象存储</td>
+<td>仓库格子：存"整个文件 + 元数据标签"，走 HTTP 访问</td>
+<td>OBS 对象存储</td>
+<td>图片视频、备份、静态网站</td>
 </tr>
 </tbody>
 </table>
-<h3 id="47-vpn">4.7 网络安全：防火墙与 VPN</h3>
+<p><strong>判别口诀</strong>：要格式化装系统 → EVS；要多机共享目录 → SFS；要存海量文件走网络 → OBS。</p>
+<h3 id="36-web">3.6 一张图理解一个云上 Web 架构</h3>
+<div class="codehilite"><pre><span></span><code>用户 ── EIP/域名 ── ELB（流量分发、健康检查）
+                        │
+        ┌───────────────┼───────────────┐
+     ECS-1            ECS-2           ECS-3      ← AS 弹性伸缩组（按负载增减）
+        │               │               │
+        └──── VPC 虚拟私有云（安全组当防火墙）────┘
+                        │
+             RDS 主备数据库  +  OBS 存图片视频
+</code></pre></div>
+
 <ul>
-<li><strong>华为防火墙（USG 系列）</strong>：安全区域（Trust/Untrust/DMZ）、安全策略、会话表</li>
-<li><strong>IPSec VPN</strong>：用加密隧道在公网上安全传输数据，适合站点间互联</li>
-<li><strong>SSL VPN</strong>：远程接入，用浏览器即可，适合移动办公</li>
+<li>用户请求从 ELB 分发到多台 ECS（Web 层）</li>
+<li>ECS 把结构化数据存进 RDS（数据库层），图片视频放 OBS（存储层）</li>
+<li>流量高峰时 AS 自动扩容 ECS，ELB 自动把新机器纳入分发列表</li>
 </ul>
-<h3 id="48-wlan">4.8 WLAN：无线局域网</h3>
-<p><strong>组网架构</strong>：AC（无线控制器）+ Fit AP（瘦 AP）
-- AC 负责集中管理、配置下发、用户认证
-- AP 负责射频信号收发</p>
-<p>关键配置：AP 上线、SSID 创建、安全模板（WPA2/WPA3）、VLAN 绑定。</p>
 <hr>
-<h2 id="5-ensp">5. 实验环境：eNSP 入门</h2>
-<h3 id="51-ensp">5.1 eNSP 是什么</h3>
-<p><strong>eNSP（Enterprise Network Simulation Platform）</strong>是华为官方推出的网络模拟器，<strong>网络赛道全球总决赛指定使用</strong>。可以模拟华为路由器、交换机、防火墙、PC 等设备，支持真实 VRP 命令行。</p>
-<h3 id="52">5.2 常用设备</h3>
+<h2 id="4">4. 核心知识点详解：华为云服务</h2>
+<h3 id="41-ecs">4.1 ECS 弹性云服务器</h3>
+<p><strong>一句话定义</strong>：ECS（Elastic Cloud Server）就是云上的一台"电脑"，CPU、内存、磁盘、操作系统任选，分钟级开通，随时退订。</p>
+<p><strong>购买五要素</strong>：</p>
 <table>
 <thead>
 <tr>
-<th>设备</th>
-<th>型号</th>
-<th>用途</th>
+<th>要素</th>
+<th>怎么选</th>
+<th>备注</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>路由器</td>
-<td>AR2220</td>
-<td>路由、广域网、NAT、VPN</td>
+<td>区域/可用区</td>
+<td>就近选；多可用区可抗机房级故障</td>
+<td>比赛环境一般指定区域</td>
 </tr>
 <tr>
-<td>交换机</td>
-<td>S5700 / S3700</td>
-<td>VLAN、STP、链路聚合、三层交换</td>
+<td>规格</td>
+<td>通用计算型（Web）、内存优化型（数据库）、GPU 型（AI）</td>
+<td>vCPU:内存 常见 1:1/1:2/1:4</td>
 </tr>
 <tr>
-<td>防火墙</td>
-<td>USG6000V</td>
-<td>安全策略、NAT、VPN</td>
+<td>镜像</td>
+<td>公共镜像（官方 OS）/ 私有镜像 / 市场镜像（预装软件）</td>
+<td>比赛常指定 CentOS/openEuler</td>
 </tr>
 <tr>
-<td>PC/Server</td>
-<td>-</td>
-<td>测试连通性、跑服务</td>
+<td>磁盘</td>
+<td>系统盘（必选）+ 数据盘（可选）</td>
+<td>类型见 4.3</td>
 </tr>
 <tr>
-<td>AC/AP</td>
-<td>AC6005 / AP</td>
-<td>WLAN 实验</td>
+<td>网络</td>
+<td>VPC + 子网 + 安全组 + 是否绑 EIP</td>
+<td>公网访问必须绑 EIP</td>
 </tr>
 </tbody>
 </table>
-<h3 id="53">5.3 基本操作流程</h3>
+<p><strong>关键操作流程</strong>：</p>
 <ol>
-<li>拖入设备 → 连线（注意接口类型）</li>
-<li>启动设备 → 等待 VRP 启动</li>
-<li>双击设备进入命令行</li>
-<li>配置 → 用 <code>display</code> 命令验证 → 用 PC ping 测试连通性</li>
+<li>控制台搜索 "ECS" → 购买 → 按上表填五要素</li>
+<li>设置登录凭证：<strong>密码</strong>（简单直接）或 <strong>SSH 密钥对</strong>（更安全）</li>
+<li>等待 1-2 分钟状态变为"运行中"</li>
+<li>远程登录：Linux 用 SSH（<code>ssh root@EIP</code>）或控制台 VNC；Windows 用 MSTSC 远程桌面</li>
 </ol>
-<h3 id="54-display">5.4 常用 display 命令</h3>
-<div class="codehilite"><pre><span></span><code>display current-configuration    # 查看当前配置
-display ip routing-table         # 查看路由表
-display mac-address              # 查看 MAC 地址表
-display vlan                     # 查看 VLAN
-display ospf peer                # 查看 OSPF 邻居
-display stp                      # 查看生成树状态
-display interface brief          # 查看接口简要
-display acl all                  # 查看所有 ACL
+<p><strong>计费模式</strong>：按需（秒级计费，练习首选，用完立刻释放）vs 包周期（包月包年，便宜但退订难）。<strong>练习/比赛用按需，练完及时释放，避免烧钱</strong>。</p>
+<h3 id="42-vpc">4.2 VPC、子网与安全组：云上的网络底座</h3>
+<p><strong>VPC（Virtual Private Cloud）</strong>：一块逻辑隔离的虚拟网络空间，相当于你在云上的"私人机房"。所有 ECS、RDS、ELB 都要放进某个 VPC 里。</p>
+<p><strong>核心组件</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>组件</th>
+<th>作用</th>
+<th>要点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>VPC</td>
+<td>整个私有网段</td>
+<td>用 CIDR 表示，如 <code>192.168.0.0/16</code></td>
+</tr>
+<tr>
+<td>子网</td>
+<td>VPC 内的 smaller 网段</td>
+<td>不同可用区可用不同子网</td>
+</tr>
+<tr>
+<td>安全组</td>
+<td>ECS 级别的虚拟防火墙</td>
+<td><strong>有状态</strong>：入方向默认全拒绝，出方向默认全允许</td>
+</tr>
+<tr>
+<td>EIP</td>
+<td>弹性公网 IP</td>
+<td>可独立保留，随时绑定/解绑 ECS</td>
+</tr>
+<tr>
+<td>路由表</td>
+<td>子网的转发规则</td>
+<td>默认路由就能同 VPC 互通；跨 VPC 用对等连接</td>
+</tr>
+</tbody>
+</table>
+<p><strong>典型安全组规则（Web 服务器）</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>方向</th>
+<th>协议</th>
+<th>端口</th>
+<th>源/目标</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>入方向</td>
+<td>TCP</td>
+<td>22</td>
+<td>0.0.0.0/0</td>
+<td>SSH 远程登录</td>
+</tr>
+<tr>
+<td>入方向</td>
+<td>TCP</td>
+<td>80</td>
+<td>0.0.0.0/0</td>
+<td>HTTP 网站访问</td>
+</tr>
+<tr>
+<td>入方向</td>
+<td>ICMP</td>
+<td>全部</td>
+<td>0.0.0.0/0</td>
+<td>允许 ping 测试</td>
+</tr>
+<tr>
+<td>出方向</td>
+<td>全部</td>
+<td>全部</td>
+<td>0.0.0.0/0</td>
+<td>默认放行</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>云上排障第一反应：端口不通 → 先查安全组</strong>。这是所有新手（和比赛中）最常见的故障来源。</p>
+</blockquote>
+<h3 id="43-evs">4.3 EVS 云硬盘与备份</h3>
+<p><strong>EVS（Elastic Volume Service）</strong>：云上的虚拟硬盘，挂给 ECS 当系统盘/数据盘。</p>
+<table>
+<thead>
+<tr>
+<th>磁盘类型</th>
+<th>性能</th>
+<th>适用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>普通型（SATA）</td>
+<td>最低成本</td>
+<td>开发测试、低频访问</td>
+</tr>
+<tr>
+<td>高 IO 型（SAS）</td>
+<td>中等</td>
+<td>普通业务应用</td>
+</tr>
+<tr>
+<td>超高 IO 型（SSD）</td>
+<td>最高</td>
+<td>数据库、高性能需求</td>
+</tr>
+</tbody>
+</table>
+<p><strong>新数据盘挂载三步</strong>（买盘后 Linux 里还要初始化）：</p>
+<div class="codehilite"><pre><span></span><code>fdisk<span class="w"> </span>-l<span class="w">                      </span><span class="c1"># 确认新盘符，如 /dev/vdb</span>
+mkfs.ext4<span class="w"> </span>/dev/vdb<span class="w">            </span><span class="c1"># 格式化为 ext4</span>
+mkdir<span class="w"> </span>/data<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>mount<span class="w"> </span>/dev/vdb<span class="w"> </span>/data<span class="w">   </span><span class="c1"># 挂载后 df -h 验证</span>
 </code></pre></div>
 
-<h3 id="55">5.5 排障思路（比赛关键能力）</h3>
-<p>网络配不通时，按层排查：</p>
+<p><strong>快照（Snapshot）</strong>：磁盘某时刻的只读副本，回滚就恢复到那一刻——改崩系统前的救命稻草。
+<strong>备份（CBR）</strong>：整机的备份+恢复，比赛里常考"对 ECS 做备份/恢复"。</p>
+<h3 id="44-obs">4.4 OBS 对象存储</h3>
+<p><strong>一句话定义</strong>：OBS（Object Storage Service）存的是"对象"（文件 + 元数据），容量近乎无限，通过 HTTP 访问，是放图片、视频、备份、静态网页的首选。</p>
+<p><strong>核心概念</strong>：</p>
+<ul>
+<li><strong>桶（Bucket）</strong>：存对象的容器，<strong>名称全局唯一</strong>（所有华为云用户里不能重名）</li>
+<li><strong>存储类别</strong>：</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>类别</th>
+<th>价格</th>
+<th>访问时延</th>
+<th>场景</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>标准</td>
+<td>高</td>
+<td>毫秒级</td>
+<td>热数据：网站图片</td>
+</tr>
+<tr>
+<td>低频</td>
+<td>中</td>
+<td>毫秒级</td>
+<td>月访问 1-2 次：月度报表</td>
+</tr>
+<tr>
+<td>归档</td>
+<td>最低</td>
+<td>需先恢复</td>
+<td>冷数据：合规归档</td>
+</tr>
+</tbody>
+</table>
+<p><strong>三种访问方式</strong>：控制台（拖拽上传）、命令行 obsutil、API/SDK（程序调用）。</p>
+<div class="codehilite"><pre><span></span><code># obsutil 命令行示例
+obsutil config -i=AK -k=SK -e=obs.cn-north-4.myhuaweicloud.com   # 配置密钥
+obsutil cp /data/web.log obs://my-bucket/logs/                    # 上传文件
+obsutil ls obs://my-bucket                                        # 列举对象
+</code></pre></div>
+
+<p><strong>典型考法</strong>：创建桶 → 上传网页文件 → 开启<strong>静态网站托管</strong> → 浏览器直接访问；或配置<strong>生命周期规则</strong>（30 天后自动转低频/归档）。</p>
+<h3 id="45-rds">4.5 RDS 关系型数据库</h3>
+<p><strong>一句话定义</strong>：RDS 是华为云"帮你运维"的数据库——不用自己装 MySQL、不用操心主从复制和备份，点点鼠标就有高可用实例。</p>
+<p><strong>支持的引擎</strong>：MySQL、PostgreSQL、SQL Server、GaussDB（华为自研）。</p>
+<p><strong>核心操作流程</strong>：</p>
 <ol>
-<li><strong>物理层</strong>：接口是否 up？<code>display interface brief</code> 看状态</li>
-<li><strong>链路层</strong>：VLAN 是否正确？Trunk 是否放通？<code>display vlan</code>、<code>display port vlan</code></li>
-<li><strong>网络层</strong>：IP 配置是否正确？路由是否存在？<code>display ip routing-table</code></li>
-<li><strong>协议层</strong>：OSPF 邻居是否建立？<code>display ospf peer</code></li>
-<li><strong>安全层</strong>：ACL/防火墙策略是否拦截？<code>display acl</code>、查看会话</li>
+<li>控制台 → RDS → 购买实例：选引擎版本、规格、存储，<strong>部署在与 ECS 相同的 VPC</strong></li>
+<li>配置安全组：放行 TCP 3306（MySQL 默认端口）</li>
+<li>创建数据库账号，或开启白名单</li>
+<li>在 ECS 上内网连接测试：</li>
 </ol>
+<div class="codehilite"><pre><span></span><code>mysql<span class="w"> </span>-h<span class="w"> </span><span class="m">192</span>.168.1.100<span class="w"> </span>-P<span class="w"> </span><span class="m">3306</span><span class="w"> </span>-u<span class="w"> </span>dbuser<span class="w"> </span>-p<span class="w">    </span><span class="c1"># -h 是 RDS 内网 IP</span>
+</code></pre></div>
+
+<p><strong>关键能力</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>能力</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>主备高可用</td>
+<td>主实例挂了自动切备实例</td>
+</tr>
+<tr>
+<td>自动备份</td>
+<td>按策略全量+增量备份，可恢复到时间点</td>
+</tr>
+<tr>
+<td>只读实例</td>
+<td>读写分离：读多写少的场景加只读分摊压力</td>
+</tr>
+</tbody>
+</table>
+<p><strong>常见坑</strong>：ECS 和 RDS <strong>必须同 VPC 才能内网互通</strong>；跨 VPC 要用对等连接，比赛通常不折腾。</p>
+<h3 id="46-elb">4.6 ELB 弹性负载均衡</h3>
+<p><strong>一句话定义</strong>：ELB 是放在多台服务器前面的"交通分流员"，把用户请求分发到健康的后端机器，一台挂了流量自动切走。</p>
+<p><strong>三层概念</strong>：</p>
+<ol>
+<li><strong>监听器（Listener）</strong>：定协议和端口——L4（TCP/UDP，转发快）或 L7（HTTP/HTTPS，可按 URL 路径转发）</li>
+<li><strong>后端服务器组</strong>：挂多台 ECS + 各自权重（后端端口如 80）</li>
+<li><strong>健康检查</strong>：定期探测后端（协议/端口/路径，如 <code>GET /health</code>），失败自动摘除</li>
+</ol>
+<p><strong>调度策略</strong>：轮询（默认）、最少连接、源 IP 哈希。</p>
+<p><strong>典型考法</strong>：给两台 Web ECS 前面加 ELB → 用浏览器多次刷新看到两个页面交替出现 → 关掉一台 ECS，验证服务不中断。</p>
+<h3 id="47-as">4.7 AS 弹性伸缩</h3>
+<p><strong>一句话定义</strong>：AS 按你定的规则自动增减 ECS 数量——CPU 高了自动扩容，流量回落自动缩容，配合 ELB 实现"流量洪峰自动扛"。</p>
+<p><strong>四大件</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>组件</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>伸缩组</td>
+<td>一批同质 ECS 的"池子"，需绑定 VPC/子网，通常关联 ELB</td>
+</tr>
+<tr>
+<td>伸缩配置</td>
+<td>扩容出来的新机器长什么样（镜像、规格、登录方式）</td>
+</tr>
+<tr>
+<td>伸缩策略</td>
+<td>告警式（CPU&gt;70% 扩 1 台）/ 定时式（每天 19:00 扩）/ 周期式（每周五缩）</td>
+</tr>
+<tr>
+<td>期望实例数</td>
+<td>伸缩组维持的机器数量，策略触发时自动加减</td>
+</tr>
+</tbody>
+</table>
+<p><strong>注意冷却时间</strong>：扩容后的一小段时间内不再触发下一次扩容，防止震荡。</p>
+<h3 id="48-ims">4.8 IMS 镜像服务</h3>
+<p><strong>一句话定义</strong>：镜像是 ECS 的"整盘克隆模板"——把一台配好的机器做成镜像，之后批量"复制"出 N 台一模一样的机器。</p>
+<table>
+<thead>
+<tr>
+<th>镜像类型</th>
+<th>来源</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>公共镜像</td>
+<td>华为云官方提供的纯操作系统</td>
+</tr>
+<tr>
+<td>私有镜像</td>
+<td>自己从 ECS/外部导入制作</td>
+</tr>
+<tr>
+<td>共享镜像</td>
+<td>别的账号共享给你</td>
+</tr>
+<tr>
+<td>市场镜像</td>
+<td>第三方预装了软件的镜像</td>
+</tr>
+</tbody>
+</table>
+<p><strong>典型考法</strong>：在一台 ECS 上装好 Web 环境 → 制作私有镜像 → 用该镜像再发放 3 台 ECS，验证全部能直接提供网页服务——比一台台手装快 10 倍。</p>
+<h3 id="49-cce-kubernetes">4.9 CCE 云容器引擎与 Kubernetes（比赛拉开差距的部分）</h3>
+<p><strong>容器 vs 虚拟机</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>对比</th>
+<th>虚拟机（ECS）</th>
+<th>容器</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>启动速度</td>
+<td>分钟级</td>
+<td>秒级</td>
+</tr>
+<tr>
+<td>体量</td>
+<td>每个 GB 级（含完整 OS）</td>
+<td>MB 级（只打包应用+依赖）</td>
+</tr>
+<tr>
+<td>隔离性</td>
+<td>强（独立内核）</td>
+<td>进程级（共享内核）</td>
+</tr>
+<tr>
+<td>密度</td>
+<td>一台物理机十几台</td>
+<td>一台节点跑几十个</td>
+</tr>
+</tbody>
+</table>
+<p><strong>CCE（Cloud Container Engine）</strong>：华为云托管的 Kubernetes 集群——控制面（Master）托管免运维，你只需要买"节点"（Node，本质是装了容器运行时的 ECS）。</p>
+<p><strong>K8s 核心对象速记</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>对象</th>
+<th>一句话</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Pod</td>
+<td>最小调度单元，一个或一组容器</td>
+</tr>
+<tr>
+<td>Deployment</td>
+<td>管 N 个 Pod 副本，挂了自动拉起新的</td>
+</tr>
+<tr>
+<td>Service</td>
+<td>给一组 Pod 一个固定访问入口（ClusterIP/NodePort/LoadBalancer）</td>
+</tr>
+<tr>
+<td>Ingress</td>
+<td>七层路由：按域名/路径转发</td>
+</tr>
+<tr>
+<td>ConfigMap/Secret</td>
+<td>配置和密码与镜像分离</td>
+</tr>
+</tbody>
+</table>
+<p><strong>典型部署清单（web.yaml）</strong>：</p>
+<div class="codehilite"><pre><span></span><code><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">apps/v1</span>
+<span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Deployment</span>
+<span class="nt">metadata</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">web</span>
+<span class="nt">spec</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">replicas</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span>
+<span class="w">  </span><span class="nt">selector</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">matchLabels</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">app</span><span class="p">:</span><span class="w"> </span><span class="nv">web</span><span class="p p-Indicator">}</span>
+<span class="w">  </span><span class="nt">template</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">metadata</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">labels</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">app</span><span class="p">:</span><span class="w"> </span><span class="nv">web</span><span class="p p-Indicator">}</span>
+<span class="w">    </span><span class="nt">spec</span><span class="p">:</span>
+<span class="w">      </span><span class="nt">containers</span><span class="p">:</span>
+<span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">nginx</span>
+<span class="w">        </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">nginx:1.25</span>
+<span class="w">        </span><span class="nt">ports</span><span class="p">:</span>
+<span class="w">        </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">containerPort</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">80</span>
+<span class="nn">---</span>
+<span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">v1</span>
+<span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Service</span>
+<span class="nt">metadata</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">web-svc</span>
+<span class="nt">spec</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">LoadBalancer</span><span class="w">      </span><span class="c1"># 自动关联 ELB，外网可访问</span>
+<span class="w">  </span><span class="nt">selector</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt">app</span><span class="p">:</span><span class="w"> </span><span class="nv">web</span><span class="p p-Indicator">}</span>
+<span class="w">  </span><span class="nt">ports</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">port</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">80</span>
+<span class="w">    </span><span class="nt">targetPort</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">80</span>
+</code></pre></div>
+
+<div class="codehilite"><pre><span></span><code>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>web.yaml<span class="w">        </span><span class="c1"># 部署</span>
+kubectl<span class="w"> </span>get<span class="w"> </span>pods<span class="w"> </span>-o<span class="w"> </span>wide<span class="w">         </span><span class="c1"># 看 Pod 状态（Running 才算成）</span>
+kubectl<span class="w"> </span>describe<span class="w"> </span>pod<span class="w"> </span>web-xxx<span class="w">     </span><span class="c1"># 排障：镜像拉取失败/资源不足看这里</span>
+kubectl<span class="w"> </span>logs<span class="w"> </span>web-xxx<span class="w">             </span><span class="c1"># 看容器日志</span>
+</code></pre></div>
+
+<p><strong>SWR（镜像仓库）</strong>：自己 <code>docker build</code> 的镜像 push 到 SWR，CCE 拉取部署——比赛常考"把自制镜像跑进集群"。</p>
+<h3 id="410-iam">4.10 IAM 身份认证管理</h3>
+<p><strong>一句话定义</strong>：IAM 管的是"谁能用云上的什么资源"——主账号全权，子用户按授权来。</p>
+<p><strong>核心模型</strong>：<strong>用户</strong>（人）加入<strong>用户组</strong>，给用户组<strong>授权</strong>（策略/角色），策略定义能对哪些资源做什么操作。</p>
+<ul>
+<li><strong>最小权限原则</strong>：只给完成任务所需的最小权限，比如运维只读策略、开发者只用 ECS</li>
+<li><strong>典型考法</strong>：创建子用户并加入组 → 授予"OBS 只读"策略 → 验证该用户能看桶但不能删</li>
+</ul>
+<h3 id="411-ces-lts">4.11 云监控 CES 与日志 LTS</h3>
+<ul>
+<li><strong>CES（云监控）</strong>：所有资源的 CPU/内存/磁盘/网络指标都在这，可配<strong>告警规则</strong>（如 CPU&gt;80% 发通知、触发 AS 扩容）</li>
+<li><strong>LTS（云日志）</strong>：集中收集 ECS/容器日志，按关键词检索排障</li>
+</ul>
+<h3 id="412-modelartsai">4.12 ModelArts：AI 开发平台</h3>
+<p><strong>一句话定义</strong>：ModelArts 把 AI 开发全流程（数据标注 → 训练 → 部署）都搬到了云上，不会算法也能用"预置模型"一键部署 AI 服务。</p>
+<p><strong>比赛考法</strong>（通常作为选做/加分）：部署一个预置服务（如 OCR 文字识别、图像分类），拿到 API 接口并成功调用；或在 Notebook 里跑一个简单训练任务。</p>
+<hr>
+<h2 id="5">5. 实验环境：华为云控制台实操入门</h2>
+<h3 id="51">5.1 实验平台与账号</h3>
+<ul>
+<li><strong>比赛环境</strong>：组委会提供华为云沙箱账号，限时、有配额、比赛结束回收。平时别指望有"原题环境"，重在迁移能力</li>
+<li><strong>平时练习</strong>：自己注册华为云账号并实名认证 → 资源一律选<strong>按需计费</strong> → 练完<strong>立刻删除/退订</strong>；华为云学院有免费沙箱实验（HCIA 配套实验手册），零成本练手</li>
+<li><strong>控制台要点</strong>：顶部<strong>搜索框</strong>直达任意服务（最快入口）；左上角切换<strong>区域</strong>（资源是区域隔离的，别找错地方）；右上角费用中心盯消费</li>
+</ul>
+<h3 id="52">5.2 通用实验七步法</h3>
+<p>每道综合实验题都按这个节奏走，避免边做边想：</p>
+<ol>
+<li><strong>读题画图</strong>：把要求的架构画出来，标注 VPC 网段、子网 IP、ECS 规格、端口——先规划再动手</li>
+<li><strong>建网络</strong>：创建 VPC + 子网</li>
+<li><strong>配安全组</strong>：按题目端口表一次配齐（22/80/3306…）</li>
+<li><strong>上计算</strong>：购买 ECS / RDS 实例（核对 VPC、子网、镜像）</li>
+<li><strong>部署应用</strong>：SSH 登录装软件、上传代码</li>
+<li><strong>联调验证</strong>：<code>ping</code> / <code>curl</code> / <code>mysql</code> 逐层验证连通</li>
+<li><strong>按题交付</strong>：截图、记录实例名/IP，对照题目要求逐条核对</li>
+</ol>
+<h3 id="53">5.3 必做实验清单（练到肌肉记忆）</h3>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>实验</th>
+<th>覆盖服务</th>
+<th>验收标准</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>购买 Linux ECS 并 SSH 远程登录</td>
+<td>ECS / EIP / 安全组</td>
+<td>终端能登录</td>
+</tr>
+<tr>
+<td>2</td>
+<td>部署 HTTP 网站（httpd/WordPress）</td>
+<td>ECS + EIP</td>
+<td><code>curl</code> 返回 200</td>
+</tr>
+<tr>
+<td>3</td>
+<td>挂载新数据盘并写入文件</td>
+<td>EVS</td>
+<td><code>df -h</code> 可见并重启不丢</td>
+</tr>
+<tr>
+<td>4</td>
+<td>OBS 静态网站托管</td>
+<td>OBS</td>
+<td>浏览器访问桶 URL 出网页</td>
+</tr>
+<tr>
+<td>5</td>
+<td>ECS + RDS 上线动态网站</td>
+<td>RDS</td>
+<td>网页能读写数据库</td>
+</tr>
+<tr>
+<td>6</td>
+<td>ELB 分发 + AS 自动扩缩</td>
+<td>ELB / AS</td>
+<td>关一台机器服务不断</td>
+</tr>
+<tr>
+<td>7</td>
+<td>制作私有镜像批量发放</td>
+<td>IMS</td>
+<td>3 台新机直接提供网页</td>
+</tr>
+<tr>
+<td>8</td>
+<td>CCE 部署容器化应用</td>
+<td>CCE / SWR</td>
+<td>Service 域名可访问</td>
+</tr>
+<tr>
+<td>9</td>
+<td>IAM 子账号权限验证</td>
+<td>IAM</td>
+<td>子用户只能看到指定服务</td>
+</tr>
+<tr>
+<td>10</td>
+<td>CES 告警规则联动</td>
+<td>CES</td>
+<td>触发阈值收到通知</td>
+</tr>
+</tbody>
+</table>
+<h3 id="54">5.4 云上排障五步法（比赛关键能力）</h3>
+<p>配不通时，按层排查：</p>
+<ol>
+<li><strong>网络可达</strong>：EIP 绑了吗？安全组端口开了吗？（云上第一坑）</li>
+<li><strong>服务运行</strong>：<code>systemctl status httpd</code>，进程起了吗？</li>
+<li><strong>配置正确</strong>：监听端口对不对？路径、账号密码拼写对不对？</li>
+<li><strong>依赖可用</strong>：RDS 连得上吗？OBS 桶策略对吗？</li>
+<li><strong>权限与配额</strong>：IAM 有权限吗？配额（实例数/磁盘数）超了吗？</li>
+</ol>
+<p><strong>常见故障排查案例</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>故障现象</th>
+<th>可能原因</th>
+<th>排查点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SSH 连不上 ECS</td>
+<td>没绑 EIP / 安全组没开 22 / 密钥错误</td>
+<td>EIP 列表、安全组入方向、VNC 登录验证</td>
+</tr>
+<tr>
+<td>网页打不开</td>
+<td>httpd 未启动 / 80 端口未放行</td>
+<td><code>systemctl status</code>、安全组规则</td>
+</tr>
+<tr>
+<td>RDS 连接超时</td>
+<td>与 ECS 不同 VPC / 安全组未放行 3306</td>
+<td>网络拓扑、RDS 安全组</td>
+</tr>
+<tr>
+<td>ELB 后端显示异常</td>
+<td>健康检查端口/路径配错</td>
+<td>健康检查配置、后端端口</td>
+</tr>
+<tr>
+<td>Pod 一直 Pending</td>
+<td>节点资源不足 / 镜像拉取失败</td>
+<td><code>kubectl describe pod</code></td>
+</tr>
+<tr>
+<td>OBS 拒绝访问</td>
+<td>桶策略/ACL 未授权</td>
+<td>桶策略、匿名读权限</td>
+</tr>
+<tr>
+<td>创建资源报错配额不足</td>
+<td>免费配额用完</td>
+<td>删掉不用的资源再试</td>
+</tr>
+</tbody>
+</table>
 <blockquote>
-<p>比赛拉开差距的不是"会不会配"，而是"配不通时能不能快速定位原因"。</p>
+<p>比赛拉开差距的不是"会不会买"，而是"出问题能不能 30 秒内定位到哪一层"。</p>
 </blockquote>
 <hr>
 <h2 id="6">6. 备赛最大难点与突破策略</h2>
-<h3 id="61">6.1 最大难点：广度与深度的矛盾</h3>
-<p>结合比赛实际，网络赛道备赛的核心难点是<strong>"知识面广 + 实践要求高 + 团队协作紧"</strong>：</p>
+<h3 id="61">6.1 最大难点</h3>
 <table>
 <thead>
 <tr>
@@ -665,66 +1042,156 @@ display acl all                  # 查看所有 ACL
 </thead>
 <tbody>
 <tr>
-<td><strong>知识点覆盖极广</strong></td>
-<td>数通、DCN、安全、WLAN 四大方向，每个方向数十个知识点，一人难全部精通</td>
+<td><strong>服务面太广</strong></td>
+<td>华为云服务 200+，比赛涉及几十个，入口、参数、联动关系记不住</td>
 </tr>
 <tr>
-<td><strong>实验操作要求高</strong></td>
-<td>全球总决赛 8 小时综合实验，一个协议配错可能整网不通</td>
+<td><strong>参数细节坑多</strong></td>
+<td>区域/版本/计费/配额，选错一步推倒重来，浪费比赛时间</td>
 </tr>
 <tr>
-<td><strong>理论实操结合紧</strong></td>
-<td>既要过理论笔试，又要把理论落地到配置</td>
+<td><strong>综合架构题</strong></td>
+<td>一道题串起 VPC+ECS+RDS+ELB+OBS，会用单个服务 ≠ 能组装架构</td>
 </tr>
 <tr>
-<td><strong>团队分工难</strong></td>
-<td>3 人 8 小时协同，分工不清浪费大量时间</td>
+<td><strong>全英文环境</strong></td>
+<td>全球总决赛英文题面 + 英文控制台，服务名和报错都要能读</td>
 </tr>
 <tr>
-<td><strong>排障压力大</strong></td>
-<td>限时环境下网络不通，容易慌乱</td>
+<td><strong>团队互踩</strong></td>
+<td>三人共用一个环境，一人改错另一人配好的资源</td>
+</tr>
+<tr>
+<td><strong>限时压力</strong></td>
+<td>8 小时从零搭完整架构，每道题都在倒计时</td>
 </tr>
 </tbody>
 </table>
 <h3 id="62">6.2 突破策略</h3>
 <p><strong>策略一：分工专攻，交叉覆盖</strong>
-- 3 人按方向分工：1 人主攻数通路由，1 人主攻交换与 DCN，1 人主攻安全与 WLAN
-- 每人把自己方向练到熟练，同时了解其他方向基础，便于协作</p>
-<p><strong>策略二：以练代背，肌肉记忆</strong>
-- 每个知识点配 1-2 个小实验验证，做到"理解 + 会配"
-- 核心协议（VLAN、OSPF、STP、ACL）反复练到不看资料也能配</p>
-<p><strong>策略三：整网实战，刻意排障</strong>
-- 用往届真题做整网实验，从拓扑设计到完整配置走全流程
-- 每次实验后复盘：哪里配错、哪里耗时、排障思路是否清晰
-- 刻意制造故障练习排障（故意配错一个点，队友排查）</p>
-<p><strong>策略四：限时模拟，建立节奏</strong>
-- 严格按 8 小时限时做整套实验
-- 建立团队协作 SOP：谁搭骨干、谁配接入、谁做安全</p>
+- 3 人分工：1 人主攻计算+存储+镜像，1 人主攻网络+数据库，1 人主攻容器+AI+运维
+- 但底盘（VPC/ECS/安全组）三人必须人人会——任何一道题都从底盘开始</p>
+<p><strong>策略二：控制台肌肉记忆</strong>
+- 为高频服务各做一张"点单清单"：入口路径 → 必填参数 → 验收动作
+- 练到看到题目就能报出"先建什么后建什么、每步填什么"</p>
+<p><strong>策略三：规划先行，模板沉淀</strong>
+- 动手前先填"资源规划表"：名称、CIDR、IP、端口、规格全部落纸
+- 每个实验沉淀三样：步骤清单、验证命令、踩过的坑</p>
+<p><strong>策略四：整架构实战，刻意排障</strong>
+- 用 5.3 清单练单点，再串成完整架构限时做
+- 复盘每次实验：哪一步反复看文档？哪里耗时最多？
+- 队友互相"埋雷"（故意改错安全组/端口），练快速排障</p>
+<p><strong>策略五：限时模拟，建立节奏</strong>
+- 严格按 8 小时做整套模拟题，切换控制台为英文界面
+- 形成团队 SOP：谁读题拆解、谁搭网络、谁部署应用、谁验证交付</p>
 <hr>
 <h2 id="7">7. 分阶段备赛计划</h2>
 <h3 id="4-6">第一阶段：打基础（4-6 周）</h3>
-<ul>
-<li>对照 HCIA-Datacom 大纲，逐个过知识点</li>
-<li>每个知识点配 eNSP 小实验</li>
-<li>产出：一张完整的知识网络图 + 每个核心协议的配置模板</li>
-</ul>
+<table>
+<thead>
+<tr>
+<th>周次</th>
+<th>学习内容</th>
+<th>实验任务</th>
+<th>产出</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>第1周</td>
+<td>云计算概念、控制台、区域与计费</td>
+<td>购买第一台 ECS 并 SSH 登录</td>
+<td>控制台速查表</td>
+</tr>
+<tr>
+<td>第2周</td>
+<td>VPC、子网、安全组、EIP</td>
+<td>双子网组网 + 端口放行实验</td>
+<td>网络规划模板</td>
+</tr>
+<tr>
+<td>第3周</td>
+<td>ECS 进阶、EVS 数据盘</td>
+<td>部署 Web 网站 + 挂载数据盘</td>
+<td>Web 上线流程清单</td>
+</tr>
+<tr>
+<td>第4周</td>
+<td>OBS、SFS、快照备份</td>
+<td>OBS 静态网站 + 快照回滚</td>
+<td>存储选型对照表</td>
+</tr>
+<tr>
+<td>第5周</td>
+<td>RDS、数据库连接</td>
+<td>ECS+RDS 动态网站架构</td>
+<td>应用+DB 联调清单</td>
+</tr>
+<tr>
+<td>第6周</td>
+<td>ELB、AS</td>
+<td>负载均衡 + 弹性伸缩实验</td>
+<td>高可用架构模板</td>
+</tr>
+</tbody>
+</table>
+<p><strong>阶段目标</strong>：对照 HCIA-Cloud Service 大纲逐个过知识点，每项服务都亲手点过一遍控制台。</p>
 <h3 id="4-6_1">第二阶段：专项突破（4-6 周）</h3>
+<table>
+<thead>
+<tr>
+<th>周次</th>
+<th>主攻方向</th>
+<th>进阶内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>第7周</td>
+<td>容器基础</td>
+<td>Docker 镜像构建、SWR 推送</td>
+</tr>
+<tr>
+<td>第8周</td>
+<td>CCE/K8s</td>
+<td>创建集群、部署 Deployment+Service、扩缩容</td>
+</tr>
+<tr>
+<td>第9周</td>
+<td>IAM 与运维</td>
+<td>子账号授权、CES 告警、LTS 日志检索</td>
+</tr>
+<tr>
+<td>第10周</td>
+<td>ModelArts</td>
+<td>预置 AI 服务部署与 API 调用</td>
+</tr>
+<tr>
+<td>第11周</td>
+<td>DNS 与综合架构</td>
+<td>域名解析、小型完整架构串联</td>
+</tr>
+<tr>
+<td>第12周</td>
+<td>跨服务整合</td>
+<td>3 小时中型综合实验计时练</td>
+</tr>
+</tbody>
+</table>
+<p><strong>阶段目标</strong>：三人按方向分工拔高到 HCIP 水平，容器与 AI 由专人攻透。</p>
+<h3 id="4_1">第三阶段：整架构实战（4 周）</h3>
 <ul>
-<li>按团队分工，每人主攻一个方向</li>
-<li>做 HCIP 级别的进阶内容（OSPF 多区域、BGP、路由策略、IPSec VPN）</li>
-<li>每周一次团队整合实验</li>
-</ul>
-<h3 id="4_1">第三阶段：整网实战（4 周）</h3>
-<ul>
-<li>用往届真题和模拟题做完整实验</li>
-<li>每次实验严格限时，赛后详细复盘</li>
-<li>建立排障手册：常见故障现象 → 排查命令 → 解决方法</li>
+<li>用往届真题、模拟题做完整架构搭建（从 VPC 规划到交付验收全流程）</li>
+<li>每次严格限时，赛后详细复盘耗时分布</li>
+<li>建立<strong>排障手册</strong>：故障现象 → 排查步骤 → 解决方法（对齐 5.4 案例表）</li>
+<li>每周至少 2 套完整实验 + 1 次队友互相埋雷的排障专项</li>
 </ul>
 <h3 id="2-3">第四阶段：冲刺模拟（2-3 周）</h3>
 <ul>
-<li>完全模拟全球总决赛节奏：8 小时、全英文题、只允许官方文档</li>
-<li>打磨团队协作 SOP，形成肌肉记忆</li>
-<li>查漏补缺，回归基础知识点</li>
+<li>完全模拟全球总决赛节奏：<strong>8 小时、英文题面、英文控制台、共用环境</strong></li>
+<li>打磨团队协作 SOP：读题拆解 → 并行搭建 → 交叉验证 → 按题交付</li>
+<li>查漏补缺，回归各服务的"点单清单"</li>
+<li>最后 3 天：只看自己的清单和笔记，不再学新内容</li>
 </ul>
 <hr>
 <h2 id="8">8. 参考资料与官方资源</h2>
@@ -741,25 +1208,33 @@ display acl all                  # 查看所有 ACL
 <td>https://e.huawei.com/cn/talent/ict-academy/</td>
 </tr>
 <tr>
-<td>华为人才在线（报名+大纲）</td>
+<td>华为人才在线（报名+认证大纲）</td>
 <td>https://e.huawei.com/cn/talent/</td>
 </tr>
 <tr>
-<td>HCIA-Datacom 认证大纲</td>
-<td>华为人才在线 → 华为认证 → Datacom</td>
+<td>HCIA-Cloud Service 认证</td>
+<td>华为人才在线 → 华为认证 → Cloud Service</td>
 </tr>
 <tr>
-<td>eNSP 下载</td>
-<td>华为官网 → 支持 → 下载 → 模拟器</td>
+<td>华为云控制台</td>
+<td>https://console.huaweicloud.com/</td>
 </tr>
 <tr>
-<td>eNSP 使用教程</td>
-<td>华为官方文档 + B 站搜索"eNSP 入门"</td>
+<td>华为云产品文档</td>
+<td>https://support.huaweicloud.com/productdesc-index.html</td>
+</tr>
+<tr>
+<td>华为云学院（免费实验沙箱）</td>
+<td>https://edu.huaweicloud.com/</td>
+</tr>
+<tr>
+<td>Kubernetes 中文文档</td>
+<td>https://kubernetes.io/zh-cn/docs/home/</td>
 </tr>
 </tbody>
 </table>
 <blockquote>
-<p>免责声明：本教程基于公开资料整理，具体考试内容以华为ICT大赛组委会发布的最新考试大纲为准。AI 辅助整理，请结合实际训练判断。</p>
+<p>免责声明：本教程基于公开资料整理，具体比赛内容以华为ICT大赛组委会发布的最新通知与考试大纲为准。AI 辅助整理，请结合实际训练判断。</p>
 </blockquote>
     <div class="pager"><a href="08.html"><div class="dir">← 上一章</div><div class="ttl">Python 与 AI 大模型：从原理到 Transformer</div></a></div>
   </main>
