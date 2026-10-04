@@ -1,0 +1,904 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>03 SQL 数据库深度讲解（工业实践版） · Java · SQL · Python AI 教程</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<header class="topnav">
+  <div class="brand">Java · SQL · Python AI 教程<small>从原理到实战</small></div>
+  <nav><a href="01.html" class="">01 JavaSE 基础知</a><a href="02.html" class="">02 Java 与 SQL</a><a href="03.html" class="active">03 SQL 数据库深度讲</a><a href="04.html" class="">04 学习报告：Java </a><a href="05.html" class="">05 JavaEE 企业级</a><a href="06.html" class="">06 Java 上位机开发</a><a href="07.html" class="">07 JavaEE 上位机</a><a href="08.html" class="">08 Python 与 A</a></nav>
+  <a class="src" href="https://github.com/user-unknowed/studying-for-building" target="_blank">📦 源码仓库</a>
+</header>
+<div class="layout">
+  <aside class="sidebar">
+    <h4>本节目录</h4>
+    <ul><ul>
+<li><a href="#0">0. 导读：工业界需要什么样的数据库能力</a></li>
+<li><a href="#1">1. 关系模型与表设计</a><ul>
+<li><a href="#11">1.1 核心概念一句话版</a></li>
+<li><a href="#12">1.2 设计原则</a></li>
+<li><a href="#13">1.3 字段类型选择速查表</a></li>
+<li><a href="#14">1.4 字符集</a></li>
+<li><a href="#15">1.5 建表"工业三件套"</a></li>
+</ul>
+</li>
+<li><a href="#2-sql">2. SQL 语言全景与执行顺序</a><ul>
+<li><a href="#21">2.1 语言分类</a></li>
+<li><a href="#22">2.2 逻辑执行顺序（面试必问、优化基础）</a></li>
+<li><a href="#23-null">2.3 NULL 与三值逻辑（高频陷阱）</a></li>
+</ul>
+</li>
+<li><a href="#3">3. 查询编程核心技能</a><ul>
+<li><a href="#31-join">3.1 JOIN 家族</a></li>
+<li><a href="#32-vs-exists-vs-join">3.2 子查询 vs EXISTS vs JOIN</a></li>
+<li><a href="#33">3.3 聚合与分组</a></li>
+<li><a href="#34">3.4 窗口函数（工业分水岭）</a></li>
+<li><a href="#35-cte-cte">3.5 CTE 与递归 CTE</a></li>
+<li><a href="#36">3.6 经典工业题型库</a></li>
+</ul>
+</li>
+<li><a href="#4">4. 性能优化：索引与执行计划</a><ul>
+<li><a href="#41-b">4.1 为什么是 B+ 树</a></li>
+<li><a href="#42-innodb">4.2 InnoDB 索引体系</a></li>
+<li><a href="#43">4.3 索引失效清单（高频踩坑）</a></li>
+<li><a href="#44-explain">4.4 EXPLAIN 解读</a></li>
+<li><a href="#45">4.5 深分页优化（大厂高频）</a></li>
+<li><a href="#46">4.6 慢查询治理流程</a></li>
+</ul>
+</li>
+<li><a href="#5">5. 事务、锁与并发</a><ul>
+<li><a href="#51-acid">5.1 ACID 的工业含义</a></li>
+<li><a href="#52">5.2 隔离级别</a></li>
+<li><a href="#53-mvcc">5.3 MVCC（多版本并发控制）</a></li>
+<li><a href="#54">5.4 锁体系</a></li>
+<li><a href="#55">5.5 死锁：排查与预防</a></li>
+<li><a href="#56-vs">5.6 乐观锁 vs 悲观锁</a></li>
+<li><a href="#57">5.7 分布式事务方案选型</a></li>
+</ul>
+</li>
+<li><a href="#6">6. 工业架构常识</a><ul>
+<li><a href="#61">6.1 主从复制</a></li>
+<li><a href="#62">6.2 读写分离</a></li>
+<li><a href="#63">6.3 分库分表</a></li>
+<li><a href="#64-hikaricp">6.4 连接池（以 HikariCP 为例）</a></li>
+<li><a href="#65">6.5 数据库版本管理</a></li>
+</ul>
+</li>
+<li><a href="#7-java">7. Java 编程接入（贴合主线）</a><ul>
+<li><a href="#71">7.1 演进路线</a></li>
+<li><a href="#72-jdbc">7.2 JDBC 标准流程（骨架代码）</a></li>
+<li><a href="#73-mybatis">7.3 MyBatis 要点</a></li>
+<li><a href="#74-checklist">7.4 编程规范 checklist</a></li>
+</ul>
+</li>
+<li><a href="#8-20252026">8. 时代背景：2025–2026 数据库在发生什么</a><ul>
+<li><a href="#81">8.1 格局</a></li>
+<li><a href="#82-sqlai">8.2 向量检索进入 SQL（AI 时代的新能力）</a></li>
+<li><a href="#83-ai">8.3 AI × 数据库</a></li>
+</ul>
+</li>
+<li><a href="#9">9. 学习路径与练习</a><ul>
+<li><a href="#91">9.1 四阶段</a></li>
+<li><a href="#92">9.2 练习资源</a></li>
+<li><a href="#93">9.3 书单</a></li>
+</ul>
+</li>
+<li><a href="#a">附录 A：真实运行输出节选</a></li>
+<li><a href="#b-10">附录 B：面试速查 10 问</a></li>
+<li><a href="#c">附录 C：配套文件清单</a></li>
+</ul></ul>
+  </aside>
+  <main class="content">
+    <div class="meta" style="color:#16a34a;font-weight:600">第 03 章 · 🗄️</div>
+    <h1 style="border-bottom:3px solid #16a34a;padding-bottom:10px">SQL 数据库深度讲解（工业实践版）</h1>
+    <div class="meta">关系模型 · 窗口函数 · 索引 · 事务并发 · 架构前沿</div>
+    <h1 id="sql">SQL数据库深度讲解（工业实践版）</h1>
+<blockquote>
+<p>面向：想系统掌握 SQL 与数据库的开发者 ｜ 整理：Operit AI ｜ 2026-09
+配套资料：<code>sql-demo/sql_demo.py</code>（可真实运行）、<code>sql-demo/demo_output.txt</code>（真实运行输出）
+姊妹篇：《学习报告-Java-数据库-AI-Agent.md》</p>
+</blockquote>
+<hr>
+<h2 id="0">0. 导读：工业界需要什么样的数据库能力</h2>
+<p>三条主线：</p>
+<table>
+<thead>
+<tr>
+<th>能力</th>
+<th>具体表现</th>
+<th>对应章节</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>写得出</strong></td>
+<td>复杂查询、窗口函数、多表分析</td>
+<td>第 1～3 章</td>
+</tr>
+<tr>
+<td><strong>跑得快</strong></td>
+<td>索引设计、执行计划、慢查询治理</td>
+<td>第 4 章</td>
+</tr>
+<tr>
+<td><strong>不出事</strong></td>
+<td>事务、锁、一致性、安全</td>
+<td>第 5～6 章</td>
+</tr>
+</tbody>
+</table>
+<p>各岗位的日常视角：
+- <strong>后端开发</strong>：表设计 + CRUD + 索引优化 + 事务控制 + Java 代码接入（第 7 章）
+- <strong>数据开发 / 分析师</strong>：复杂 SQL、窗口函数、ETL、报表（第 3 章）
+- <strong>DBA / SRE</strong>：复制、备份、分库分表、故障处理（第 6 章）</p>
+<hr>
+<h2 id="1">1. 关系模型与表设计</h2>
+<h3 id="11">1.1 核心概念一句话版</h3>
+<p>表=二维结构；行=记录；列=字段；<strong>主键</strong>=唯一标识（InnoDB 中主键就是聚簇索引）；<strong>外键</strong>=引用完整性；约束=NOT NULL / UNIQUE / CHECK / DEFAULT。</p>
+<h3 id="12">1.2 设计原则</h3>
+<ul>
+<li>三大范式：1NF 列不可再分；2NF 消除部分依赖；3NF 消除传递依赖。</li>
+<li>工业实践：<strong>不迷信范式，适度反范式</strong>。例：订单表冗余"下单时的商品名 / 收货地址"——商品可能改名，订单要保留<strong>历史快照</strong>。</li>
+<li>校验分工：数据库约束兜底 + 应用层校验为主（错误信息更友好）。</li>
+</ul>
+<h3 id="13">1.3 字段类型选择速查表</h3>
+<table>
+<thead>
+<tr>
+<th>场景</th>
+<th>推荐类型</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>主键</td>
+<td>BIGINT UNSIGNED 自增 / 雪花 ID</td>
+<td>分布式系统用趋势递增的雪花 ID，避免写入热点</td>
+</tr>
+<tr>
+<td>金额</td>
+<td>DECIMAL(10,2)</td>
+<td><strong>绝不用 FLOAT/DOUBLE</strong>（二进制浮点误差：0.1+0.2≠0.3）</td>
+</tr>
+<tr>
+<td>时间</td>
+<td>DATETIME / TIMESTAMP</td>
+<td>TIMESTAMP 有 2038 问题；高精度用 DATETIME(3)</td>
+</tr>
+<tr>
+<td>短字符串</td>
+<td>VARCHAR(N)</td>
+<td>N 影响排序内存与索引大小，按业务估算</td>
+</tr>
+<tr>
+<td>布尔</td>
+<td>TINYINT(1)</td>
+<td>MySQL 没有真正的 BOOLEAN</td>
+</tr>
+<tr>
+<td>半结构化</td>
+<td>JSON / JSONB(PG)</td>
+<td>PG 的 jsonb 可建索引，更推荐</td>
+</tr>
+<tr>
+<td>枚举</td>
+<td>TINYINT + 字典表</td>
+<td>比 ENUM 容易演进（加值不改表结构）</td>
+</tr>
+</tbody>
+</table>
+<h3 id="14">1.4 字符集</h3>
+<p>一律 <strong>utf8mb4</strong>——MySQL 的 "utf8" 是 3 字节残缺版，存不了 emoji 等 4 字节字符。排序规则常用 utf8mb4_unicode_ci / utf8mb4_0900_ai_ci。</p>
+<h3 id="15">1.5 建表"工业三件套"</h3>
+<div class="codehilite"><pre><span></span><code><span class="n">id</span><span class="w">         </span><span class="nb">BIGINT</span><span class="w"> </span><span class="n">UNSIGNED</span><span class="w"> </span><span class="n">AUTO_INCREMENT</span><span class="w"> </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="p">,</span>
+<span class="n">created_at</span><span class="w"> </span><span class="n">DATETIME</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="k">CURRENT_TIMESTAMP</span><span class="p">,</span>
+<span class="n">updated_at</span><span class="w"> </span><span class="n">DATETIME</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="k">CURRENT_TIMESTAMP</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="k">UPDATE</span><span class="w"> </span><span class="k">CURRENT_TIMESTAMP</span>
+</code></pre></div>
+
+<hr>
+<h2 id="2-sql">2. SQL 语言全景与执行顺序</h2>
+<h3 id="21">2.1 语言分类</h3>
+<table>
+<thead>
+<tr>
+<th>类别</th>
+<th>语句</th>
+<th>用途</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>DDL</td>
+<td>CREATE / ALTER / DROP / TRUNCATE</td>
+<td>定义结构</td>
+</tr>
+<tr>
+<td>DML</td>
+<td>INSERT / UPDATE / DELETE</td>
+<td>修改数据</td>
+</tr>
+<tr>
+<td>DQL</td>
+<td>SELECT</td>
+<td>查询</td>
+</tr>
+<tr>
+<td>DCL</td>
+<td>GRANT / REVOKE</td>
+<td>权限</td>
+</tr>
+<tr>
+<td>TCL</td>
+<td>BEGIN / COMMIT / ROLLBACK / SAVEPOINT</td>
+<td>事务</td>
+</tr>
+</tbody>
+</table>
+<h3 id="22">2.2 逻辑执行顺序（面试必问、优化基础）</h3>
+<div class="codehilite"><pre><span></span><code>FROM → JOIN/ON → WHERE → GROUP BY → HAVING → SELECT → DISTINCT → ORDER BY → LIMIT
+</code></pre></div>
+
+<p>推论：
+- WHERE 里不能用 SELECT 定义的别名（SELECT 还没执行）→ 用子查询或重复表达式；
+- 聚合过滤必须用 HAVING；
+- 能尽早过滤就尽早过滤：能在 WHERE 做的别拖到 HAVING / ORDER BY。</p>
+<h3 id="23-null">2.3 NULL 与三值逻辑（高频陷阱）</h3>
+<ul>
+<li><code>NULL = NULL</code> 结果是 NULL（不是 TRUE）→ 判断用 <code>IS NULL</code> / <code>IS NOT NULL</code>；</li>
+<li><code>COUNT(*)</code> 数行数；<code>COUNT(列)</code> 忽略 NULL；</li>
+<li><strong><code>NOT IN (子查询含 NULL)</code> 会整体失效、返回空集</strong> → 改用 <code>NOT EXISTS</code>；</li>
+<li>空值函数：<code>COALESCE</code>（标准）、<code>IFNULL</code>（MySQL）、<code>NULLIF(a,b)</code>（相等则返回 NULL，可用于防除零）。</li>
+</ul>
+<hr>
+<h2 id="3">3. 查询编程核心技能</h2>
+<h3 id="31-join">3.1 JOIN 家族</h3>
+<table>
+<thead>
+<tr>
+<th>类型</th>
+<th>含义</th>
+<th>典型场景</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>INNER JOIN</td>
+<td>交集</td>
+<td>常规关联</td>
+</tr>
+<tr>
+<td>LEFT JOIN</td>
+<td>左表全保留</td>
+<td>主表 + 可选关联（"没下过单也要列出用户"）</td>
+</tr>
+<tr>
+<td>RIGHT JOIN</td>
+<td>右表全保留</td>
+<td>少用，习惯改写为 LEFT</td>
+</tr>
+<tr>
+<td>FULL JOIN</td>
+<td>并集</td>
+<td>PG/Oracle 支持；MySQL 用 UNION 模拟</td>
+</tr>
+<tr>
+<td>CROSS JOIN</td>
+<td>笛卡尔积</td>
+<td>生成序列、组合枚举</td>
+</tr>
+<tr>
+<td>自连接</td>
+<td>表与自己连</td>
+<td>层级（员工-经理）、行间对比</td>
+</tr>
+</tbody>
+</table>
+<p>真实运行示例（结果见附录 A）：</p>
+<div class="codehilite"><pre><span></span><code><span class="k">SELECT</span><span class="w"> </span><span class="n">e</span><span class="p">.</span><span class="n">name</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="err">员工</span><span class="p">,</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="n">name</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="err">部门</span><span class="p">,</span><span class="w"> </span><span class="k">COALESCE</span><span class="p">(</span><span class="n">m</span><span class="p">.</span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;—&#39;</span><span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="err">经理</span>
+<span class="k">FROM</span><span class="w"> </span><span class="n">emp</span><span class="w"> </span><span class="n">e</span>
+<span class="k">JOIN</span><span class="w"> </span><span class="n">dept</span><span class="w"> </span><span class="n">d</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">e</span><span class="p">.</span><span class="n">dept_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="n">id</span><span class="w">      </span><span class="c1">-- 内连接</span>
+<span class="k">LEFT</span><span class="w"> </span><span class="k">JOIN</span><span class="w"> </span><span class="n">emp</span><span class="w"> </span><span class="n">m</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">e</span><span class="p">.</span><span class="n">mgr_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">m</span><span class="p">.</span><span class="n">id</span><span class="p">;</span><span class="w">  </span><span class="c1">-- 左连接 + 自连接</span>
+</code></pre></div>
+
+<h3 id="32-vs-exists-vs-join">3.2 子查询 vs EXISTS vs JOIN</h3>
+<ul>
+<li>标量子查询：返回单值，可放 SELECT / WHERE；</li>
+<li>IN：适合"子查询结果集小"；</li>
+<li>EXISTS：短路语义，适合"子查询大、命中即止"（找到一条就不再扫）；</li>
+<li>很多场景 JOIN 可替代且更可控；核心直觉是<strong>"小表驱动大表"</strong>；</li>
+<li>注意去重语义：JOIN 可能放大行数（一对多），EXISTS 不会。</li>
+</ul>
+<h3 id="33">3.3 聚合与分组</h3>
+<ul>
+<li>GROUP BY + HAVING 是报表骨架；</li>
+<li>MySQL：<code>WITH ROLLUP</code> 出小计/总计；<code>GROUP_CONCAT</code> 聚合字符串；</li>
+<li><strong>ONLY_FULL_GROUP_BY</strong>（MySQL 5.7+ 默认开启）：非聚合列必须出现在 GROUP BY 里 → 保证结果确定性。</li>
+</ul>
+<h3 id="34">3.4 窗口函数（工业分水岭）</h3>
+<p>语法：<code>函数() OVER (PARTITION BY 分组 ORDER BY 排序 [ROWS/RANGE 帧])</code></p>
+<p>三大类：</p>
+<table>
+<thead>
+<tr>
+<th>类别</th>
+<th>函数</th>
+<th>典型场景</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>排名</td>
+<td>ROW_NUMBER / RANK / DENSE_RANK</td>
+<td>排名、去重、TopN</td>
+</tr>
+<tr>
+<td>偏移</td>
+<td>LAG / LEAD / FIRST_VALUE / LAST_VALUE</td>
+<td>环比同比、前后行对比</td>
+</tr>
+<tr>
+<td>聚合</td>
+<td>SUM / COUNT / AVG / MAX / MIN ... OVER</td>
+<td>累计值、移动平均、占比</td>
+</tr>
+</tbody>
+</table>
+<p>三个必背模板：</p>
+<div class="codehilite"><pre><span></span><code><span class="c1">-- ① 分组 TopN（窗口函数在 WHERE 之后计算，不能直接 WHERE rn&lt;=N，要套一层）</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="p">(</span>
+<span class="w">  </span><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="p">,</span><span class="w"> </span><span class="n">ROW_NUMBER</span><span class="p">()</span><span class="w"> </span><span class="n">OVER</span><span class="w"> </span><span class="p">(</span><span class="n">PARTITION</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="err">组</span><span class="w"> </span><span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="err">值</span><span class="w"> </span><span class="k">DESC</span><span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">rn</span>
+<span class="w">  </span><span class="k">FROM</span><span class="w"> </span><span class="n">t</span>
+<span class="p">)</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">rn</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mi">3</span><span class="p">;</span>
+
+<span class="c1">-- ② 累计值（默认帧：分组内首行 → 当前行）</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="n">dt</span><span class="p">,</span><span class="w"> </span><span class="n">amt</span><span class="p">,</span><span class="w"> </span><span class="k">SUM</span><span class="p">(</span><span class="n">amt</span><span class="p">)</span><span class="w"> </span><span class="n">OVER</span><span class="w"> </span><span class="p">(</span><span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">dt</span><span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">running_total</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">t</span><span class="p">;</span>
+
+<span class="c1">-- ③ 环比（与上一行对比）</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="n">dt</span><span class="p">,</span><span class="w"> </span><span class="n">amt</span><span class="p">,</span>
+<span class="w">       </span><span class="n">LAG</span><span class="p">(</span><span class="n">amt</span><span class="p">)</span><span class="w"> </span><span class="n">OVER</span><span class="w"> </span><span class="p">(</span><span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">dt</span><span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">prev_amt</span><span class="p">,</span>
+<span class="w">       </span><span class="n">amt</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">LAG</span><span class="p">(</span><span class="n">amt</span><span class="p">)</span><span class="w"> </span><span class="n">OVER</span><span class="w"> </span><span class="p">(</span><span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">dt</span><span class="p">)</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">diff</span>
+<span class="k">FROM</span><span class="w"> </span><span class="n">t</span><span class="p">;</span>
+</code></pre></div>
+
+<p>真实运行结果节选（注意市场部并列薪资下的行号/名次差异）：</p>
+<table>
+<thead>
+<tr>
+<th>员工</th>
+<th>部门</th>
+<th>薪资</th>
+<th>ROW_NUMBER</th>
+<th>RANK</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>赵敏</td>
+<td>2</td>
+<td>20000</td>
+<td>1</td>
+<td>1</td>
+</tr>
+<tr>
+<td>刘洋</td>
+<td>2</td>
+<td>20000</td>
+<td>2</td>
+<td><strong>1</strong> ← 并列同名次</td>
+</tr>
+</tbody>
+</table>
+<h3 id="35-cte-cte">3.5 CTE 与递归 CTE</h3>
+<ul>
+<li><code>WITH cte AS (...)</code> 把复杂 SQL 分层，可读性大幅提升；</li>
+<li>递归模板（组织树 / 菜单树 / 路径搜索）：</li>
+</ul>
+<div class="codehilite"><pre><span></span><code><span class="k">WITH</span><span class="w"> </span><span class="k">RECURSIVE</span><span class="w"> </span><span class="n">tree</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="p">(</span>
+<span class="w">  </span><span class="k">SELECT</span><span class="w"> </span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">lvl</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">org</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">parent_id</span><span class="w"> </span><span class="k">IS</span><span class="w"> </span><span class="k">NULL</span><span class="w">   </span><span class="c1">-- 起点：根节点</span>
+<span class="w">  </span><span class="k">UNION</span><span class="w"> </span><span class="k">ALL</span>
+<span class="w">  </span><span class="k">SELECT</span><span class="w"> </span><span class="n">o</span><span class="p">.</span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">o</span><span class="p">.</span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">t</span><span class="p">.</span><span class="n">lvl</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span>
+<span class="w">  </span><span class="k">FROM</span><span class="w"> </span><span class="n">org</span><span class="w"> </span><span class="n">o</span><span class="w"> </span><span class="k">JOIN</span><span class="w"> </span><span class="n">tree</span><span class="w"> </span><span class="n">t</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">o</span><span class="p">.</span><span class="n">parent_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">t</span><span class="p">.</span><span class="n">id</span><span class="w">                 </span><span class="c1">-- 递归：挂到上级下面</span>
+<span class="p">)</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">tree</span><span class="p">;</span>
+</code></pre></div>
+
+<h3 id="36">3.6 经典工业题型库</h3>
+<table>
+<thead>
+<tr>
+<th>题型</th>
+<th>方法</th>
+<th>关键点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>连续 N 天登录</td>
+<td>日期 − 行号 = 常数分组</td>
+<td>窗口函数 + GROUP BY（附录 A 有完整可运行版）</td>
+</tr>
+<tr>
+<td>分组 TopN</td>
+<td>ROW_NUMBER 套子查询</td>
+<td>窗口函数计算时机</td>
+</tr>
+<tr>
+<td>行转列</td>
+<td>CASE WHEN + SUM</td>
+<td>MySQL 无 PIVOT 语法</td>
+</tr>
+<tr>
+<td>同比 / 环比</td>
+<td>LAG / 自连接偏移</td>
+<td>注意缺月补零</td>
+</tr>
+<tr>
+<td>第 N 高薪水</td>
+<td>DENSE_RANK / LIMIT OFFSET</td>
+<td>"并列名次"的语义</td>
+</tr>
+<tr>
+<td>留存率 / 复购率</td>
+<td>首次活跃日 + 日期差 + COUNT DISTINCT</td>
+<td>先想清楚"数据粒度"</td>
+</tr>
+<tr>
+<td>中位数</td>
+<td>窗口函数 + 位置判定</td>
+<td>区分奇偶个数</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="4">4. 性能优化：索引与执行计划</h2>
+<h3 id="41-b">4.1 为什么是 B+ 树</h3>
+<ul>
+<li>非叶子节点只存键 → 一个节点塞更多键 → 树更矮（3～4 层可撑千万级数据）；</li>
+<li>叶子节点存数据且用链表相连 → 范围查询高效；</li>
+<li>对比：哈希索引只支持等值查询；B 树非叶子存数据导致树更高、范围查询差。</li>
+</ul>
+<h3 id="42-innodb">4.2 InnoDB 索引体系</h3>
+<ul>
+<li><strong>聚簇索引（主键）</strong>：叶子节点 = 整行数据，表数据就长在它身上；</li>
+<li><strong>二级索引</strong>：叶子 = 索引列 + 主键值；</li>
+<li><strong>回表</strong>：二级索引找到主键 → 再回聚簇索引取整行；</li>
+<li><strong>覆盖索引</strong>：查询需要的列全在索引里 → 免回表（性能提升常用手段）；</li>
+<li><strong>联合索引最左前缀</strong>：(a,b,c) 可支撑 a / a,b / a,b,c 的组合；范围查询会中断后续列；</li>
+<li><strong>索引下推 ICP</strong>（MySQL 5.6+）：过滤条件下推到引擎层，减少回表。</li>
+</ul>
+<h3 id="43">4.3 索引失效清单（高频踩坑）</h3>
+<table>
+<thead>
+<tr>
+<th>写法</th>
+<th>问题</th>
+<th>改写</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>WHERE YEAR(dt)=2026</code></td>
+<td>列上套函数</td>
+<td><code>dt &gt;= '2026-01-01' AND dt &lt; '2027-01-01'</code></td>
+</tr>
+<tr>
+<td><code>WHERE user_id = '123'</code>（int 列）</td>
+<td>隐式类型转换</td>
+<td>类型匹配</td>
+</tr>
+<tr>
+<td><code>LIKE '%abc'</code></td>
+<td>前缀模糊</td>
+<td>改后缀 / 全文索引 / 向量检索</td>
+</tr>
+<tr>
+<td><code>a=1 OR b=2</code>（b 无索引）</td>
+<td>OR 拖累</td>
+<td>拆成 UNION</td>
+</tr>
+<tr>
+<td><code>!= / NOT IN</code>（大范围）</td>
+<td>低选择性</td>
+<td>视情况换分段查询</td>
+</tr>
+<tr>
+<td>跳过联合索引最左列</td>
+<td>断链</td>
+<td>调整索引顺序</td>
+</tr>
+<tr>
+<td>ORDER BY 与索引序不一致</td>
+<td>filesort</td>
+<td>让排序用上索引</td>
+</tr>
+</tbody>
+</table>
+<h3 id="44-explain">4.4 EXPLAIN 解读</h3>
+<ul>
+<li>核心列：<code>type</code>（访问类型）、<code>key</code>（用到哪个索引）、<code>rows</code>（预估行数）、<code>filtered</code>（过滤比）、<code>Extra</code>（关键信号）；</li>
+<li>type 等级：<code>system &gt; const &gt; eq_ref &gt; ref &gt; range &gt; index &gt; ALL</code>，出现 ALL（全表扫描）要警觉；</li>
+<li>Extra 信号：<code>Using index</code>（覆盖索引，优）｜ <code>Using filesort</code>（额外排序）｜ <code>Using temporary</code>（临时表）｜ <code>Using index condition</code>（ICP）；</li>
+<li>真实对比（SQLite 等价演示）：
+  <code>加索引前: SCAN orders
+  加索引后: SEARCH orders USING INDEX idx_orders_user (user_id=?)</code></li>
+</ul>
+<h3 id="45">4.5 深分页优化（大厂高频）</h3>
+<div class="codehilite"><pre><span></span><code><span class="c1">-- 慢：先扫 100 万行再丢掉</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">t</span><span class="w"> </span><span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="k">LIMIT</span><span class="w"> </span><span class="mi">1000000</span><span class="p">,</span><span class="w"> </span><span class="mi">20</span><span class="p">;</span>
+
+<span class="c1">-- 快①：延迟关联（先用覆盖索引拿主键）</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="n">t</span><span class="p">.</span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">t</span>
+<span class="k">JOIN</span><span class="w"> </span><span class="p">(</span><span class="k">SELECT</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">t</span><span class="w"> </span><span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="k">LIMIT</span><span class="w"> </span><span class="mi">1000000</span><span class="p">,</span><span class="w"> </span><span class="mi">20</span><span class="p">)</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="k">ON</span><span class="w"> </span><span class="n">t</span><span class="p">.</span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">x</span><span class="p">.</span><span class="n">id</span><span class="p">;</span>
+
+<span class="c1">-- 快②：游标(keyset)分页——记住上一页最后的 id</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">t</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">1000200</span><span class="w"> </span><span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="k">LIMIT</span><span class="w"> </span><span class="mi">20</span><span class="p">;</span>
+</code></pre></div>
+
+<h3 id="46">4.6 慢查询治理流程</h3>
+<div class="codehilite"><pre><span></span><code>监控（慢日志 / performance_schema）→ 定位 TOP SQL → EXPLAIN 分析
+→ 三级手段（改索引 / 改 SQL / 改架构）→ 回归验证
+</code></pre></div>
+
+<p>工具：pt-query-digest、mysqld_exporter + Prometheus + Grafana。</p>
+<hr>
+<h2 id="5">5. 事务、锁与并发</h2>
+<h3 id="51-acid">5.1 ACID 的工业含义</h3>
+<ul>
+<li><strong>A 原子性</strong>：要么全成要么全回滚（undo log 实现）；</li>
+<li><strong>C 一致性</strong>：约束与业务规则不被破坏（是目的，A/I/D 是手段）；</li>
+<li><strong>I 隔离性</strong>：并发事务互不干扰（锁 + MVCC 实现）；</li>
+<li><strong>D 持久性</strong>：提交即落盘（redo log，WAL 机制）。</li>
+</ul>
+<h3 id="52">5.2 隔离级别</h3>
+<table>
+<thead>
+<tr>
+<th>级别</th>
+<th>脏读</th>
+<th>不可重复读</th>
+<th>幻读</th>
+<th>默认于</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>READ UNCOMMITTED</td>
+<td>✗</td>
+<td>✗</td>
+<td>✗</td>
+<td>几乎不用</td>
+</tr>
+<tr>
+<td>READ COMMITTED</td>
+<td>✓</td>
+<td>✗</td>
+<td>✗</td>
+<td>PG / Oracle 默认</td>
+</tr>
+<tr>
+<td>REPEATABLE READ</td>
+<td>✓</td>
+<td>✓</td>
+<td>✗（InnoDB 基本解决）</td>
+<td><strong>MySQL 默认</strong></td>
+</tr>
+<tr>
+<td>SERIALIZABLE</td>
+<td>✓</td>
+<td>✓</td>
+<td>✓</td>
+<td>性能差，极少用</td>
+</tr>
+</tbody>
+</table>
+<h3 id="53-mvcc">5.3 MVCC（多版本并发控制）</h3>
+<p>三件套：
+1. 每行有隐藏列：<code>trx_id</code>（最后修改它的事务）+ <code>roll_pointer</code>（指向 undo log 中的旧版本）；
+2. undo log 把旧版本串成<strong>版本链</strong>；
+3. <strong>ReadView</strong>（活跃事务列表）判断"哪个版本对当前事务可见"。</p>
+<ul>
+<li><strong>RC</strong>：每次 SELECT 都生成新 ReadView → 能看到别人已提交的新数据；</li>
+<li><strong>RR</strong>：第一次 SELECT 生成后复用 → 全程快照一致；</li>
+<li>快照读（普通 SELECT）走 MVCC；当前读（<code>FOR UPDATE</code>、UPDATE/DELETE）读最新版本并加锁。</li>
+</ul>
+<h3 id="54">5.4 锁体系</h3>
+<table>
+<thead>
+<tr>
+<th>锁</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>共享锁 S / 排他锁 X</td>
+<td>读锁 / 写锁</td>
+</tr>
+<tr>
+<td>意向锁 IS/IX</td>
+<td>表级"意图"标志，快速判断表内有无行锁</td>
+</tr>
+<tr>
+<td>记录锁 Record Lock</td>
+<td>锁住单行索引记录</td>
+</tr>
+<tr>
+<td>间隙锁 Gap Lock</td>
+<td>锁索引间隙，防止插入（RR 下基本默认开启）</td>
+</tr>
+<tr>
+<td>临键锁 Next-Key Lock</td>
+<td>记录 + 前间隙，RR 防幻读的关键</td>
+</tr>
+<tr>
+<td>插入意向锁</td>
+<td>INSERT 等待间隙时的信号锁</td>
+</tr>
+</tbody>
+</table>
+<p>记忆点：<strong>RC 基本关闭间隙锁</strong>（更少死锁）；RR 默认开启（更防幻读但更易死锁）。</p>
+<h3 id="55">5.5 死锁：排查与预防</h3>
+<ul>
+<li>排查：<code>SHOW ENGINE INNODB STATUS</code> → LATEST DETECTED DEADLOCK 段，看两个事务的 SQL、持有的锁、等待的锁；</li>
+<li>预防：固定访问顺序、小事务、缩短锁持有时间、尽量命中索引（防行锁升级全表）、必要时降为 RC、业务侧乐观锁兜底。</li>
+</ul>
+<h3 id="56-vs">5.6 乐观锁 vs 悲观锁</h3>
+<ul>
+<li>悲观锁：<code>SELECT ... FOR UPDATE</code>，冲突激烈场景；</li>
+<li>乐观锁：版本号 CAS——<code>UPDATE t SET version = version + 1 WHERE id = ? AND version = ?</code>，冲突少场景（互联网主流）。</li>
+</ul>
+<h3 id="57">5.7 分布式事务方案选型</h3>
+<table>
+<thead>
+<tr>
+<th>方案</th>
+<th>一致性</th>
+<th>侵入性</th>
+<th>典型场景</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2PC / XA</td>
+<td>强一致</td>
+<td>低</td>
+<td>传统金融；性能差</td>
+</tr>
+<tr>
+<td>TCC</td>
+<td>最终一致</td>
+<td>高</td>
+<td>支付核心</td>
+</tr>
+<tr>
+<td>Saga</td>
+<td>最终一致</td>
+<td>中</td>
+<td>长流程履约（订单-库存-物流）</td>
+</tr>
+<tr>
+<td>本地消息表 / 事务消息</td>
+<td>最终一致</td>
+<td>低</td>
+<td><strong>大多数互联网业务</strong></td>
+</tr>
+<tr>
+<td>Seata AT</td>
+<td>最终一致</td>
+<td>低</td>
+<td>Java 生态标配</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="6">6. 工业架构常识</h2>
+<h3 id="61">6.1 主从复制</h3>
+<ul>
+<li>原理：主库写 <strong>binlog</strong> → 从库 IO 线程拉取写 relay log → SQL 线程重放；</li>
+<li>binlog 三格式：STATEMENT / <strong>ROW</strong>（推荐，确定性重放） / MIXED；</li>
+<li>复制模式：异步 / 半同步 / 组复制 MGR；</li>
+<li>CDC（变更数据捕获）：canal / Debezium 消费 binlog → 数据同步、缓存失效、搜索索引。</li>
+</ul>
+<h3 id="62">6.2 读写分离</h3>
+<p>写主读从；核心难题是<strong>主从延迟</strong>。对策：强一致场景强制走主库、半同步复制、业务上容忍读旧数据的场景才走从库。</p>
+<h3 id="63">6.3 分库分表</h3>
+<ul>
+<li>垂直拆分（按业务/字段）、水平拆分（按行）；</li>
+<li>中间件：ShardingSphere / Vitess / 云原生分布式数据库；</li>
+<li>难点：分片键设计、跨片 JOIN / 分页 / 聚合的代价、扩容（一致性哈希、双写迁移）。</li>
+</ul>
+<h3 id="64-hikaricp">6.4 连接池（以 HikariCP 为例）</h3>
+<ul>
+<li><code>maximumPoolSize</code> 不是越大越好（连接是稀缺资源），从 <code>CPU核数 × 2 + 磁盘数</code> 起步，压测调优；</li>
+<li><code>connectionTimeout</code>、<code>maxLifetime</code>（要小于 DB 的 wait_timeout）、<code>leakDetectionThreshold</code>。</li>
+</ul>
+<h3 id="65">6.5 数据库版本管理</h3>
+<p>Flyway / Liquibase：DDL 变更脚本化、进 Git、随 CI/CD 自动执行，可审计。</p>
+<hr>
+<h2 id="7-java">7. Java 编程接入（贴合主线）</h2>
+<h3 id="71">7.1 演进路线</h3>
+<div class="codehilite"><pre><span></span><code>JDBC → Spring JDBC → MyBatis → MyBatis-Plus / JPA(Hibernate)
+</code></pre></div>
+
+<ul>
+<li>学原理：从 JDBC 开始（一切框架的底座）；</li>
+<li>做业务：MyBatis / MyBatis-Plus 国内主流；JPA 海外与标准派常用。</li>
+</ul>
+<h3 id="72-jdbc">7.2 JDBC 标准流程（骨架代码）</h3>
+<div class="codehilite"><pre><span></span><code><span class="n">String</span><span class="w"> </span><span class="n">sql</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;SELECT id, name FROM users WHERE age &gt; ?&quot;</span><span class="p">;</span>
+<span class="k">try</span><span class="w"> </span><span class="p">(</span><span class="n">Connection</span><span class="w"> </span><span class="n">conn</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dataSource</span><span class="p">.</span><span class="na">getConnection</span><span class="p">();</span>
+<span class="w">     </span><span class="n">PreparedStatement</span><span class="w"> </span><span class="n">ps</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">conn</span><span class="p">.</span><span class="na">prepareStatement</span><span class="p">(</span><span class="n">sql</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">ps</span><span class="p">.</span><span class="na">setInt</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">18</span><span class="p">);</span>
+<span class="w">    </span><span class="k">try</span><span class="w"> </span><span class="p">(</span><span class="n">ResultSet</span><span class="w"> </span><span class="n">rs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ps</span><span class="p">.</span><span class="na">executeQuery</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">rs</span><span class="p">.</span><span class="na">next</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="kt">long</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rs</span><span class="p">.</span><span class="na">getLong</span><span class="p">(</span><span class="s">&quot;id&quot;</span><span class="p">);</span>
+<span class="w">            </span><span class="n">String</span><span class="w"> </span><span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">rs</span><span class="p">.</span><span class="na">getString</span><span class="p">(</span><span class="s">&quot;name&quot;</span><span class="p">);</span>
+<span class="w">            </span><span class="c1">// ...</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>要点：
+- 必须用 PreparedStatement（占位符预编译，<strong>防 SQL 注入</strong>）；
+- 批处理：<code>addBatch()</code> / <code>executeBatch()</code>；
+- 事务：<code>conn.setAutoCommit(false)</code> → 业务操作 → <code>commit()</code> / 异常时 <code>rollback()</code>。</p>
+<h3 id="73-mybatis">7.3 MyBatis 要点</h3>
+<ul>
+<li><code>#{}</code>：预编译占位符（安全，<strong>默认都用它</strong>）；</li>
+<li><code>${}</code>：字符串拼接（有注入风险，仅用于动态表名/排序字段等，且必须白名单校验）；</li>
+<li>Mapper 接口 + XML 映射；复杂结果用 resultMap。</li>
+</ul>
+<h3 id="74-checklist">7.4 编程规范 checklist</h3>
+<ul>
+<li>☑ 禁止 <code>SELECT *</code>（改字段、走覆盖索引）；</li>
+<li>☑ 必须分页（禁止全量捞）；</li>
+<li>☑ 禁止循环里查库（N+1 问题）→ 用 IN 批量查或 JOIN；</li>
+<li>☑ 大事务拆小；连接池化并正确释放；</li>
+<li>☑ 写操作检查是否命中索引（把 EXPLAIN 写进 Code Review 清单）。</li>
+</ul>
+<hr>
+<h2 id="8-20252026">8. 时代背景：2025–2026 数据库在发生什么</h2>
+<h3 id="81">8.1 格局</h3>
+<table>
+<thead>
+<tr>
+<th>类型</th>
+<th>代表</th>
+<th>用途</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>OLTP</td>
+<td>MySQL（9.x 已迭代至 9.7）、PostgreSQL 18、Oracle</td>
+<td>在线交易</td>
+</tr>
+<tr>
+<td>OLAP</td>
+<td>ClickHouse、Doris、StarRocks、DuckDB</td>
+<td>分析报表</td>
+</tr>
+<tr>
+<td>HTAP</td>
+<td>TiDB、OceanBase、PolarDB</td>
+<td>一份数据两种负载</td>
+</tr>
+<tr>
+<td>向量</td>
+<td>Milvus、Qdrant、pgvector、Redis 8</td>
+<td>AI 检索</td>
+</tr>
+</tbody>
+</table>
+<h3 id="82-sqlai">8.2 向量检索进入 SQL（AI 时代的新能力）</h3>
+<div class="codehilite"><pre><span></span><code><span class="c1">-- pgvector：按&quot;向量距离&quot;排序，和普通 ORDER BY 无异（&lt;-&gt; 欧氏、&lt;=&gt; 余弦、&lt;#&gt; 内积）</span>
+<span class="k">SELECT</span><span class="w"> </span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">content</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">docs</span>
+<span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">embedding</span><span class="w"> </span><span class="o">&lt;-&gt;</span><span class="w"> </span><span class="s1">&#39;[0.12, 0.34, ...]&#39;</span>
+<span class="k">LIMIT</span><span class="w"> </span><span class="mi">10</span><span class="p">;</span>
+
+<span class="c1">-- MySQL 9.x：原生 VECTOR 类型 + STRING_TO_VECTOR()/VECTOR_DIM() 等函数</span>
+<span class="c1">-- （DISTANCE() 距离函数随 MySQL HeatWave / MySQL AI 发行版提供）</span>
+</code></pre></div>
+
+<blockquote>
+<p>RAG 的向量检索层、Agent 的长期记忆层，正在被关系数据库"吸收"——SQL 技能在 AI 时代不降反升。</p>
+</blockquote>
+<h3 id="83-ai">8.3 AI × 数据库</h3>
+<ul>
+<li><strong>NL2SQL（Text2SQL）</strong>：自然语言 → SQL，Agent 直连数据库查询；</li>
+<li>自动索引推荐、参数自调优（云数据库自治能力）；</li>
+<li>LLM 应用的元数据（用户、会话、文档权限）依然靠关系库管理。</li>
+</ul>
+<hr>
+<h2 id="9">9. 学习路径与练习</h2>
+<h3 id="91">9.1 四阶段</h3>
+<table>
+<thead>
+<tr>
+<th>阶段</th>
+<th>目标</th>
+<th>过招标准</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1. SQL 语法</td>
+<td>CRUD + JOIN + 聚合</td>
+<td>LeetCode 数据库简单题 20 道</td>
+</tr>
+<tr>
+<td>2. 分析能力</td>
+<td>窗口函数 + CTE</td>
+<td>连续登录 / 分组 TopN 能独立写出</td>
+</tr>
+<tr>
+<td>3. 性能</td>
+<td>索引 + EXPLAIN</td>
+<td>能解释一条慢 SQL 并给出 2 种优化方案</td>
+</tr>
+<tr>
+<td>4. 工程</td>
+<td>事务 + 架构 + Java 接入</td>
+<td>用 Spring Boot + MyBatis 完成完整小项目</td>
+</tr>
+</tbody>
+</table>
+<h3 id="92">9.2 练习资源</h3>
+<ul>
+<li>LeetCode Database（面试导向）、SQLZoo（交互式）、HackerRank SQL；</li>
+<li>动手：Docker 起 MySQL 8.4 / PostgreSQL 18，导入公开数据集；</li>
+<li>本工作区 <code>sql-demo/sql_demo.py</code> 可随时扩展新题目自测。</li>
+</ul>
+<h3 id="93">9.3 书单</h3>
+<p>《高性能 MySQL》《SQL 进阶教程》(MICK)《数据库系统概念》《PostgreSQL 修炼之道》</p>
+<hr>
+<h2 id="a">附录 A：真实运行输出节选</h2>
+<blockquote>
+<p>来自 <code>sql-demo/sql_demo.py</code> 实际执行（SQLite 3.45.1），语法与 MySQL/PG 基本一致。</p>
+</blockquote>
+<p><strong>① 连续 3 天登录（日期-行号分组法）</strong></p>
+<div class="codehilite"><pre><span></span><code>(1, &#39;2026-03-01&#39;, 3)
+← 用户1从 3-01 起连续登录 3 天；
+  用户2只有 3-01/3-03/3-04，未连续 3 天，被正确过滤
+</code></pre></div>
+
+<p><strong>② ROW_NUMBER vs RANK（并列名次语义）</strong></p>
+<div class="codehilite"><pre><span></span><code>(&#39;赵敏&#39;, 2, 20000.0, rn=1, rk=1)
+(&#39;刘洋&#39;, 2, 20000.0, rn=2, rk=1)   ← RANK 并列同名次，ROW_NUMBER 强制不重复
+</code></pre></div>
+
+<p><strong>③ 索引效果对比（EXPLAIN）</strong></p>
+<div class="codehilite"><pre><span></span><code>加索引前: SCAN orders
+加索引后: SEARCH orders USING INDEX idx_orders_user (user_id=?)
+</code></pre></div>
+
+<p>完整输出见 <code>sql-demo/demo_output.txt</code>（含 JOIN、TopN、累计值、行转列、递归 CTE 等 9 组）。</p>
+<h2 id="b-10">附录 B：面试速查 10 问</h2>
+<ol>
+<li><strong>SQL 逻辑执行顺序？</strong> FROM → JOIN → WHERE → GROUP BY → HAVING → SELECT → DISTINCT → ORDER BY → LIMIT。</li>
+<li><strong>WHERE 与 HAVING 区别？</strong> WHERE 过滤行（聚合前，能用索引）；HAVING 过滤组（聚合后）。</li>
+<li><strong>CHAR 与 VARCHAR？</strong> CHAR 定长可能补空格；VARCHAR 变长，N 影响内存与索引。</li>
+<li><strong>COUNT(*) / COUNT(1) / COUNT(列)？</strong> 前两者统计所有行；COUNT(列) 忽略 NULL。</li>
+<li><strong>什么是回表？如何避免？</strong> 二级索引 → 主键 → 聚簇索引取数；覆盖索引可避免。</li>
+<li><strong>MySQL 默认隔离级别？幻读怎么解决？</strong> RR；快照读靠 MVCC，当前读靠 Next-Key Lock。</li>
+<li><strong>redo log 与 binlog 区别？</strong> redo=引擎层、崩溃恢复、循环写；binlog=Server 层、归档/复制、追加写。</li>
+<li><strong>为什么推荐自增主键？</strong> 小且有序 → 插入不撕裂 B+ 树；二级索引叶子更小。</li>
+<li><strong>深分页怎么优化？</strong> 延迟关联 / keyset 游标分页。</li>
+<li><strong>分布式事务怎么选？</strong> 大多数业务用本地消息表 / Seata AT（最终一致）；强一致核心用 TCC/XA。</li>
+</ol>
+<h2 id="c">附录 C：配套文件清单</h2>
+<ul>
+<li><code>sql-demo/sql_demo.py</code> — 可运行演示脚本（建议自己跑一遍，改数据玩）</li>
+<li><code>sql-demo/demo_output.txt</code> — 真实运行输出存档</li>
+<li>《学习报告-Java-数据库-AI-Agent.md》 — 三大方向总览</li>
+</ul>
+    <div class="pager"><a href="02.html"><div class="dir">← 上一章</div><div class="ttl">Java 与 SQL 数据库深度融合</div></a><a href="04.html" style="text-align:right"><div class="dir">下一章 →</div><div class="ttl">学习报告：Java · 数据库 · AI Agent</div></a></div>
+  </main>
+</div>
+</body>
+</html>
