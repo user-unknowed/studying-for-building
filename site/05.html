@@ -2,18 +2,36 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#1e3a8a">
 <title>05 JavaEE 企业级开发（现代实战） · Java · SQL · Python AI 教程</title>
 <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
 <header class="topnav">
+  <button class="nav-toggle" type="button" aria-label="打开导航目录" aria-expanded="false" aria-controls="sidebar">☰</button>
   <div class="brand">Java · SQL · Python AI 教程<small>从原理到实战</small></div>
-  <nav><a href="01.html" class="">01 JavaSE 基础知</a><a href="02.html" class="">02 Java 与 SQL</a><a href="03.html" class="">03 SQL 数据库深度讲</a><a href="04.html" class="">04 学习报告：Java </a><a href="05.html" class="active">05 JavaEE 企业级</a><a href="06.html" class="">06 Java 上位机开发</a><a href="07.html" class="">07 JavaEE 上位机</a><a href="08.html" class="">08 Python 与 A</a></nav>
-  <a class="src" href="https://github.com/user-unknowed/studying-for-building" target="_blank">📦 源码仓库</a>
+  <nav><a href="01.html" class="">01 JavaSE 基础知</a><a href="02.html" class="">02 Java 与 SQL</a><a href="03.html" class="">03 SQL 数据库深度讲</a><a href="04.html" class="">04 学习报告：Java </a><a href="05.html" class="active">05 JavaEE 企业级</a><a href="06.html" class="">06 Java 上位机开发</a><a href="07.html" class="">07 JavaEE 上位机</a><a href="08.html" class="">08 Python 与 A</a><a href="09.html" class="">09 华为ICT大赛·云赛道</a><a href="10.html" class="">10 源码编辑</a></nav>
+  <a class="src" href="https://github.com/user-unknowed/studying-for-building" target="_blank" rel="noopener">📦 源码仓库</a>
 </header>
+<div class="drawer-backdrop" aria-hidden="true"></div>
 <div class="layout">
-  <aside class="sidebar">
+  <aside class="sidebar" id="sidebar">
+    <div class="sb-head"><b>📑 导航目录</b><button class="sb-close" type="button" aria-label="关闭目录">✕</button></div>
+    <div class="chapters-m">
+      <h4>全部章节</h4>
+      <ul><li><a href="index.html">🏠 课程总览（首页）</a></li>
+<li><a href="01.html">☕ 第 01 章 · JavaSE 基础知识点</a></li>
+<li><a href="02.html">🔗 第 02 章 · Java 与 SQL 数据库深度融合</a></li>
+<li><a href="03.html">🗄️ 第 03 章 · SQL 数据库深度讲解（工业实践版）</a></li>
+<li><a href="04.html">🧭 第 04 章 · 学习报告：Java · 数据库 · AI Agent</a></li>
+<li class="active"><a href="05.html">🏢 第 05 章 · JavaEE 企业级开发（现代实战）</a></li>
+<li><a href="06.html">🛠️ 第 06 章 · Java 上位机开发实战</a></li>
+<li><a href="07.html">🌐 第 07 章 · JavaEE 上位机：网页监控看板</a></li>
+<li><a href="08.html">🐍 第 08 章 · Python 与 AI 大模型：从原理到 Transformer</a></li>
+<li><a href="09.html">☁️ 第 09 章 · 华为ICT大赛·云赛道备赛实战</a></li>
+<li><a href="10.html">✂️ 第 10 章 · 源码编辑与源码导读</a></li></ul>
+    </div>
     <h4>本节目录</h4>
     <ul><ul>
 <li><a href="#0-2026-java-ee">0. 导读：2026 年，我们说的"Java EE"到底是什么？</a></li>
@@ -508,7 +526,7 @@
 <tr>
 <th>写法</th>
 <th>最低版本</th>
-<th style="text-align: center;">项目里在哪看</th>
+<th align="center">项目里在哪看</th>
 <th>什么时候用</th>
 </tr>
 </thead>
@@ -516,43 +534,43 @@
 <tr>
 <td><code>var</code></td>
 <td>Java 10</td>
-<td style="text-align: center;"><code>OrderApiServlet</code> / <code>ProductApiServlet</code></td>
+<td align="center"><code>OrderApiServlet</code> / <code>ProductApiServlet</code></td>
 <td>类型显而易见的局部变量</td>
 </tr>
 <tr>
 <td>文本块 <code>"""</code></td>
 <td>Java 15</td>
-<td style="text-align: center;"><code>Db.java</code> / <code>StatsApiServlet</code> / <code>BookDao</code></td>
+<td align="center"><code>Db.java</code> / <code>StatsApiServlet</code> / <code>BookDao</code></td>
 <td>多行 SQL / JSON / 模板文本</td>
 </tr>
 <tr>
 <td>switch 表达式 <code>-&gt;</code></td>
 <td>Java 14</td>
-<td style="text-align: center;"><code>BookApiServlet</code> 路由分发</td>
+<td align="center"><code>BookApiServlet</code> 路由分发</td>
 <td>多分支分发、要避免穿透</td>
 </tr>
 <tr>
 <td>try-with-resources</td>
 <td>Java 7</td>
-<td style="text-align: center;">几乎所有 JDBC 代码</td>
+<td align="center">几乎所有 JDBC 代码</td>
 <td>一切需要 close 的资源</td>
 </tr>
 <tr>
 <td><code>Map.of</code> / <code>List.of</code></td>
 <td>Java 9</td>
-<td style="text-align: center;">各 Servlet 的响应组装</td>
+<td align="center">各 Servlet 的响应组装</td>
 <td>固定少量元素、要求不可变</td>
 </tr>
 <tr>
 <td>lambda + <code>Optional</code></td>
 <td>Java 8</td>
-<td style="text-align: center;"><code>OrderService</code> / <code>ShortlinkService</code></td>
+<td align="center"><code>OrderService</code> / <code>ShortlinkService</code></td>
 <td>"可能没有"的查找、回调逻辑</td>
 </tr>
 <tr>
 <td><code>record</code></td>
 <td>Java 16</td>
-<td style="text-align: center;">Spring Boot 版 model 包</td>
+<td align="center">Spring Boot 版 model 包</td>
 <td>只读数据载体（DTO / VO）</td>
 </tr>
 </tbody>
@@ -1497,7 +1515,7 @@ busy_count = 0
 <tr>
 <th>项目</th>
 <th>目录</th>
-<th style="text-align: center;">端口</th>
+<th align="center">端口</th>
 <th>一句话</th>
 </tr>
 </thead>
@@ -1505,25 +1523,25 @@ busy_count = 0
 <tr>
 <td>library-api</td>
 <td><code>demos/jakarta-ee/library-api</code></td>
-<td style="text-align: center;">8081</td>
+<td align="center">8081</td>
 <td>图书借阅：Servlet 路由 + DAO 分层 + 事务借还</td>
 </tr>
 <tr>
 <td>order-service（原生）</td>
 <td><code>demos/jakarta-ee/order-service</code></td>
-<td style="text-align: center;">8082</td>
+<td align="center">8082</td>
 <td>迷你订单：防超卖 + 状态守卫 + 并发压测</td>
 </tr>
 <tr>
 <td>order-service（Spring Boot）</td>
 <td><code>demos/spring-boot/order-service</code></td>
-<td style="text-align: center;">8081</td>
+<td align="center">8081</td>
 <td>同业务现代实现：注解 + IoC + 声明式事务</td>
 </tr>
 <tr>
 <td>shortlink-service</td>
 <td><code>demos/spring-boot/shortlink-service</code></td>
-<td style="text-align: center;">8083</td>
+<td align="center">8083</td>
 <td>短链接：302 跳转 + 唯一约束 + 原子计数</td>
 </tr>
 </tbody>
@@ -1566,69 +1584,69 @@ bash<span class="w"> </span>test_api.sh<span class="w"> </span><span class="p">|
 <table>
 <thead>
 <tr>
-<th style="text-align: center;">章节</th>
+<th align="center">章节</th>
 <th>如果你真的读懂了</th>
 <th>对应代码位置</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td style="text-align: center;">0~1</td>
+<td align="center">0~1</td>
 <td>Java EE / Jakarta EE 是什么、从哪来</td>
 <td>—</td>
 </tr>
 <tr>
-<td style="text-align: center;">2</td>
+<td align="center">2</td>
 <td>规范 vs 现代技术栈全景对照</td>
 <td>—</td>
 </tr>
 <tr>
-<td style="text-align: center;">3</td>
+<td align="center">3</td>
 <td>现代语法：var / 文本块 / switch 表达式 / record</td>
 <td><code>OrderApiServlet</code>、<code>Db.java</code>、<code>BookApiServlet</code>、<code>Product</code></td>
 </tr>
 <tr>
-<td style="text-align: center;">4</td>
+<td align="center">4</td>
 <td>外部库：四个 jar 各司其职 + 两种依赖管理</td>
 <td><code>lib/</code>、<code>download-deps.sh</code>、<code>pom.xml</code></td>
 </tr>
 <tr>
-<td style="text-align: center;">5</td>
+<td align="center">5</td>
 <td>Servlet 生命周期、路由与 JSON 响应</td>
 <td><code>BookApiServlet</code> / <code>OrderApiServlet</code></td>
 </tr>
 <tr>
-<td style="text-align: center;">6</td>
+<td align="center">6</td>
 <td>DAO 分层、事务边界、连接管理</td>
 <td><code>BookDao.borrow()</code> 手写事务模板</td>
 </tr>
 <tr>
-<td style="text-align: center;">7</td>
+<td align="center">7</td>
 <td>REST 语义：201 / 400 / 404 / 409</td>
 <td>四个项目的接口层</td>
 </tr>
 <tr>
-<td style="text-align: center;">8</td>
+<td align="center">8</td>
 <td>并发防超卖：条件更新 + 影响行数检查</td>
 <td><code>decreaseStock</code> 条件 UPDATE</td>
 </tr>
 <tr>
-<td style="text-align: center;">9</td>
+<td align="center">9</td>
 <td>事务 ACID、隔离级别、SQLite 并发参数</td>
 <td><code>place</code> / <code>cancel</code> / WAL + busy_timeout</td>
 </tr>
 <tr>
-<td style="text-align: center;">10</td>
+<td align="center">10</td>
 <td>幂等：状态守卫防重复操作</td>
 <td><code>cancel()</code> 的 <code>WHERE status='CREATED'</code></td>
 </tr>
 <tr>
-<td style="text-align: center;">11</td>
+<td align="center">11</td>
 <td>Jakarta EE → Spring Boot 逐行迁移</td>
 <td>两版 order-service 对照阅读</td>
 </tr>
 <tr>
-<td style="text-align: center;">12</td>
+<td align="center">12</td>
 <td>工程化：Maven、测试脚本、踩坑排障</td>
 <td><code>application.yml</code> 并发参数 + 实测输出存档</td>
 </tr>
@@ -1690,5 +1708,25 @@ bash<span class="w"> </span>test_api.sh<span class="w"> </span><span class="p">|
     <div class="pager"><a href="04.html"><div class="dir">← 上一章</div><div class="ttl">学习报告：Java · 数据库 · AI Agent</div></a><a href="06.html" style="text-align:right"><div class="dir">下一章 →</div><div class="ttl">Java 上位机开发实战</div></a></div>
   </main>
 </div>
+
+<script>
+(function(){
+  var body=document.body,toggle=document.querySelector('.nav-toggle');
+  function setOpen(open){
+    body.classList.toggle('drawer-open',open);
+    if(toggle)toggle.setAttribute('aria-expanded',open?'true':'false');
+  }
+  function close(){setOpen(false)}
+  if(toggle)toggle.addEventListener('click',function(){
+    setOpen(!body.classList.contains('drawer-open'));
+  });
+  var bk=document.querySelector('.drawer-backdrop');
+  if(bk)bk.addEventListener('click',close);
+  var xc=document.querySelector('.sb-close');
+  if(xc)xc.addEventListener('click',close);
+  document.addEventListener('keydown',function(e){if(e.key==='Escape')close()});
+})();
+</script>
+
 </body>
 </html>
