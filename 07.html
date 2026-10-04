@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>07 JavaEE 上位机：网页监控看板 · Java · SQL · Python AI 教程</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<header class="topnav">
+  <div class="brand">Java · SQL · Python AI 教程<small>从原理到实战</small></div>
+  <nav><a href="01.html" class="">01 JavaSE 基础知</a><a href="02.html" class="">02 Java 与 SQL</a><a href="03.html" class="">03 SQL 数据库深度讲</a><a href="04.html" class="">04 学习报告：Java </a><a href="05.html" class="">05 JavaEE 企业级</a><a href="06.html" class="">06 Java 上位机开发</a><a href="07.html" class="active">07 JavaEE 上位机</a><a href="08.html" class="">08 Python 与 A</a></nav>
+  <a class="src" href="https://github.com/user-unknowed/studying-for-building" target="_blank">📦 源码仓库</a>
+</header>
+<div class="layout">
+  <aside class="sidebar">
+    <h4>本节目录</h4>
+    <ul><ul>
+<li><a href="#0">0. 导读：为什么上位机还要有"网页版"？</a><ul>
+<li><a href="#_1">与已有案例的复用关系</a></li>
+</ul>
+</li>
+<li><a href="#1">1. 架构总览：数据怎么从设备走到浏览器</a></li>
+<li><a href="#2">2. 工程结构与启动骨架</a><ul>
+<li><a href="#21-main-web">2.1 一个 Main 起一个 Web 服务</a></li>
+<li><a href="#22-filter">2.2 Filter：给每个请求"过安检"</a></li>
+<li><a href="#23">2.3 端口规划</a></li>
+</ul>
+</li>
+<li><a href="#3">3. 采集服务：轮询、快照与"韧性"</a><ul>
+<li><a href="#31-poller">3.1 Poller 一个线程干三件事</a></li>
+<li><a href="#32">3.2 断线自愈：工控软件的"韧性"</a></li>
+</ul>
+</li>
+<li><a href="#4-web-rest">4. Web 层：四个 REST 端点</a><ul>
+<li><a href="#41-json">4.1 输出 JSON 的一个小讲究</a></li>
+<li><a href="#42">4.2 控制下发的完整链路（一次真实的"远程操作"）</a></li>
+</ul>
+</li>
+<li><a href="#5">5. 网页看板：从"能看"到"好看"</a><ul>
+<li><a href="#51">5.1 三条设计原则</a></li>
+<li><a href="#52-30-svg">5.2 手写 30 行 SVG 折线图</a></li>
+<li><a href="#53">5.3 轮询与离线兜底</a></li>
+<li><a href="#54">5.4 "审美"清单（给你的作品做对照）</a></li>
+</ul>
+</li>
+<li><a href="#6">6. 运行与验证（真实输出）</a></li>
+<li><a href="#7">7. 与桌面版对照 &amp; 下一步</a></li>
+<li><a href="#afaq">附录 A：常见问题（FAQ）</a></li>
+<li><a href="#b">附录 B：关键资产清单</a></li>
+</ul></ul>
+  </aside>
+  <main class="content">
+    <div class="meta" style="color:#0891b2;font-weight:600">第 07 章 · 🌐</div>
+    <h1 style="border-bottom:3px solid #0891b2;padding-bottom:10px">JavaEE 上位机：网页监控看板</h1>
+    <div class="meta">Servlet · 嵌入式 Tomcat · REST · 零依赖 SVG 看板</div>
+    <h1 id="javaee">JavaEE 上位机实战：网页监控看板与远程控制</h1>
+<blockquote>
+<p>面向已读完《06-Java 上位机开发实战》或《05-JavaEE 企业级开发》的学习者 ｜ 整理：Operit AI ｜ 2026-09</p>
+<p>配套可运行项目：<code>demos/web-monitor</code>（真实编译、运行、验证，完整证据见 <code>run_output.txt</code>）
+下位机沿用 06 号教程的"温室环境监测仪"模拟器 —— 同一台设备，两种上位机。</p>
+</blockquote>
+<hr>
+<h2 id="0">0. 导读：为什么上位机还要有"网页版"？</h2>
+<p>06 号教程做了一台<strong>桌面版上位机</strong>（Swing + 串口/Modbus）：值班工程师坐在工位上，看着监控窗口采集、入库、报警。它很可靠，但有两个天花板：</p>
+<ol>
+<li><strong>只有装了客户端的人能看到</strong> —— 车间主任想瞄一眼数据？得再装一套程序；</li>
+<li><strong>一人一窗</strong> —— 大屏看板、手机巡检、远程访问，桌面程序都不擅长。</li>
+</ol>
+<p><strong>网页版上位机</strong>正好补上这两块：一台服务器 / 一个采集进程跑在机房，<strong>浏览器就是客户端</strong>——
+车间大屏打开一个固定网址、主任用手机扫个二维码、你在家打开笔记本，看到的是同一份实时数据。</p>
+<p>两条路线的对照：</p>
+<table>
+<thead>
+<tr>
+<th>维度</th>
+<th>桌面版（06 · device-monitor）</th>
+<th>网页版（本教程 · web-monitor）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>技术栈</td>
+<td>JavaSE + Swing + jSerialComm</td>
+<td>JavaEE + Servlet + 嵌入式 Tomcat</td>
+</tr>
+<tr>
+<td>客户端</td>
+<td>每台电脑装程序</td>
+<td>浏览器，零安装</td>
+</tr>
+<tr>
+<td>通信链路</td>
+<td>串口 RTU / 网口 TCP 都行</td>
+<td>适合网口（Modbus TCP），经网关也能接串口</td>
+</tr>
+<tr>
+<td>多人访问</td>
+<td>困难</td>
+<td>天生支持</td>
+</tr>
+<tr>
+<td>典型场景</td>
+<td>工位单机、直接连设备</td>
+<td>机房集中采集、多端查看、远程巡检</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>选型口诀：直接摸设备用桌面版，多端看数据用网页版。</strong></p>
+</blockquote>
+<h3 id="_1">与已有案例的复用关系</h3>
+<ul>
+<li>下位机模拟器、寄存器契约：<strong>直接复用 06 号教程</strong>的 <code>sim_modbus.py</code>（同一台设备）；</li>
+<li>嵌入式 Tomcat 的启动骨架：<strong>对照 05 号教程</strong>的 <code>library-api</code>（同一种"一个 Main 起一个 Web 服务"的写法）；</li>
+<li>数据库六步法 / WAL / busy_timeout：复用 02、05 号教程的结论；</li>
+<li>协议帧（0x03 / 0x06）：本项目的 <code>ModbusTcpClient</code> 是 06 版的精简孪生兄弟。</li>
+</ul>
+<hr>
+<h2 id="1">1. 架构总览：数据怎么从设备走到浏览器</h2>
+<div class="codehilite"><pre><span></span><code>┌─────────────┐   Modbus TCP    ┌───────────────────────────────┐
+│  下位机      │◀──────────────▶│  web-monitor（一台 Java 进程）  │
+│ 模拟器/PLC   │   :15020        │                               │
+│ (温室监测仪) │                 │  ┌─────────┐    ┌──────────┐  │
+└─────────────┘                 │  │ Poller  │───▶│ MonitorDb│  │
+                                │  │ 采集线程 │    │ (SQLite) │  │
+                                │  └────┬────┘    └──────────┘  │
+                                │       │ 实时快照                 │
+                                │  ┌────▼────────────────────┐  │
+                                │  │ Servlet（嵌入式 Tomcat）  │  │
+                                │  │  /api/*      /dashboard  │  │
+                                │  └────┬────────────────────┘  │
+                                └───────┼───────────────────────┘
+                                        │ HTTP
+                                ┌───────▼────────┐
+                                │  浏览器（任意台） │
+                                │ 看板：实时+历史+控制│
+                                └────────────────┘
+</code></pre></div>
+
+<p>一条数据要经过 <strong>4 层</strong>：协议层（Modbus）→ 服务层（Poller）→ 存储层（SQLite）→ Web 层（Servlet/浏览器）。
+每一层都能单独理解、单独测试——这正是分层架构的意义。</p>
+<hr>
+<h2 id="2">2. 工程结构与启动骨架</h2>
+<div class="codehilite"><pre><span></span><code>web-monitor/
+├── src/com/example/webmonitor/
+│   ├── Main.java            # 入口：装配一切 + 启动 Tomcat
+│   ├── protocol/            # 协议层：手写 Modbus TCP 帧
+│   ├── service/             # 服务层：Poller 采集线程
+│   ├── db/                  # 存储层：SQLite 三张表
+│   └── web/                 # Web 层：Servlet + Filter
+├── web/dashboard.html       # 看板页（零依赖前端）
+├── simulator/sim_modbus.py  # 下位机模拟器（复用 06 号）
+└── scripts/                 # 一键启动 / 演示 / 自检
+</code></pre></div>
+
+<h3 id="21-main-web">2.1 一个 Main 起一个 Web 服务</h3>
+<p>启动骨架与 <code>library-api</code> 同构，但多了三样东西：<strong>采集线程、过滤器、看板页</strong>（<code>Main.java</code> 节选）：</p>
+<div class="codehilite"><pre><span></span><code><span class="c1">// ① 历史数据库（SQLite）</span>
+<span class="kd">var</span><span class="w"> </span><span class="n">db</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">MonitorDb</span><span class="p">(</span><span class="n">dbFile</span><span class="p">);</span>
+
+<span class="c1">// ② 采集线程（后台，循环轮询下位机）</span>
+<span class="kd">var</span><span class="w"> </span><span class="n">poller</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Poller</span><span class="p">(</span><span class="n">simHost</span><span class="p">,</span><span class="w"> </span><span class="n">simPort</span><span class="p">,</span><span class="w"> </span><span class="n">intervalSec</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="mi">1000L</span><span class="p">,</span><span class="w"> </span><span class="n">db</span><span class="p">);</span>
+<span class="n">poller</span><span class="p">.</span><span class="na">start</span><span class="p">();</span>
+
+<span class="c1">// ③ Web 层：嵌入式 Tomcat（Jakarta EE 10 / Servlet 6.0）</span>
+<span class="kd">var</span><span class="w"> </span><span class="n">tomcat</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Tomcat</span><span class="p">();</span>
+<span class="n">tomcat</span><span class="p">.</span><span class="na">setPort</span><span class="p">(</span><span class="n">port</span><span class="p">);</span>
+<span class="n">tomcat</span><span class="p">.</span><span class="na">getConnector</span><span class="p">();</span>
+
+<span class="n">Context</span><span class="w"> </span><span class="n">ctx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tomcat</span><span class="p">.</span><span class="na">addContext</span><span class="p">(</span><span class="s">&quot;&quot;</span><span class="p">,</span><span class="w"> </span><span class="kc">null</span><span class="p">);</span>
+
+<span class="n">Tomcat</span><span class="p">.</span><span class="na">addServlet</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;api&quot;</span><span class="p">,</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ApiServlet</span><span class="p">(</span><span class="n">poller</span><span class="p">,</span><span class="w"> </span><span class="n">db</span><span class="p">));</span>
+<span class="n">ctx</span><span class="p">.</span><span class="na">addServletMappingDecoded</span><span class="p">(</span><span class="s">&quot;/api/*&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;api&quot;</span><span class="p">);</span>
+
+<span class="n">Tomcat</span><span class="p">.</span><span class="na">addServlet</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;dashboard&quot;</span><span class="p">,</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">DashboardServlet</span><span class="p">(</span><span class="n">webDir</span><span class="p">));</span>
+<span class="n">ctx</span><span class="p">.</span><span class="na">addServletMappingDecoded</span><span class="p">(</span><span class="s">&quot;/&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;dashboard&quot;</span><span class="p">);</span>
+<span class="n">ctx</span><span class="p">.</span><span class="na">addServletMappingDecoded</span><span class="p">(</span><span class="s">&quot;/index.html&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;dashboard&quot;</span><span class="p">);</span>
+</code></pre></div>
+
+<h3 id="22-filter">2.2 Filter：给每个请求"过安检"</h3>
+<p>请求日志过滤器（<code>LogFilter.java</code>）——把"打印一行日志"这种横切逻辑从业务代码里拿出去：</p>
+<div class="codehilite"><pre><span></span><code><span class="kd">public</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">doFilter</span><span class="p">(</span><span class="n">ServletRequest</span><span class="w"> </span><span class="n">request</span><span class="p">,</span><span class="w"> </span><span class="n">ServletResponse</span><span class="w"> </span><span class="n">response</span><span class="p">,</span><span class="w"> </span><span class="n">FilterChain</span><span class="w"> </span><span class="n">chain</span><span class="p">)</span>
+<span class="w">        </span><span class="kd">throws</span><span class="w"> </span><span class="n">IOException</span><span class="p">,</span><span class="w"> </span><span class="n">ServletException</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">var</span><span class="w"> </span><span class="n">http</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">HttpServletRequest</span><span class="p">)</span><span class="w"> </span><span class="n">request</span><span class="p">;</span>
+<span class="w">    </span><span class="kt">long</span><span class="w"> </span><span class="n">t0</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">System</span><span class="p">.</span><span class="na">currentTimeMillis</span><span class="p">();</span>
+<span class="w">    </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">chain</span><span class="p">.</span><span class="na">doFilter</span><span class="p">(</span><span class="n">request</span><span class="p">,</span><span class="w"> </span><span class="n">response</span><span class="p">);</span><span class="w">   </span><span class="c1">// 放行</span>
+<span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">finally</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">printf</span><span class="p">(</span><span class="s">&quot;[web] %s %s (%d ms)%n&quot;</span><span class="p">,</span>
+<span class="w">                </span><span class="n">http</span><span class="p">.</span><span class="na">getMethod</span><span class="p">(),</span><span class="w"> </span><span class="n">http</span><span class="p">.</span><span class="na">getRequestURI</span><span class="p">(),</span><span class="w"> </span><span class="n">System</span><span class="p">.</span><span class="na">currentTimeMillis</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">t0</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>注册（<code>Main.java</code>）：</p>
+<div class="codehilite"><pre><span></span><code><span class="kd">var</span><span class="w"> </span><span class="n">filterDef</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">FilterDef</span><span class="p">();</span>
+<span class="n">filterDef</span><span class="p">.</span><span class="na">setFilterName</span><span class="p">(</span><span class="s">&quot;log&quot;</span><span class="p">);</span>
+<span class="n">filterDef</span><span class="p">.</span><span class="na">setFilter</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">LogFilter</span><span class="p">());</span>
+<span class="n">ctx</span><span class="p">.</span><span class="na">addFilterDef</span><span class="p">(</span><span class="n">filterDef</span><span class="p">);</span>
+
+<span class="kd">var</span><span class="w"> </span><span class="n">filterMap</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">FilterMap</span><span class="p">();</span>
+<span class="n">filterMap</span><span class="p">.</span><span class="na">setFilterName</span><span class="p">(</span><span class="s">&quot;log&quot;</span><span class="p">);</span>
+<span class="n">filterMap</span><span class="p">.</span><span class="na">addURLPattern</span><span class="p">(</span><span class="s">&quot;/*&quot;</span><span class="p">);</span>
+<span class="n">ctx</span><span class="p">.</span><span class="na">addFilterMap</span><span class="p">(</span><span class="n">filterMap</span><span class="p">);</span>
+</code></pre></div>
+
+<p>运行后，服务端会为每个请求打印一行，实测节选：</p>
+<div class="codehilite"><pre><span></span><code>[web] GET /api/summary (14 ms)
+[web] GET / (8 ms)
+[web] POST /api/command (19 ms)
+</code></pre></div>
+
+<blockquote>
+<p>想看 Filter 的真实效果？跑起来后多刷新几次看板，日志会一行行滚出来。</p>
+</blockquote>
+<h3 id="23">2.3 端口规划</h3>
+<table>
+<thead>
+<tr>
+<th>端口</th>
+<th>归属</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>8090</td>
+<td>web-monitor（Web 服务）</td>
+<td>浏览器访问</td>
+</tr>
+<tr>
+<td>15020</td>
+<td>模拟器（Modbus TCP）</td>
+<td>与 06 号教程共用；两个教程的采集进程<strong>不要同时开着抢同一台模拟器</strong></td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="3">3. 采集服务：轮询、快照与"韧性"</h2>
+<h3 id="31-poller">3.1 Poller 一个线程干三件事</h3>
+<div class="codehilite"><pre><span></span><code><span class="kd">private</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">pollOnce</span><span class="p">()</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">Exception</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kt">int</span><span class="o">[]</span><span class="w"> </span><span class="n">env</span><span class="p">;</span><span class="w">  </span><span class="kt">int</span><span class="o">[]</span><span class="w"> </span><span class="n">meta</span><span class="p">;</span>
+<span class="w">    </span><span class="kd">synchronized</span><span class="w"> </span><span class="p">(</span><span class="n">ioLock</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">ensureConnected</span><span class="p">();</span>
+<span class="w">        </span><span class="n">env</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="n">client</span><span class="p">.</span><span class="na">readHoldingRegisters</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">);</span><span class="w">   </span><span class="c1">// 温度/湿度/光照/土壤</span>
+<span class="w">        </span><span class="n">meta</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">client</span><span class="p">.</span><span class="na">readHoldingRegisters</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">);</span><span class="w">   </span><span class="c1">// 上限/报警/累计/状态</span>
+<span class="w">    </span><span class="p">}</span>
+
+<span class="w">    </span><span class="kd">var</span><span class="w"> </span><span class="n">r</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Reading</span><span class="p">(</span><span class="n">Instant</span><span class="p">.</span><span class="na">now</span><span class="p">(),</span><span class="w"> </span><span class="n">env</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mf">10.0</span><span class="p">,</span><span class="w"> </span><span class="n">env</span><span class="o">[</span><span class="mi">1</span><span class="o">]</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mf">10.0</span><span class="p">,</span><span class="w"> </span><span class="n">env</span><span class="o">[</span><span class="mi">2</span><span class="o">]</span><span class="p">,</span><span class="w"> </span><span class="n">env</span><span class="o">[</span><span class="mi">3</span><span class="o">]</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mf">10.0</span><span class="p">,</span>
+<span class="w">            </span><span class="n">meta</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mf">10.0</span><span class="p">,</span><span class="w"> </span><span class="n">meta</span><span class="o">[</span><span class="mi">1</span><span class="o">]</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span>
+<span class="w">    </span><span class="n">db</span><span class="p">.</span><span class="na">insertReading</span><span class="p">(</span><span class="n">r</span><span class="p">);</span><span class="w">                            </span><span class="c1">// ① 入库（历史）</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">r</span><span class="p">.</span><span class="na">alarm</span><span class="p">()</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="o">!</span><span class="n">lastAlarm</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">                  </span><span class="c1">// ② 报警上升沿</span>
+<span class="w">        </span><span class="n">db</span><span class="p">.</span><span class="na">insertAlarm</span><span class="p">(</span><span class="s">&quot;TEMP_HIGH&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;温度超上限: ...&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">r</span><span class="p">.</span><span class="na">temp</span><span class="p">());</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="n">lastAlarm</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">r</span><span class="p">.</span><span class="na">alarm</span><span class="p">();</span>
+<span class="w">    </span><span class="n">latest</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Snapshot</span><span class="p">(...);</span><span class="w">                     </span><span class="c1">// ③ 刷新实时快照</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>三个设计决定，各有原因：</p>
+<ol>
+<li><strong>快照（Snapshot）+ volatile</strong>：API 请求永远读内存里的最新值，不查库——刷新 2 秒一次也不心疼；</li>
+<li><strong>上升沿报警</strong>：<code>0→1</code> 的瞬间才记一条，<code>lastAlarm</code> 记住穿越前的状态（与 06 号一致）；</li>
+<li><strong>ioLock 串行化</strong>：浏览器点"下发"时，HTTP 线程要写 Modbus 连接；
+   而采集线程可能正在读——<strong>同一根连接必须排队</strong>，否则帧会串。</li>
+</ol>
+<h3 id="32">3.2 断线自愈：工控软件的"韧性"</h3>
+<p>采集失败时<strong>不退出</strong>，而是：标记离线 → 关连接 → 下轮自动重连。我们没有只写在文档里，做了专项测试（杀模拟器 → 离线 → 重启 → 恢复）：</p>
+<div class="codehilite"><pre><span></span><code>T1 初始（应在线）:
+{&quot;online&quot;:true,...,&quot;polls&quot;:4,...}
+
+T2 模拟器被杀（应离线 + 错误信息）:
+{&quot;online&quot;:false,&quot;lastError&quot;:&quot;Connection refused&quot;,...,&quot;polls&quot;:4,...}
+
+T3 模拟器重启（应自动恢复）:
+{&quot;online&quot;:true,...,&quot;polls&quot;:8,...}
+</code></pre></div>
+
+<p>注意 <code>polls: 4 → 8</code> —— 恢复后采集<strong>接着往上涨</strong>，历史数据也没有断档。
+看板页对离线有明确的视觉反馈：状态胶囊变成红色"离线（自动重试中）"。</p>
+<hr>
+<h2 id="4-web-rest">4. Web 层：四个 REST 端点</h2>
+<p><code>ApiServlet</code> 用 <code>switch</code> 做最小路由（一个 Servlet 顶四个端点）：</p>
+<table>
+<thead>
+<tr>
+<th>方法</th>
+<th>路径</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td><code>/api/summary</code></td>
+<td>实时快照 + 累计统计</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/readings?limit=N</code></td>
+<td>最近 N 条读数（时间正序，图表用）</td>
+</tr>
+<tr>
+<td>GET</td>
+<td><code>/api/alarms</code></td>
+<td>最近报警记录</td>
+</tr>
+<tr>
+<td>POST</td>
+<td><code>/api/command</code></td>
+<td>下发控制 <code>{"cmd":"set_temp_limit","value":21.5}</code></td>
+</tr>
+</tbody>
+</table>
+<div class="codehilite"><pre><span></span><code><span class="n">Object</span><span class="w"> </span><span class="n">payload</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">switch</span><span class="w"> </span><span class="p">(</span><span class="n">path</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="s">&quot;/summary&quot;</span><span class="w">  </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">summary</span><span class="p">();</span>
+<span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="s">&quot;/readings&quot;</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">readings</span><span class="p">(</span><span class="n">intParam</span><span class="p">(</span><span class="n">req</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;limit&quot;</span><span class="p">,</span><span class="w"> </span><span class="mi">120</span><span class="p">));</span>
+<span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="s">&quot;/alarms&quot;</span><span class="w">   </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">db</span><span class="p">.</span><span class="na">recentAlarms</span><span class="p">(</span><span class="mi">20</span><span class="p">);</span>
+<span class="w">    </span><span class="k">default</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span>
+<span class="p">};</span>
+</code></pre></div>
+
+<h3 id="41-json">4.1 输出 JSON 的一个小讲究</h3>
+<p>Gson 默认会把 <code>&gt;</code> 转义成 <code>\u003e</code>（HTML 安全）。对 API 场景没必要，一行配置让它"说人话"：</p>
+<div class="codehilite"><pre><span></span><code><span class="kd">private</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="n">Gson</span><span class="w"> </span><span class="n">gson</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">GsonBuilder</span><span class="p">().</span><span class="na">disableHtmlEscaping</span><span class="p">().</span><span class="na">create</span><span class="p">();</span>
+</code></pre></div>
+
+<h3 id="42">4.2 控制下发的完整链路（一次真实的"远程操作"）</h3>
+<p>浏览器点"下发 21.5℃" → <code>POST /api/command</code> → Poller 写寄存器 9 → 模拟器收到 0x06 帧：</p>
+<div class="codehilite"><pre><span></span><code>{&quot;ok&quot;:true,&quot;message&quot;:&quot;已下发报警上限 21.5℃（写寄存器 9）&quot;}
+</code></pre></div>
+
+<p>模拟器侧的真实报文（寄存器 9 = 0x00D7 = 215 = 21.5℃）：</p>
+<div class="codehilite"><pre><span></span><code>[05:01:48] [SIM] TCP fn=0x06 请求=06000900d7 响应=06000900d7
+</code></pre></div>
+
+<p><strong>下发立刻生效</strong>：上限降到 21.5℃ 后，温度（24℃ 上下）越限，下一轮采集即触发报警：</p>
+<div class="codehilite"><pre><span></span><code>{&quot;online&quot;:true,...,&quot;limit&quot;:21.5,&quot;alarm&quot;:true,&quot;deviceAlarms&quot;:1,&quot;totalAlarms&quot;:1}
+[{&quot;time&quot;:&quot;05:01:49&quot;,&quot;kind&quot;:&quot;TEMP_HIGH&quot;,&quot;message&quot;:&quot;温度超上限: 24.5℃ &gt; 21.5℃&quot;}]
+</code></pre></div>
+
+<p>从"网页上的一个按钮"到"设备寄存器的真实变化"再到"报警记录"，全链路闭环——这就是上位机的核心业务。</p>
+<hr>
+<h2 id="5">5. 网页看板：从"能看"到"好看"</h2>
+<p>看板页 <code>web/dashboard.html</code> 是纯 HTML/CSS/JS——<strong>零 CDN、零框架、离线可用</strong>（工厂内网常常没有外网）。</p>
+<h3 id="51">5.1 三条设计原则</h3>
+<ol>
+<li><strong>信息层级</strong>：先 KPI 卡片（温度/湿度/光照/土壤 × 大字号），再趋势图，最后明细（报警/控制）；</li>
+<li><strong>颜色语义</strong>：正常=青/绿，告警=红（温度卡片超限时整卡发光描边），离线=灰红状态胶囊；</li>
+<li><strong>零依赖</strong>：不引外部字体、图表库——所有资源都在这一个文件里，拷到哪里都能用。</li>
+</ol>
+<h3 id="52-30-svg">5.2 手写 30 行 SVG 折线图</h3>
+<p>不用图表库，四步画出趋势图（<code>dashboard.html</code> 节选，实际约 60 行）：</p>
+<div class="codehilite"><pre><span></span><code><span class="kd">const</span><span class="w"> </span><span class="nx">X</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">i</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">pad</span><span class="p">.</span><span class="nx">l</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="p">(</span><span class="nx">w</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nx">pad</span><span class="p">.</span><span class="nx">l</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nx">pad</span><span class="p">.</span><span class="nx">r</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="nx">n</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="mf">1</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="mf">0</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="nx">i</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="p">(</span><span class="nx">n</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mf">1</span><span class="p">));</span>
+<span class="kd">const</span><span class="w"> </span><span class="nx">Y</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">v</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">h</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nx">pad</span><span class="p">.</span><span class="nx">b</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="p">(</span><span class="nx">v</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nx">lo</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="nx">h</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nx">pad</span><span class="p">.</span><span class="nx">t</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nx">pad</span><span class="p">.</span><span class="nx">b</span><span class="p">)</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="p">(</span><span class="nx">hi</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nx">lo</span><span class="p">);</span>
+
+<span class="kd">const</span><span class="w"> </span><span class="nx">pts</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">rows</span><span class="p">.</span><span class="nx">map</span><span class="p">((</span><span class="nx">r</span><span class="p">,</span><span class="w"> </span><span class="nx">i</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">X</span><span class="p">(</span><span class="nx">i</span><span class="p">).</span><span class="nx">toFixed</span><span class="p">(</span><span class="mf">1</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s2">&quot;,&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nx">Y</span><span class="p">(</span><span class="nx">m</span><span class="p">.</span><span class="nx">pick</span><span class="p">(</span><span class="nx">r</span><span class="p">)).</span><span class="nx">toFixed</span><span class="p">(</span><span class="mf">1</span><span class="p">)).</span><span class="nx">join</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">);</span>
+<span class="nx">parts</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="s1">&#39;&lt;polyline points=&quot;&#39;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nx">pts</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s1">&#39;&quot; fill=&quot;none&quot; stroke=&quot;&#39;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nx">m</span><span class="p">.</span><span class="nx">color</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s1">&#39;&quot; .../&gt;&#39;</span><span class="p">);</span>
+</code></pre></div>
+
+<p>要点：<strong>自动缩放</strong>（取序列 min/max 各留 12% 边距）、<strong>渐变面积</strong>（SVG linearGradient 填充到折线下方）、
+<strong>报警点标红</strong>（<code>r.alarm</code> 时画一个小红点）、<strong>最后一点高亮</strong>（圆点 + 当前值）。
+四个指标用顶部的"温度/湿度/光照/土壤"标签切换——对应数据里的四个字段。</p>
+<h3 id="53">5.3 轮询与离线兜底</h3>
+<div class="codehilite"><pre><span></span><code><span class="nx">setInterval</span><span class="p">(</span><span class="nx">refreshSummary</span><span class="p">,</span><span class="w"> </span><span class="mf">2000</span><span class="p">);</span><span class="w">   </span><span class="c1">// 实时卡片</span>
+<span class="nx">setInterval</span><span class="p">(</span><span class="nx">refreshChart</span><span class="p">,</span><span class="w">   </span><span class="mf">4000</span><span class="p">);</span><span class="w">   </span><span class="c1">// 趋势图</span>
+<span class="nx">setInterval</span><span class="p">(</span><span class="nx">refreshAlarms</span><span class="p">,</span><span class="w">  </span><span class="mf">8000</span><span class="p">);</span><span class="w">   </span><span class="c1">// 报警列表</span>
+</code></pre></div>
+
+<p>任何一次请求失败都不会让页面"白屏"：卡片显示 <code>—</code>，状态胶囊转红，下一轮自动重试。</p>
+<h3 id="54">5.4 "审美"清单（给你的作品做对照）</h3>
+<ul>
+<li>[ ] 有统一的配色变量（<code>:root { --bg: ...; --accent: ... }</code>），不是散落的十六进制；</li>
+<li>[ ] 数字用等宽数字（<code>font-variant-numeric: tabular-nums</code>），刷新时不抖动；</li>
+<li>[ ] 正常/告警/离线三态都有明确的颜色与文案，不靠猜；</li>
+<li>[ ] 响应式：<code>grid-template-columns: repeat(auto-fit, minmax(200px, 1fr))</code> —— 手机上也好看；</li>
+<li>[ ] 所有交互有反馈：按钮"下发中…→ ✅ / ❌"，绝不静默。</li>
+</ul>
+<hr>
+<h2 id="6">6. 运行与验证（真实输出）</h2>
+<div class="codehilite"><pre><span></span><code><span class="nb">cd</span><span class="w"> </span>web-monitor
+bash<span class="w"> </span>download-deps.sh<span class="w">        </span><span class="c1"># 首次下载依赖</span>
+bash<span class="w"> </span>scripts/run_web.sh<span class="w">      </span><span class="c1"># 一键启动 → 浏览器打开 http://localhost:8090/</span>
+</code></pre></div>
+
+<p>无浏览器环境用自动演示脚本：</p>
+<div class="codehilite"><pre><span></span><code>bash<span class="w"> </span>scripts/run_demo.sh<span class="w">     </span><span class="c1"># 编译 → 起服务 → API 自检 → 控制下发 → 收尾</span>
+</code></pre></div>
+
+<p>实测关键输出（完整版见 <code>run_output.txt</code>）：</p>
+<div class="codehilite"><pre><span></span><code>GET / → HTTP 200
+&lt;title&gt;温室环境监控 · Web 看板&lt;/title&gt;
+
+[1] /api/summary
+{&quot;online&quot;: true, &quot;temp&quot;: 24.1, &quot;humidity&quot;: 54.9, &quot;light&quot;: 680, &quot;soil&quot;: 45.8,
+ &quot;limit&quot;: 28.0, &quot;alarm&quot;: false, &quot;deviceAlarms&quot;: 0, &quot;polls&quot;: 4, ...}
+
+{&quot;ok&quot;:true,&quot;message&quot;:&quot;已下发报警上限 21.5℃（写寄存器 9）&quot;}
+→ 触发报警：[{&quot;kind&quot;:&quot;TEMP_HIGH&quot;,&quot;message&quot;:&quot;温度超上限: 24.5℃ &gt; 21.5℃&quot;}]
+</code></pre></div>
+
+<hr>
+<h2 id="7">7. 与桌面版对照 &amp; 下一步</h2>
+<table>
+<thead>
+<tr>
+<th>问题</th>
+<th>桌面版（06）</th>
+<th>网页版（本教程）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>数据存哪</td>
+<td>本机 SQLite</td>
+<td>服务器 SQLite（可换 PostgreSQL）</td>
+</tr>
+<tr>
+<td>谁在采集</td>
+<td>客户端进程</td>
+<td>服务端采集线程</td>
+</tr>
+<tr>
+<td>掉线表现</td>
+<td>窗口里红字告警</td>
+<td>页面状态胶囊 + API <code>online:false</code></td>
+</tr>
+<tr>
+<td>多人同时看</td>
+<td>每人一套</td>
+<td>天然共享同一份数据</td>
+</tr>
+</tbody>
+</table>
+<p><strong>上线三件事（按顺序做）</strong>：</p>
+<ol>
+<li><strong>反向代理 + HTTPS</strong>：Nginx 顶在前面（<code>proxy_pass http://127.0.0.1:8090</code>），顺手把 443 证书配上；</li>
+<li><strong>登录鉴权</strong>：在 <code>LogFilter</code> 的位置加一个"校验 Cookie/Token"的 Filter——课程作业级实现是"登录成功发一个签名 Token"；</li>
+<li><strong>多设备扩展</strong>：把 <code>Poller</code> 的 host/port 做成"设备表"循环轮询，<code>readings</code> 加一列 <code>device_id</code>——一张表升级成多设备平台。</li>
+</ol>
+<p><strong>练习（含验收标准）</strong>：</p>
+<ol>
+<li>给 <code>/api/summary</code> 增加"过去 1 分钟温度均值"字段（验收：curl 可见、数值随数据变化）；</li>
+<li>把报警上限范围限制从 5~50℃ 改成 10~40℃，前端同步提示（验收：越界请求返回 400）；</li>
+<li>在 <code>LogFilter</code> 里统计并打印"最近 60 秒请求数"（验收：日志可见且随刷新变化）。</li>
+</ol>
+<hr>
+<h2 id="afaq">附录 A：常见问题（FAQ）</h2>
+<p><strong>Q1：8090 端口被占用？</strong>
+<code>--port 8091</code> 换端口，或 <code>kill</code> 掉旧的 Java 进程（<code>ps</code> / <code>jps</code> 找 PID）。</p>
+<p><strong>Q2：看板显示"离线（自动重试中）"？</strong>
+先看模拟器日志（<code>data/web_sim.log</code>）有没有 "从站已监听"；再看服务日志里 <code>lastError</code>
+（最常见是 <code>Connection refused</code>——模拟器没起）。</p>
+<p><strong>Q3：页面打开是空白？</strong>
+先 <code>curl -s http://localhost:8090/api/summary</code> 排除服务问题；再检查浏览器控制台。
+本页零依赖，没有网络请求失败点；JS 语法可先用 <code>node --check</code> 自查。</p>
+<p><strong>Q4：请求日志在哪看？</strong>
+服务端 stdout（<code>data/server.log</code>），<code>[web] ...</code> 开头的行就是 LogFilter 输出的。</p>
+<h2 id="b">附录 B：关键资产清单</h2>
+<table>
+<thead>
+<tr>
+<th>资产</th>
+<th>位置</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>上位机服务源码</td>
+<td><code>demos/web-monitor/src/</code></td>
+</tr>
+<tr>
+<td>看板页</td>
+<td><code>demos/web-monitor/web/dashboard.html</code></td>
+</tr>
+<tr>
+<td>下位机模拟器</td>
+<td><code>demos/web-monitor/simulator/sim_modbus.py</code></td>
+</tr>
+<tr>
+<td>真实运行证据</td>
+<td><code>demos/web-monitor/run_output.txt</code></td>
+</tr>
+<tr>
+<td>一键脚本</td>
+<td><code>demos/web-monitor/scripts/</code></td>
+</tr>
+</tbody>
+</table>
+<hr>
+<p><em>上一篇：《06-Java 上位机开发实战：串口 · Modbus · 数据采集与监控》（桌面版）</em>
+<em>至此，"桌面 + 网页"两种上位机形态、采集/存储/展示/控制/报警的完整闭环都已跑通——</em>
+<em>把你车间的第一台设备接进来吧。</em></p>
+    <div class="pager"><a href="06.html"><div class="dir">← 上一章</div><div class="ttl">Java 上位机开发实战</div></a><a href="08.html" style="text-align:right"><div class="dir">下一章 →</div><div class="ttl">Python 与 AI 大模型：从原理到 Transformer</div></a></div>
+  </main>
+</div>
+</body>
+</html>
