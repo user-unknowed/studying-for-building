@@ -1,0 +1,1694 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>05 JavaEE 企业级开发（现代实战） · Java · SQL · Python AI 教程</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<header class="topnav">
+  <div class="brand">Java · SQL · Python AI 教程<small>从原理到实战</small></div>
+  <nav><a href="01.html" class="">01 JavaSE 基础知</a><a href="02.html" class="">02 Java 与 SQL</a><a href="03.html" class="">03 SQL 数据库深度讲</a><a href="04.html" class="">04 学习报告：Java </a><a href="05.html" class="active">05 JavaEE 企业级</a><a href="06.html" class="">06 Java 上位机开发</a><a href="07.html" class="">07 JavaEE 上位机</a><a href="08.html" class="">08 Python 与 A</a></nav>
+  <a class="src" href="https://github.com/user-unknowed/studying-for-building" target="_blank">📦 源码仓库</a>
+</header>
+<div class="layout">
+  <aside class="sidebar">
+    <h4>本节目录</h4>
+    <ul><ul>
+<li><a href="#0-2026-java-ee">0. 导读：2026 年，我们说的"Java EE"到底是什么？</a></li>
+<li><a href="#1-j2ee-jakarta-ee">1. 从 J2EE 到 Jakarta EE：一次改名背后的技术史</a><ul>
+<li><a href="#11">1.1 时间线</a></li>
+<li><a href="#12-javax-jakarta">1.2 最重要的技术断层：javax → jakarta</a></li>
+</ul>
+</li>
+<li><a href="#2-java-ee-vs">2. 技术全景：Java EE 规范 vs 现代实际技术栈</a></li>
+<li><a href="#3-java">3. 现代 Java 语法速览：先看懂项目代码里的"新写法"</a><ul>
+<li><a href="#31-var">3.1 var：类型推断，让局部变量更干净</a></li>
+<li><a href="#32-sql">3.2 文本块 """：多行 SQL 不再拼字符串</a></li>
+<li><a href="#33-switch-case-borrow-">3.3 switch 表达式：case "borrow" -&gt; 箭头写法</a></li>
+<li><a href="#34-try-with-resources">3.4 try-with-resources：资源自动关闭</a></li>
+<li><a href="#35-mapof-listof">3.5 Map.of / List.of：一行构建响应体</a></li>
+<li><a href="#36-lambda-optional">3.6 lambda 与 Optional：链式风格的对象查找</a></li>
+<li><a href="#37-recordspring-boot">3.7 record：Spring Boot 版的数据模型</a></li>
+<li><a href="#38">3.8 小结：速查表</a></li>
+</ul>
+</li>
+<li><a href="#4-jar">4. 外部函数库与依赖管理：四个 jar 撑起一个服务</a><ul>
+<li><a href="#41">4.1 清点家底：四个库，各司其职</a></li>
+<li><a href="#42-download-depssh-classpath">4.2 手工挡：download-deps.sh + classpath</a></li>
+<li><a href="#43-maven-pomxml">4.3 现代挡：Maven + pom.xml</a></li>
+<li><a href="#44">4.4 给项目加一个新库：固定三步</a></li>
+<li><a href="#45-dependency-12">4.5 本项目的两起"dependency 事故"（完整复盘在第 12 章）</a></li>
+<li><a href="#46">4.6 小结</a></li>
+</ul>
+</li>
+<li><a href="#5-web-servlet-java-web">5. Web 层核心：Servlet（一切 Java Web 的起点）</a><ul>
+<li><a href="#51-http">5.1 HTTP 复习：一次请求发生了什么</a></li>
+<li><a href="#52-servlet">5.2 Servlet 生命周期（面试高频）</a></li>
+<li><a href="#53-servlet">5.3 项目里怎么用 Servlet</a></li>
+</ul>
+</li>
+<li><a href="#6-dao">6. 数据访问层：DAO 分层与事务边界</a><ul>
+<li><a href="#61">6.1 分层职责（现代架构的最小单元）</a></li>
+<li><a href="#62">6.2 事务边界放在哪？</a></li>
+</ul>
+</li>
+<li><a href="#7-rest-api">7. REST API 设计实践（工业规范）</a><ul>
+<li><a href="#71">7.1 资源与动词</a></li>
+<li><a href="#72">7.2 状态码语义（本项目真实用到的）</a></li>
+<li><a href="#73">7.3 错误响应格式</a></li>
+<li><a href="#74">7.4 幂等性：一个高级话题的第一次接触</a></li>
+</ul>
+</li>
+<li><a href="#8">8. 并发控制实战：一次真实压测揭示的"超卖"真相</a><ul>
+<li><a href="#81-15-3">8.1 复现现场：15 个并发抢 3 台显示器</a></li>
+<li><a href="#82">8.2 如果写成"先查再扣"，灾难就来了</a></li>
+<li><a href="#83-update-where">8.3 正解：把判断压进 UPDATE 的 WHERE 里</a></li>
+<li><a href="#84">8.4 这是"乐观"策略——那"悲观"呢？</a></li>
+<li><a href="#85">8.5 小结</a></li>
+</ul>
+</li>
+<li><a href="#9">9. 事务：把"要么全成、要么全不成"写进代码</a><ul>
+<li><a href="#91">9.1 为什么必须有事务</a></li>
+<li><a href="#92">9.2 手动挡：原生版的完整事务模板</a></li>
+<li><a href="#93">9.3 回滚不是"撤销打印"，而是数据库的真正回退</a></li>
+<li><a href="#94">9.4 隔离级别：并发事务的"交通规则"</a></li>
+<li><a href="#95-sqlite">9.5 SQLite 的并发细节：连接串里的两个参数</a></li>
+<li><a href="#96">9.6 事务边界的三条纪律（真实项目最常犯）</a></li>
+</ul>
+</li>
+<li><a href="#10">10. 幂等性工程：取消订单背后的"状态守卫"</a><ul>
+<li><a href="#101-bug">10.1 重复请求从哪里来（不是 bug，是常态）</a></li>
+<li><a href="#102">10.2 反例：库存被回滚两次会怎样</a></li>
+<li><a href="#103-condition-guarded-transition">10.3 正解：状态守卫（condition-guarded transition）</a></li>
+<li><a href="#104-sql">10.4 为什么这条 SQL 是幂等的关键</a></li>
+<li><a href="#105">10.5 幂等性工具箱（按场景选用）</a></li>
+<li><a href="#106">10.6 小结</a></li>
+</ul>
+</li>
+<li><a href="#11-jakarta-ee-spring-boot">11. 从 Jakarta EE 到 Spring Boot：一次完整迁移对照</a><ul>
+<li><a href="#111">11.1 同一个业务，两次实现</a></li>
+<li><a href="#112">11.2 全景对照表</a></li>
+<li><a href="#113">11.3 代码级对照（挑三处最有感觉的）</a></li>
+<li><a href="#114-spring-boot-serverlog">11.4 Spring Boot 版的真实启动日志（server.log 原文，节选）</a></li>
+<li><a href="#115-shortlink-service">11.5 第二个现代案例：shortlink-service（短链接服务）</a></li>
+<li><a href="#116">11.6 所以，学哪个？</a></li>
+</ul>
+</li>
+<li><a href="#12">12. 工程化收口：构建、测试与真实踩坑记录</a><ul>
+<li><a href="#121-javac-maven">12.1 从 javac 到 Maven：工程构建的进化</a></li>
+<li><a href="#122">12.2 测试策略：把证据留下来</a></li>
+<li><a href="#123">12.3 真实踩坑记录（三个坑都踩在本教程开发过程中）</a></li>
+<li><a href="#124">12.4 上线前自查清单（写操作安全版）</a></li>
+</ul>
+</li>
+<li><a href="#13">13. 收官：四个项目全家福与下一站路线</a><ul>
+<li><a href="#131">13.1 四个项目全家福（启动速查）</a></li>
+<li><a href="#132">13.2 知识地图：你现在会了什么</a></li>
+<li><a href="#133">13.3 下一站：五条进阶路线</a></li>
+<li><a href="#134">13.4 给"动手派"的三个建议</a></li>
+</ul>
+</li>
+</ul></ul>
+  </aside>
+  <main class="content">
+    <div class="meta" style="color:#ea580c;font-weight:600">第 05 章 · 🏢</div>
+    <h1 style="border-bottom:3px solid #ea580c;padding-bottom:10px">JavaEE 企业级开发（现代实战）</h1>
+    <div class="meta">Servlet · DAO · 事务 · REST · 防超卖 · Spring Boot</div>
+    <h1 id="java-eejakarta-ee">Java EE（Jakarta EE）企业级开发 · 现代实战教程（升级版）</h1>
+<blockquote>
+<p>面向已掌握 JavaSE 与 SQL 基础的学习者 ｜ 整理：Operit AI ｜ 2026-09</p>
+<p>配套可运行项目（全部真实编译运行验证）：
+- <code>demos/jakarta-ee/library-api</code> —— 图书借阅管理 REST API（Servlet + JDBC + SQLite）
+- <code>demos/jakarta-ee/order-service</code> —— 迷你订单服务（含防超卖并发压测）
+- <code>demos/spring-boot/order-service</code> —— 同一订单业务的 Spring Boot 版（与原生版逐行对照）
+- <code>demos/spring-boot/shortlink-service</code> —— 短链接服务（302 跳转 + 唯一约束 + 原子计数）</p>
+<p><strong>本版升级（基础化 + 全面化）</strong>：新增第 3 章《现代 Java 语法速览》与第 4 章《外部函数库与依赖管理》；原第 3~11 章顺延为第 5~13 章，全文共 0~13 章。</p>
+</blockquote>
+<hr>
+<h2 id="0-2026-java-ee">0. 导读：2026 年，我们说的"Java EE"到底是什么？</h2>
+<p>如果你在网上看到这些词——<strong>Java EE、J2EE、Jakarta EE、Jakarta EE 10 / 11</strong>——它们说的是同一件事的不同阶段：</p>
+<blockquote>
+<p><strong>一套让 Java 能够开发"企业级后端服务"的标准规范集合。</strong></p>
+</blockquote>
+<ul>
+<li>"企业级" ≈ 需要处理：HTTP 请求、数据库、事务、并发、安全、消息……</li>
+<li>"规范"的意思是：<strong>它只是接口标准</strong>，由不同的厂商/开源项目提供实现（Tomcat、WildFly、Payara……）</li>
+<li>2018 年，Oracle 把 Java EE 移交给了 Eclipse 基金会，并改名 <strong>Jakarta EE</strong>（因为 "Java" 商标属于 Oracle）</li>
+</ul>
+<p><strong>为什么 2026 年还值得学？三个理由：</strong></p>
+<ol>
+<li><strong>它没有死，只是换了舞台</strong>：今天主流的 Spring Boot 应用，内部跑的仍然是 Servlet 容器（内嵌 Tomcat 就是一个 Servlet 容器）</li>
+<li><strong>面试与排障的降维打击</strong>：懂 Servlet 生命周期、事务边界、DAO 分层的人，看 Spring 问题一看一个准</li>
+<li><strong>思想 100% 活在现代技术栈里</strong>：本篇第 2 节有一张完整对照表</li>
+</ol>
+<hr>
+<h2 id="1-j2ee-jakarta-ee">1. 从 J2EE 到 Jakarta EE：一次改名背后的技术史</h2>
+<h3 id="11">1.1 时间线</h3>
+<table>
+<thead>
+<tr>
+<th>年份</th>
+<th>事件</th>
+<th>关键词</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1999</td>
+<td>J2EE 1.2 发布</td>
+<td>Servlet、JSP 时代开启</td>
+</tr>
+<tr>
+<td>2006</td>
+<td>改名 Java EE 5</td>
+<td>注解配置、EJB 3.0</td>
+</tr>
+<tr>
+<td>2013</td>
+<td>Java EE 7</td>
+<td>WebSocket、JSON 处理</td>
+</tr>
+<tr>
+<td>2017</td>
+<td>Java EE 8 发布</td>
+<td>Servlet 4.0、HTTP/2</td>
+</tr>
+<tr>
+<td>2017.9</td>
+<td>Oracle 将 Java EE 移交给 Eclipse 基金会</td>
+<td>"开源化"</td>
+</tr>
+<tr>
+<td>2018</td>
+<td>正式更名 <strong>Jakarta EE</strong></td>
+<td>品牌切割</td>
+</tr>
+<tr>
+<td>2019</td>
+<td>Jakarta EE 8 —— 交接后第一个版本</td>
+<td>与 Java EE 8 兼容</td>
+</tr>
+<tr>
+<td>2020-2022</td>
+<td><strong>Jakarta EE 9 / 9.1 / 10</strong></td>
+<td>⭐ <code>javax.*</code> → <code>jakarta.*</code> 命名空间迁移</td>
+</tr>
+<tr>
+<td>2024</td>
+<td>Jakarta EE 11</td>
+<td>Servlet 6.1、虚拟线程友好</td>
+</tr>
+<tr>
+<td>现在</td>
+<td>最新规范持续迭代</td>
+<td>云原生、虚拟线程</td>
+</tr>
+</tbody>
+</table>
+<h3 id="12-javax-jakarta">1.2 最重要的技术断层：javax → jakarta</h3>
+<p><strong>这是初学者最容易被坑的点</strong>：网上大量"老教程"的代码是 <code>javax.servlet.*</code>，而现代的 Tomcat 10+ 用的是 <code>jakarta.servlet.*</code>：</p>
+<div class="codehilite"><pre><span></span><code><span class="c1">// Jakarta EE 9 之前（老代码）：</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">javax.servlet.http.HttpServlet</span><span class="p">;</span>
+
+<span class="c1">// Jakarta EE 9+（现代代码，本教程配套项目使用的）：</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">jakarta.servlet.http.HttpServlet</span><span class="p">;</span>
+</code></pre></div>
+
+<table>
+<thead>
+<tr>
+<th>组合</th>
+<th>命名空间</th>
+<th>例子</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Tomcat 9 及以下 + Java EE 8</td>
+<td><code>javax.*</code></td>
+<td>老项目、老教程</td>
+</tr>
+<tr>
+<td>Tomcat 10+ + Jakarta EE 10/11</td>
+<td><code>jakarta.*</code></td>
+<td>✅ 现代写法</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>记忆口诀：<strong>"10 开始 jakarta"</strong>——Tomcat 10+、Jakarta EE 9+ 之后，包名前缀都是 <code>jakarta</code>。</p>
+</blockquote>
+<p>下面这份"真实启动日志"来自本项目的实际运行（终端里跑出来的，不是编的）：</p>
+<div class="codehilite"><pre><span></span><code>  图书借阅管理 API 已启动 (嵌入式 Tomcat 10.1 / Servlet 6.0)
+  地址: http://localhost:8081/api/books
+</code></pre></div>
+
+<hr>
+<h2 id="2-java-ee-vs">2. 技术全景：Java EE 规范 vs 现代实际技术栈</h2>
+<p>一张表看清"规范"与"今天的实际工业选择"的对应关系：</p>
+<table>
+<thead>
+<tr>
+<th>Java EE 规范</th>
+<th>解决的问题</th>
+<th>现代实际常用</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Servlet</strong></td>
+<td>HTTP 请求处理</td>
+<td>✅ 依然存在</td>
+<td>Spring MVC 底层就是 Servlet</td>
+</tr>
+<tr>
+<td>JSP</td>
+<td>服务端页面渲染</td>
+<td>前后端分离（Vue/React）+ REST</td>
+<td>基本淘汰</td>
+</tr>
+<tr>
+<td><strong>JPA</strong></td>
+<td>对象-关系映射（ORM）</td>
+<td>Spring Data JPA / MyBatis</td>
+<td>ORM 思想不变</td>
+</tr>
+<tr>
+<td>EJB</td>
+<td>分布式组件/事务 Bean</td>
+<td>Spring Bean + @Transactional</td>
+<td>EJB 基本消亡</td>
+</tr>
+<tr>
+<td><strong>JAX-RS</strong></td>
+<td>REST 风格 Web 服务</td>
+<td>Spring MVC 注解</td>
+<td>思想一脉相承</td>
+</tr>
+<tr>
+<td>CDI</td>
+<td>依赖注入</td>
+<td>Spring IoC / @Autowired</td>
+<td>理念完全一致</td>
+</tr>
+<tr>
+<td>Bean Validation</td>
+<td>参数校验</td>
+<td>Hibernate Validator</td>
+<td>规范仍在广泛使用</td>
+</tr>
+<tr>
+<td>JMS</td>
+<td>异步消息</td>
+<td>Kafka / RocketMQ / RabbitMQ</td>
+<td>中间件演进</td>
+</tr>
+<tr>
+<td>JTA</td>
+<td>分布式事务</td>
+<td>Spring 事务管理 / Seata</td>
+<td>复杂度问题</td>
+</tr>
+<tr>
+<td>JAX-WS</td>
+<td>SOAP Web 服务</td>
+<td>基本被 REST 取代</td>
+<td>遗留系统</td>
+</tr>
+<tr>
+<td>WebSocket</td>
+<td>双向通信</td>
+<td>Spring WebSocket / Netty</td>
+<td>实时场景</td>
+</tr>
+<tr>
+<td>Security API</td>
+<td>认证授权</td>
+<td>Spring Security / JWT</td>
+<td>生态化</td>
+</tr>
+</tbody>
+</table>
+<p><strong>结论：不要"学 Java EE 还是学 Spring Boot"二选一——正确姿势是：</strong></p>
+<blockquote>
+<p><strong>用 Java EE 的底层思想打地基，用 Spring Boot 的工程化提效率。</strong></p>
+</blockquote>
+<p>本教程第 11 节会给你完整的迁移对照。</p>
+<hr>
+<h2 id="3-java">3. 现代 Java 语法速览：先看懂项目代码里的"新写法"</h2>
+<blockquote>
+<p>四个项目都用 <strong>OpenJDK 17</strong>（本教程全部实测环境）编译运行，源码里大量使用"现代写法"：<code>var</code>、文本块、switch 表达式、record……
+如果你对它们还陌生，先花 10 分钟过完这一章——后面所有源码片段都能无障碍阅读。
+（更系统的语言细节见《JavaSE基础知识点 - 完整梳理》第 14 章；本章只讲"在工程代码里它们长什么样、什么时候用"。）</p>
+</blockquote>
+<h3 id="31-var">3.1 <code>var</code>：类型推断，让局部变量更干净</h3>
+<p>原生版 <code>ProductApiServlet</code> / <code>OrderApiServlet</code> 里的真实代码：</p>
+<div class="codehilite"><pre><span></span><code><span class="kt">long</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Long</span><span class="p">.</span><span class="na">parseLong</span><span class="p">(</span><span class="n">path</span><span class="p">.</span><span class="na">substring</span><span class="p">(</span><span class="mi">1</span><span class="p">));</span>
+<span class="kd">var</span><span class="w"> </span><span class="n">p</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dao</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="n">id</span><span class="p">);</span><span class="w">                 </span><span class="c1">// 编译器推断出 p 的类型是 Product</span>
+</code></pre></div>
+
+<div class="codehilite"><pre><span></span><code><span class="kd">var</span><span class="w"> </span><span class="n">order</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dao</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="n">id</span><span class="p">);</span><span class="w">             </span><span class="c1">// 推断为 Order</span>
+<span class="c1">// ...</span>
+<span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kd">var</span><span class="w"> </span><span class="n">el</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">arr</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">                 </span><span class="c1">// 增强 for 也能用 var（推断为 JsonElement）</span>
+<span class="w">    </span><span class="n">JsonObject</span><span class="w"> </span><span class="n">o</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">el</span><span class="p">.</span><span class="na">getAsJsonObject</span><span class="p">();</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>三个要点：</p>
+<ol>
+<li><strong><code>var</code> 不是"动态类型"</strong>——类型在编译期就定死了（<code>var p = ...</code> 之后，<code>p</code> 就是 <code>Product</code>，写错方法名编译不过）；</li>
+<li>只能用于<strong>带初始值的局部变量</strong>（不能用于字段、方法参数、返回值）；</li>
+<li><strong>可读性优先</strong>：<code>var p = dao.get(id)</code> 一眼知道是"产品"；但 <code>var x = calculate(a, b, c)</code> 这种，老实写全类型。</li>
+</ol>
+<blockquote>
+<p>有意思的细节：同一个原生项目里，<code>BookApiServlet</code> 用的是显式类型（<code>Book b = dao.get(id)</code>），<code>OrderApiServlet</code> 用了 <code>var</code>——两种风格都对。
+<strong>var 用不用是团队约定问题，不是对错问题；但有初始值、类型显然的局部变量，用 var 更清爽。</strong></p>
+</blockquote>
+<h3 id="32-sql">3.2 文本块 <code>"""</code>：多行 SQL 不再拼字符串</h3>
+<p>老写法（拼接 + <code>\n</code>，改一行错一行）：</p>
+<div class="codehilite"><pre><span></span><code><span class="n">String</span><span class="w"> </span><span class="n">sql</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;CREATE TABLE IF NOT EXISTS books (\n&quot;</span><span class="w"> </span><span class="o">+</span>
+<span class="w">        </span><span class="s">&quot;    id     INTEGER PRIMARY KEY AUTOINCREMENT,\n&quot;</span><span class="w"> </span><span class="o">+</span>
+<span class="w">        </span><span class="s">&quot;    title  TEXT    NOT NULL,\n&quot;</span><span class="w"> </span><span class="o">+</span>
+<span class="w">        </span><span class="p">...</span>
+</code></pre></div>
+
+<p>新写法（<code>Db.java</code> 源码原文，Java 15+）：</p>
+<div class="codehilite"><pre><span></span><code><span class="k">try</span><span class="w"> </span><span class="p">(</span><span class="n">Connection</span><span class="w"> </span><span class="n">c</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">get</span><span class="p">();</span><span class="w"> </span><span class="n">Statement</span><span class="w"> </span><span class="n">st</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">c</span><span class="p">.</span><span class="na">createStatement</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">st</span><span class="p">.</span><span class="na">execute</span><span class="p">(</span><span class="s">&quot;&quot;&quot;</span>
+<span class="s">            CREATE TABLE IF NOT EXISTS books (</span>
+<span class="s">                id     INTEGER PRIMARY KEY AUTOINCREMENT,</span>
+<span class="s">                title  TEXT    NOT NULL,</span>
+<span class="s">                author TEXT    NOT NULL,</span>
+<span class="s">                stock  INTEGER NOT NULL DEFAULT 0</span>
+<span class="s">            )&quot;&quot;&quot;</span><span class="p">);</span>
+</code></pre></div>
+
+<p>好处：<strong>所见即所得</strong>——SQL 怎么缩进，字符串里就怎么缩进；不用转义引号、不用到处写 <code>\n</code>。
+本项目所有建表语句、统计 SQL（<code>StatsApiServlet.sales()</code>）都用了文本块，打开源码对照一眼就懂。</p>
+<h3 id="33-switch-case-borrow-">3.3 switch 表达式：<code>case "borrow" -&gt;</code> 箭头写法</h3>
+<p><code>BookApiServlet</code> 路由分发的源码原文（Java 14+）：</p>
+<div class="codehilite"><pre><span></span><code><span class="k">switch</span><span class="w"> </span><span class="p">(</span><span class="n">action</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="s">&quot;borrow&quot;</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">r</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dao</span><span class="p">.</span><span class="na">borrow</span><span class="p">(</span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">borrower</span><span class="p">);</span>
+<span class="w">        </span><span class="c1">// ... 借阅成功 / 库存不足 / 图书不存在 三种分支</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="k">case</span><span class="w"> </span><span class="s">&quot;return&quot;</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">r</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dao</span><span class="p">.</span><span class="na">giveBack</span><span class="p">(</span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">borrower</span><span class="p">);</span>
+<span class="w">        </span><span class="c1">// ...</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="k">default</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">fail</span><span class="p">(</span><span class="n">resp</span><span class="p">,</span><span class="w"> </span><span class="mi">400</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;未知操作: &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">action</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>和"老 switch"的区别：</p>
+<table>
+<thead>
+<tr>
+<th>对比</th>
+<th>老写法 <code>case X:</code></th>
+<th>新写法 <code>case X -&gt;</code></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>穿透（fall-through）</td>
+<td>会！忘了 <code>break</code> 就出事</td>
+<td>不会，天然隔离</td>
+</tr>
+<tr>
+<td>写一堆 <code>break</code></td>
+<td>要写</td>
+<td>不用</td>
+</tr>
+<tr>
+<td>直接当表达式返回值</td>
+<td>不能</td>
+<td>能（<code>var x = switch (...) { ... }</code>）</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>忘写 <code>break</code> 导致的"灵异 bug"是老 Java 的著名坑；箭头写法从语言层面消灭了它。</p>
+</blockquote>
+<h3 id="34-try-with-resources">3.4 try-with-resources：资源自动关闭</h3>
+<p><code>StatsApiServlet.sales()</code> 里<strong>一条语句管三个资源</strong>（连接、语句、结果集）：</p>
+<div class="codehilite"><pre><span></span><code><span class="k">try</span><span class="w"> </span><span class="p">(</span><span class="n">Connection</span><span class="w"> </span><span class="n">c</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Db</span><span class="p">.</span><span class="na">get</span><span class="p">();</span>
+<span class="w">     </span><span class="n">Statement</span><span class="w"> </span><span class="n">st</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">c</span><span class="p">.</span><span class="na">createStatement</span><span class="p">();</span>
+<span class="w">     </span><span class="n">ResultSet</span><span class="w"> </span><span class="n">rs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">st</span><span class="p">.</span><span class="na">executeQuery</span><span class="p">(</span><span class="n">sql</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">    </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">rs</span><span class="p">.</span><span class="na">next</span><span class="p">())</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="p">}</span>
+
+<span class="p">}</span><span class="w">   </span><span class="c1">// 出了这个括号，三个资源按&quot;后进先出&quot;顺序自动关闭</span>
+</code></pre></div>
+
+<p>JDBC 的 <code>Connection</code>、文件流、Reader 都会"占系统资源且必须关"。手写 <code>finally { c.close(); }</code> 容易漏、异常时还容易跳过；<strong><code>try (...)</code> 把"关了没"交给编译器保证</strong>——本项目所有数据库代码、<code>readBody</code> 里的 <code>BufferedReader</code> 全都这么写。</p>
+<h3 id="35-mapof-listof">3.5 <code>Map.of</code> / <code>List.of</code>：一行构建响应体</h3>
+<p>原生项目里到处是这种"一次性"的响应组装（Java 9+）：</p>
+<div class="codehilite"><pre><span></span><code><span class="n">write</span><span class="p">(</span><span class="n">resp</span><span class="p">,</span><span class="w"> </span><span class="mi">200</span><span class="p">,</span><span class="w"> </span><span class="n">Map</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="s">&quot;result&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;借阅成功&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;book&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">dao</span><span class="p">.</span><span class="na">get</span><span class="p">(</span><span class="n">id</span><span class="p">)));</span>
+<span class="n">write</span><span class="p">(</span><span class="n">resp</span><span class="p">,</span><span class="w"> </span><span class="mi">400</span><span class="p">,</span><span class="w"> </span><span class="n">Map</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="s">&quot;error&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;不支持的路径: &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">path</span><span class="p">));</span>
+</code></pre></div>
+
+<p>Spring Boot 版同样（<code>ShopController</code>）：</p>
+<div class="codehilite"><pre><span></span><code><span class="k">return</span><span class="w"> </span><span class="n">Map</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="s">&quot;orderId&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">orderId</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;status&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;PAID&quot;</span><span class="p">);</span>
+</code></pre></div>
+
+<p>一个实战级细节：<strong><code>Map.of</code> 创建的是不可变 Map</strong>——往里 <code>put</code> 会直接抛 <code>UnsupportedOperationException</code>。
+要往集合里放<strong>未知个数的元素</strong>，先 <code>new LinkedHashMap&lt;&gt;()</code>（<code>StatsApiServlet</code> 统计接口就是这么干的）；"已知的固定几个字段"才用 <code>Map.of</code>。</p>
+<h3 id="36-lambda-optional">3.6 lambda 与 <code>Optional</code>：链式风格的对象查找</h3>
+<p>Spring Boot 版项目里，找不到就抛业务异常的写法（<code>OrderService</code> 源码原文）：</p>
+<div class="codehilite"><pre><span></span><code><span class="n">Product</span><span class="w"> </span><span class="n">p</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">products</span><span class="p">.</span><span class="na">findById</span><span class="p">(</span><span class="n">it</span><span class="p">.</span><span class="na">productId</span><span class="p">())</span>
+<span class="w">        </span><span class="p">.</span><span class="na">orElseThrow</span><span class="p">(()</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">BizException</span><span class="p">(</span><span class="s">&quot;商品不存在: id=&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">it</span><span class="p">.</span><span class="na">productId</span><span class="p">()));</span>
+</code></pre></div>
+
+<ul>
+<li><code>findById</code> 返回 <code>Optional&lt;Product&gt;</code>——"可能没有"的显式表达；</li>
+<li><code>orElseThrow(() -&gt; ...)</code> 里的 <code>() -&gt; new BizException(...)</code> 就是 <strong>lambda</strong>：把"一段逻辑"当参数传进去，找不到时才执行。</li>
+</ul>
+<p><code>shortlink-service</code> 里同样：</p>
+<div class="codehilite"><pre><span></span><code><span class="p">.</span><span class="na">orElseThrow</span><span class="p">(()</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">BizException</span><span class="p">.</span><span class="na">notFound</span><span class="p">(</span><span class="s">&quot;短码不存在: &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">code</span><span class="p">));</span>
+</code></pre></div>
+
+<blockquote>
+<p>lambda 与 Optional 的完整语义见《JavaSE基础知识点》第 12~13 章；这里只需要会读：<strong><code>X.orElseThrow(() -&gt; 异常)</code> = "X 没有就抛异常"。</strong></p>
+</blockquote>
+<h3 id="37-recordspring-boot">3.7 <code>record</code>：Spring Boot 版的数据模型</h3>
+<p>进入 Spring Boot 版项目，模型层换成了更现代的写法（Java 16+）：</p>
+<div class="codehilite"><pre><span></span><code><span class="kd">public</span><span class="w"> </span><span class="kd">record</span> <span class="nc">Product</span><span class="p">(</span><span class="kt">long</span><span class="w"> </span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="n">priceCents</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">stock</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>一行 = 自动获得：<strong>全参构造器 + 取值方法（<code>p.name()</code>）+ <code>equals</code> / <code>hashCode</code> / <code>toString</code></strong>。</p>
+<p>下单请求体更是把 record 和<strong>参数校验</strong>组合起来（<code>CreateOrderRequest</code> 源码原文）：</p>
+<div class="codehilite"><pre><span></span><code><span class="kd">public</span><span class="w"> </span><span class="kd">record</span> <span class="nc">CreateOrderRequest</span><span class="p">(</span>
+<span class="w">        </span><span class="nd">@NotBlank</span><span class="p">(</span><span class="n">message</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;userName 不能为空&quot;</span><span class="p">)</span>
+<span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">userName</span><span class="p">,</span>
+
+<span class="w">        </span><span class="nd">@NotEmpty</span><span class="p">(</span><span class="n">message</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;items 不能为空&quot;</span><span class="p">)</span>
+<span class="w">        </span><span class="nd">@Valid</span>
+<span class="w">        </span><span class="n">List</span><span class="o">&lt;</span><span class="n">Item</span><span class="o">&gt;</span><span class="w"> </span><span class="n">items</span>
+<span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">record</span> <span class="nc">Item</span><span class="p">(</span>
+<span class="w">            </span><span class="nd">@NotNull</span><span class="p">(</span><span class="n">message</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;productId 不能为空&quot;</span><span class="p">)</span>
+<span class="w">            </span><span class="n">Long</span><span class="w"> </span><span class="n">productId</span><span class="p">,</span>
+
+<span class="w">            </span><span class="nd">@Min</span><span class="p">(</span><span class="n">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">message</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;quantity 至少为 1&quot;</span><span class="p">)</span>
+<span class="w">            </span><span class="kt">int</span><span class="w"> </span><span class="n">quantity</span>
+<span class="w">    </span><span class="p">)</span><span class="w"> </span><span class="p">{}</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>（校验由框架在进入 Controller 前自动执行——机制详见第 11 章的迁移对照。）</p>
+<p><strong>两代写法对照</strong>：原生版的数据模型是普通类（<code>Book.java</code>：手写字段 + 构造器），Spring Boot 版是 record；<code>Order</code>、<code>OrderItem</code>、<code>OrderDetail</code>、<code>Link</code> 全是 record。<strong>只读数据用 record，已经是 2026 年的主流约定。</strong></p>
+<h3 id="38">3.8 小结：速查表</h3>
+<table>
+<thead>
+<tr>
+<th>写法</th>
+<th>最低版本</th>
+<th style="text-align: center;">项目里在哪看</th>
+<th>什么时候用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>var</code></td>
+<td>Java 10</td>
+<td style="text-align: center;"><code>OrderApiServlet</code> / <code>ProductApiServlet</code></td>
+<td>类型显而易见的局部变量</td>
+</tr>
+<tr>
+<td>文本块 <code>"""</code></td>
+<td>Java 15</td>
+<td style="text-align: center;"><code>Db.java</code> / <code>StatsApiServlet</code> / <code>BookDao</code></td>
+<td>多行 SQL / JSON / 模板文本</td>
+</tr>
+<tr>
+<td>switch 表达式 <code>-&gt;</code></td>
+<td>Java 14</td>
+<td style="text-align: center;"><code>BookApiServlet</code> 路由分发</td>
+<td>多分支分发、要避免穿透</td>
+</tr>
+<tr>
+<td>try-with-resources</td>
+<td>Java 7</td>
+<td style="text-align: center;">几乎所有 JDBC 代码</td>
+<td>一切需要 close 的资源</td>
+</tr>
+<tr>
+<td><code>Map.of</code> / <code>List.of</code></td>
+<td>Java 9</td>
+<td style="text-align: center;">各 Servlet 的响应组装</td>
+<td>固定少量元素、要求不可变</td>
+</tr>
+<tr>
+<td>lambda + <code>Optional</code></td>
+<td>Java 8</td>
+<td style="text-align: center;"><code>OrderService</code> / <code>ShortlinkService</code></td>
+<td>"可能没有"的查找、回调逻辑</td>
+</tr>
+<tr>
+<td><code>record</code></td>
+<td>Java 16</td>
+<td style="text-align: center;">Spring Boot 版 model 包</td>
+<td>只读数据载体（DTO / VO）</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>以上每一种，在《JavaSE基础知识点》第 14 章都有独立的编译运行演示（<code>javase-demo/Demo4_ModernJava.java</code>，10 组知识点真实输出）；本章的代码全部出自本项目四个工程，可直接在源码里搜索对照。</p>
+</blockquote>
+<hr>
+<h2 id="4-jar">4. 外部函数库与依赖管理：四个 jar 撑起一个服务</h2>
+<blockquote>
+<p>服务端开发的一条真相：<strong>你写的业务代码只是冰山一角，下面托着它的全是"外部函数库"。</strong>
+本章把四个项目用到的全部外部库讲清楚，并对比两种依赖管理方式（手工 jar vs Maven）。
+（jar 与 classpath 的底层原理，见《JavaSE基础知识点 - 完整梳理》第 15 章；本章讲"工程里怎么管"。）</p>
+</blockquote>
+<h3 id="41">4.1 清点家底：四个库，各司其职</h3>
+<p>原生项目 <code>lib/</code> 目录的全部依赖（= 项目所需的全部"外部世界"）：</p>
+<table>
+<thead>
+<tr>
+<th>jar</th>
+<th>Maven 坐标</th>
+<th>作用</th>
+<th>在本项目里</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>tomcat-embed-core-10.1.60.jar</code></td>
+<td><code>org.apache.tomcat.embed:tomcat-embed-core</code></td>
+<td>嵌入式 Tomcat：Servlet 容器本体</td>
+<td><code>new Tomcat()</code> 启动 Web 服务</td>
+</tr>
+<tr>
+<td><code>jakarta.annotation-api-2.1.1.jar</code></td>
+<td><code>jakarta.annotation:jakarta.annotation-api</code></td>
+<td>注解 API（<code>@Resource</code> 等）</td>
+<td>容器启动的隐式依赖（坑 1 的主角）</td>
+</tr>
+<tr>
+<td><code>sqlite-jdbc-3.47.0.0.jar</code></td>
+<td><code>org.xerial:sqlite-jdbc</code></td>
+<td>SQLite 的 JDBC 驱动</td>
+<td><code>Class.forName("org.sqlite.JDBC")</code></td>
+</tr>
+<tr>
+<td><code>gson-2.11.0.jar</code></td>
+<td><code>com.google.code.gson:gson</code></td>
+<td>JSON 序列化 / 反序列化</td>
+<td><code>GSON.toJson(...)</code>、<code>JsonParser.parseString(...)</code></td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>读代码小技巧：<code>import</code> 里凡是 <strong>不是</strong> <code>java.*</code>、<code>jakarta.servlet.*</code>（业务代码自己用的 API）的包，十有八九来自这些 jar——
+<code>org.apache.catalina.*</code>（Tomcat）、<code>com.google.gson.*</code>（Gson）、<code>org.sqlite.*</code>（驱动）。</p>
+</blockquote>
+<h3 id="42-download-depssh-classpath">4.2 手工挡：download-deps.sh + classpath</h3>
+<p>原生项目在"没有 Maven"的约束下，做法朴素而透明：一个脚本从 Maven Central 下载 jar 到 <code>lib/</code>（<code>download-deps.sh</code> 节选）：</p>
+<div class="codehilite"><pre><span></span><code><span class="nv">MIRROR</span><span class="o">=</span><span class="s2">&quot;https://repo1.maven.org/maven2&quot;</span>
+download<span class="w"> </span><span class="s2">&quot;org/apache/tomcat/embed/tomcat-embed-core/10.1.60/tomcat-embed-core-10.1.60.jar&quot;</span><span class="w"> </span><span class="s2">&quot;tomcat-embed-core-10.1.60.jar&quot;</span>
+download<span class="w"> </span><span class="s2">&quot;com/google/code/gson/gson/2.11.0/gson-2.11.0.jar&quot;</span><span class="w"> </span><span class="s2">&quot;gson-2.11.0.jar&quot;</span>
+download<span class="w"> </span><span class="s2">&quot;org/xerial/sqlite-jdbc/3.47.0.0/sqlite-jdbc-3.47.0.0.jar&quot;</span><span class="w"> </span><span class="s2">&quot;sqlite-jdbc-3.47.0.0.jar&quot;</span>
+download<span class="w"> </span><span class="s2">&quot;jakarta/annotation/jakarta.annotation-api/2.1.1/jakarta.annotation-api-2.1.1.jar&quot;</span><span class="w"> </span><span class="s2">&quot;jakarta.annotation-api-2.1.1.jar&quot;</span>
+</code></pre></div>
+
+<p>编译、运行都要显式带上 <code>-cp</code>：</p>
+<div class="codehilite"><pre><span></span><code>javac<span class="w"> </span>-encoding<span class="w"> </span>UTF-8<span class="w"> </span>-cp<span class="w"> </span><span class="s2">&quot;lib/*&quot;</span><span class="w"> </span>-d<span class="w"> </span>out<span class="w"> </span>src/com/demo/library/*.java
+java<span class="w"> </span>-Dfile.encoding<span class="o">=</span>UTF-8<span class="w"> </span>-cp<span class="w"> </span><span class="s2">&quot;out:lib/*&quot;</span><span class="w"> </span>com.demo.library.Main
+</code></pre></div>
+
+<p><strong>优点</strong>：一切尽在掌握，适合学习和排查（classpath 报错一眼看出缺哪个 jar）。
+<strong>缺点</strong>：库一多就累——还要自己处理"库依赖库"（传递依赖）、版本冲突。</p>
+<h3 id="43-maven-pomxml">4.3 现代挡：Maven + pom.xml</h3>
+<p>Spring Boot 版交给 Maven 管理（<code>order-service/pom.xml</code> 原文节选）：</p>
+<div class="codehilite"><pre><span></span><code><span class="nt">&lt;parent&gt;</span>
+<span class="w">    </span><span class="nt">&lt;groupId&gt;</span>org.springframework.boot<span class="nt">&lt;/groupId&gt;</span>
+<span class="w">    </span><span class="nt">&lt;artifactId&gt;</span>spring-boot-starter-parent<span class="nt">&lt;/artifactId&gt;</span>
+<span class="w">    </span><span class="nt">&lt;version&gt;</span>3.5.16<span class="nt">&lt;/version&gt;</span>
+<span class="nt">&lt;/parent&gt;</span>
+
+<span class="nt">&lt;properties&gt;</span>
+<span class="w">    </span><span class="nt">&lt;java.version&gt;</span>17<span class="nt">&lt;/java.version&gt;</span>
+<span class="nt">&lt;/properties&gt;</span>
+
+<span class="nt">&lt;dependencies&gt;</span>
+<span class="w">    </span><span class="nt">&lt;dependency&gt;</span>
+<span class="w">        </span><span class="nt">&lt;groupId&gt;</span>org.springframework.boot<span class="nt">&lt;/groupId&gt;</span>
+<span class="w">        </span><span class="nt">&lt;artifactId&gt;</span>spring-boot-starter-web<span class="nt">&lt;/artifactId&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/dependency&gt;</span>
+<span class="w">    </span><span class="nt">&lt;dependency&gt;</span>
+<span class="w">        </span><span class="nt">&lt;groupId&gt;</span>org.springframework.boot<span class="nt">&lt;/groupId&gt;</span>
+<span class="w">        </span><span class="nt">&lt;artifactId&gt;</span>spring-boot-starter-jdbc<span class="nt">&lt;/artifactId&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/dependency&gt;</span>
+<span class="w">    </span><span class="nt">&lt;dependency&gt;</span>
+<span class="w">        </span><span class="nt">&lt;groupId&gt;</span>org.springframework.boot<span class="nt">&lt;/groupId&gt;</span>
+<span class="w">        </span><span class="nt">&lt;artifactId&gt;</span>spring-boot-starter-validation<span class="nt">&lt;/artifactId&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/dependency&gt;</span>
+<span class="w">    </span><span class="nt">&lt;dependency&gt;</span>
+<span class="w">        </span><span class="nt">&lt;groupId&gt;</span>org.xerial<span class="nt">&lt;/groupId&gt;</span>
+<span class="w">        </span><span class="nt">&lt;artifactId&gt;</span>sqlite-jdbc<span class="nt">&lt;/artifactId&gt;</span>
+<span class="w">        </span><span class="nt">&lt;version&gt;</span>3.47.0.0<span class="nt">&lt;/version&gt;</span>
+<span class="w">    </span><span class="nt">&lt;/dependency&gt;</span>
+<span class="nt">&lt;/dependencies&gt;</span>
+</code></pre></div>
+
+<p>解读：</p>
+<ul>
+<li><strong>坐标三要素</strong>：<code>groupId : artifactId : version</code>——库里每个构件的唯一身份证（如 <code>com.google.code.gson:gson:2.11.0</code>）；</li>
+<li><strong>starter</strong>：Spring Boot 的"套餐"——<code>spring-boot-starter-web</code> 一句话拉进来：Spring MVC + 内嵌 Tomcat + Jackson（JSON）等一串库；</li>
+<li><strong><code>&lt;parent&gt;</code></strong>：继承官方父 POM 的版本管理——所以 starter 不用写版本号（父 POM 统一决定），只有 sqlite-jdbc 这种"非套餐"才自己标 <code>3.47.0.0</code>；</li>
+<li>然后就是一条命令：<code>mvn -q -DskipTests package</code>——<strong>依赖下载、编译、打包（可执行 fat jar）一条龙</strong>。</li>
+</ul>
+<h3 id="44">4.4 给项目加一个新库：固定三步</h3>
+<p>任何新库进入项目，都是同一套动作（以本项目的 Gson 为例复盘）：</p>
+<ol>
+<li><strong>找到坐标</strong>：在 Maven Central（<code>central.sonatype.com</code>）搜库名，拿到 <code>groupId:artifactId:version</code>；</li>
+<li><strong>拿到 jar</strong>：手工挡 → 在 <code>download-deps.sh</code> 里加一行 <code>download ...</code> 重跑；Maven 挡 → 往 <code>pom.xml</code> 加一段 <code>&lt;dependency&gt;</code>；</li>
+<li><strong>在代码里用</strong>：</li>
+</ol>
+<div class="codehilite"><pre><span></span><code><span class="kn">import</span><span class="w"> </span><span class="nn">com.google.gson.Gson</span><span class="p">;</span><span class="w">        </span><span class="c1">// ← 编译期：classpath 里必须有 gson-2.11.0.jar</span>
+<span class="n">Gson</span><span class="w"> </span><span class="n">gson</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">GsonBuilder</span><span class="p">().</span><span class="na">disableHtmlEscaping</span><span class="p">().</span><span class="na">create</span><span class="p">();</span>
+</code></pre></div>
+
+<p><strong>两个经典报错就是"没加对"的翻译：</strong></p>
+<table>
+<thead>
+<tr>
+<th>报错</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>package xxx does not exist</code> / <code>cannot find symbol</code>（<strong>编译期</strong>）</td>
+<td>编译时 classpath 里没有这个 jar</td>
+</tr>
+<tr>
+<td><code>NoClassDefFoundError</code> / <code>ClassNotFoundException</code>（<strong>运行期</strong>）</td>
+<td>编译过了，但运行时 classpath 里没带上 jar</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>记住口诀：<strong>"编译和运行，两个 classpath 都要给"</strong>——新手最常犯的错就是编译加了 <code>-cp</code>、运行时忘了。</p>
+</blockquote>
+<h3 id="45-dependency-12">4.5 本项目的两起"dependency 事故"（完整复盘在第 12 章）</h3>
+<ul>
+<li><strong>事故 1</strong>：<code>NoClassDefFoundError: jakarta.annotation.Resource</code>——Tomcat 10.1 的 <code>tomcat-embed-core</code> 不自带注解 API，少一个 <code>jakarta.annotation-api-2.1.1.jar</code>，所有接口返回 HTTP 000；</li>
+<li><strong>事故 2</strong>：Gson 默认把 <code>=</code> 转义成 <code>\u003d</code>——读库的默认行为，一行 <code>disableHtmlEscaping()</code> 解决。</li>
+</ul>
+<p>两个坑的共同教训：<strong>把外部库当成"会犯错的同事"——先弄清它的默认行为，再谈怎么用。</strong></p>
+<h3 id="46">4.6 小结</h3>
+<table>
+<thead>
+<tr>
+<th>维度</th>
+<th>手工 jar（原生版）</th>
+<th>Maven（Spring Boot 版）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>依赖清单</td>
+<td><code>download-deps.sh</code> + <code>lib/</code></td>
+<td><code>pom.xml</code></td>
+</tr>
+<tr>
+<td>下载方式</td>
+<td>curl 脚本手动拉</td>
+<td><code>mvn package</code> 自动</td>
+</tr>
+<tr>
+<td>传递依赖</td>
+<td>手动（自己找全）</td>
+<td>自动</td>
+</tr>
+<tr>
+<td>版本管理</td>
+<td>文件名</td>
+<td>parent POM + 显式 <code>&lt;version&gt;</code></td>
+</tr>
+<tr>
+<td>适合场景</td>
+<td>学习 / 排障 / 无 Maven 环境</td>
+<td>一切真实工程</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>配合《JavaSE基础知识点》第 15 章食用更佳：那一章是"显微镜"（jar 到底是什么、classpath 怎么找类），这一章是"工具箱"（工程里怎么管理它们）——两章合起来，外部库这件事就通透了。</p>
+</blockquote>
+<hr>
+<h2 id="5-web-servlet-java-web">5. Web 层核心：Servlet（一切 Java Web 的起点）</h2>
+<h3 id="51-http">5.1 HTTP 复习：一次请求发生了什么</h3>
+<div class="codehilite"><pre><span></span><code>浏览器/curl --HTTP请求--&gt; [ Tomcat（Servlet 容器）] --调用--&gt; Servlet.service()
+         &lt;--HTTP响应-- [ 线程池 / 连接管理 / 协议解析 ] &lt;--返回-- result
+</code></pre></div>
+
+<p>要牢记：<strong>Servlet 只是"接请求、还响应"的组件</strong>；连接管理、线程池、协议解析这些脏活累活都是"容器"（Tomcat）干的。</p>
+<h3 id="52-servlet">5.2 Servlet 生命周期（面试高频）</h3>
+<table>
+<thead>
+<tr>
+<th>阶段</th>
+<th>方法</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>加载 &amp; 初始化</td>
+<td><code>init()</code></td>
+<td>容器启动时调用一次</td>
+</tr>
+<tr>
+<td>服务</td>
+<td><code>service()</code> → <code>doGet()/doPost()</code></td>
+<td>每个请求调用（多线程！）</td>
+</tr>
+<tr>
+<td>销毁</td>
+<td><code>destroy()</code></td>
+<td>容器关闭时调用一次</td>
+</tr>
+</tbody>
+</table>
+<p>⚠️ 因为 <code>service()</code> 是多线程并发调用，<strong>Servlet 里不要出现可变共享状态</strong>（本项目的 DAO 都是无状态的，天然安全）。</p>
+<h3 id="53-servlet">5.3 项目里怎么用 Servlet</h3>
+<p>极简三件套（嵌入式 Tomcat）：</p>
+<div class="codehilite"><pre><span></span><code><span class="c1">// 1. 启动容器</span>
+<span class="n">Tomcat</span><span class="w"> </span><span class="n">tomcat</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Tomcat</span><span class="p">();</span>
+<span class="n">tomcat</span><span class="p">.</span><span class="na">setPort</span><span class="p">(</span><span class="mi">8081</span><span class="p">);</span>
+<span class="n">tomcat</span><span class="p">.</span><span class="na">getConnector</span><span class="p">();</span>
+
+<span class="c1">// 2. 注册 Servlet 与 URL 映射</span>
+<span class="n">Context</span><span class="w"> </span><span class="n">ctx</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">tomcat</span><span class="p">.</span><span class="na">addContext</span><span class="p">(</span><span class="s">&quot;&quot;</span><span class="p">,</span><span class="w"> </span><span class="kc">null</span><span class="p">);</span>
+<span class="n">Tomcat</span><span class="p">.</span><span class="na">addServlet</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;bookApi&quot;</span><span class="p">,</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">BookApiServlet</span><span class="p">());</span>
+<span class="n">ctx</span><span class="p">.</span><span class="na">addServletMappingDecoded</span><span class="p">(</span><span class="s">&quot;/api/books/*&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;bookApi&quot;</span><span class="p">);</span>
+
+<span class="c1">// 3. 启动，阻塞等待请求</span>
+<span class="n">tomcat</span><span class="p">.</span><span class="na">start</span><span class="p">();</span>
+<span class="n">tomcat</span><span class="p">.</span><span class="na">getServer</span><span class="p">().</span><span class="na">await</span><span class="p">();</span>
+</code></pre></div>
+
+<p>URL 中 <code>*</code> 是通配符，<code>req.getPathInfo()</code> 拿到的是映射之后的剩余路径（如 <code>/3/borrow</code>），据此做路由分发——这就是"手写 REST 路由"的核心。</p>
+<hr>
+<h2 id="6-dao">6. 数据访问层：DAO 分层与事务边界</h2>
+<h3 id="61">6.1 分层职责（现代架构的最小单元）</h3>
+<div class="codehilite"><pre><span></span><code>Servlet（Web 层）   ← 只管 HTTP：解析参数、设置状态码、拼 JSON
+   ↓ 调用
+DAO（数据层）       ← 只管数据：SQL、事务、对象映射
+   ↓ 调用
+Db（基础设施）      ← 连接管理（相当于 Spring 里 DataSource 的雏形）
+</code></pre></div>
+
+<p><strong>边界原则</strong>：
+- SQL 只出现在 DAO 里；
+- HTTP 状态码只在 Servlet 里；
+- 任何一层都不"越权"。</p>
+<h3 id="62">6.2 事务边界放在哪？</h3>
+<p>放 DAO 的"业务方法"上（如 <code>borrow()</code>、<code>place()</code>、<code>cancel()</code>），一个方法 = 一个原子业务操作：</p>
+<div class="codehilite"><pre><span></span><code><span class="kd">public</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="nf">borrow</span><span class="p">(</span><span class="kt">long</span><span class="w"> </span><span class="n">bookId</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">borrower</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">Exception</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">try</span><span class="w"> </span><span class="p">(</span><span class="n">Connection</span><span class="w"> </span><span class="n">c</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Db</span><span class="p">.</span><span class="na">get</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">c</span><span class="p">.</span><span class="na">setAutoCommit</span><span class="p">(</span><span class="kc">false</span><span class="p">);</span><span class="w">      </span><span class="c1">// 开启事务</span>
+<span class="w">        </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="c1">// ① 扣库存（条件更新）</span>
+<span class="w">            </span><span class="c1">// ② 写借阅记录</span>
+<span class="w">            </span><span class="n">c</span><span class="p">.</span><span class="na">commit</span><span class="p">();</span><span class="w">              </span><span class="c1">// 全部成功 → 提交</span>
+<span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="s">&quot;OK&quot;</span><span class="p">;</span>
+<span class="w">        </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">Exception</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">c</span><span class="p">.</span><span class="na">rollback</span><span class="p">();</span><span class="w">            </span><span class="c1">// 任何失败 → 全部回滚</span>
+<span class="w">            </span><span class="k">throw</span><span class="w"> </span><span class="n">e</span><span class="p">;</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<blockquote>
+<p>你以后学 Spring 时看到的 <code>@Transactional</code>，做的事情和这段"手工模板"一模一样——只是框架用 AOP 帮你自动包上了。</p>
+</blockquote>
+<hr>
+<h2 id="7-rest-api">7. REST API 设计实践（工业规范）</h2>
+<h3 id="71">7.1 资源与动词</h3>
+<table>
+<thead>
+<tr>
+<th>动词</th>
+<th>语义</th>
+<th>幂等？</th>
+<th>例子</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GET</td>
+<td>查询</td>
+<td>✅</td>
+<td><code>GET /api/books/1</code></td>
+</tr>
+<tr>
+<td>POST</td>
+<td>创建/动作</td>
+<td>❌</td>
+<td><code>POST /api/orders</code></td>
+</tr>
+<tr>
+<td>PUT</td>
+<td>全量更新</td>
+<td>✅</td>
+<td>（本项目未用）</td>
+</tr>
+<tr>
+<td>DELETE</td>
+<td>删除</td>
+<td>✅</td>
+<td>（本项目未用）</td>
+</tr>
+</tbody>
+</table>
+<h3 id="72">7.2 状态码语义（本项目真实用到的）</h3>
+<table>
+<thead>
+<tr>
+<th>状态码</th>
+<th>含义</th>
+<th>项目中的场景</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>200 OK</td>
+<td>成功</td>
+<td>查询、借书、还书、取消成功</td>
+</tr>
+<tr>
+<td>201 Created</td>
+<td>创建成功</td>
+<td>新增图书、下单成功</td>
+</tr>
+<tr>
+<td>400 Bad Request</td>
+<td>参数错误</td>
+<td>缺字段、id 非法</td>
+</tr>
+<tr>
+<td>404 Not Found</td>
+<td>资源不存在</td>
+<td>查询不存在的书/订单</td>
+</tr>
+<tr>
+<td>409 Conflict</td>
+<td>业务冲突</td>
+<td>库存不足、重复取消</td>
+</tr>
+<tr>
+<td>500 Internal Server Error</td>
+<td>服务端错误</td>
+<td>未预期异常</td>
+</tr>
+</tbody>
+</table>
+<h3 id="73">7.3 错误响应格式</h3>
+<p>统一成 <code>{"error": "..."}</code>，前端可以稳定解析：</p>
+<div class="codehilite"><pre><span></span><code><span class="p">{</span><span class="nt">&quot;error&quot;</span><span class="p">:</span><span class="s2">&quot;库存不足，借阅失败&quot;</span><span class="p">}</span>
+</code></pre></div>
+
+<h3 id="74">7.4 幂等性：一个高级话题的第一次接触</h3>
+<p>"取消订单"这个动作被点两次会发生什么？如果代码写得随意，库存会被回滚两次——<strong>灾难</strong>。本项目用"状态守卫"解决（第 10 节讲）。</p>
+<blockquote>
+<p>幂等 = 同一个请求执行一次和执行多次，对系统状态的最终影响相同。支付回调、取消、重试场景的核心议题。</p>
+</blockquote>
+<h2 id="8">8. 并发控制实战：一次真实压测揭示的"超卖"真相</h2>
+<h3 id="81-15-3">8.1 复现现场：15 个并发抢 3 台显示器</h3>
+<p>为项目预置的商品中，「4K显示器」库存 = 3。用 <code>stress_test.py</code> 模拟 15 个用户同时下单，每个订单只买 1 台：</p>
+<div class="codehilite"><pre><span></span><code>python3<span class="w"> </span>stress_test.py<span class="w"> </span><span class="m">15</span><span class="w"> </span><span class="m">3</span><span class="w"> </span><span class="m">1</span><span class="w">     </span><span class="c1"># 15 个并发 · 目标商品 id=3 · 每单 1 件</span>
+</code></pre></div>
+
+<p>真实运行结果（<code>run_output.txt</code> 原文摘录）：</p>
+<div class="codehilite"><pre><span></span><code>===== 7. 并发压测：15 个并发抢购 3 台 4K显示器（防超卖验证） =====
+并发发起 15 个订单（商品 id=3，每单 1 件）...
+成功下单(201): 3 | 库存不足(409): 12 | 其他错误: 0
+压测后商品[4K显示器]剩余库存: 0
+结论: 成功单数 = min(初始库存/每单数量, 并发数)，库存 &gt;= 0，未发生超卖 ✓
+</code></pre></div>
+
+<p><strong>3 人抢到，12 人拿到 409 拒绝，库存恰好归零——没有一件超卖。</strong></p>
+<h3 id="82">8.2 如果写成"先查再扣"，灾难就来了</h3>
+<p>面试最常考的反例（天真写法）：</p>
+<div class="codehilite"><pre><span></span><code><span class="c1">// ❌ 危险：检查和扣减是两条独立 SQL，之间存在&quot;时间窗口&quot;</span>
+<span class="n">Product</span><span class="w"> </span><span class="n">p</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dao</span><span class="p">.</span><span class="na">findById</span><span class="p">(</span><span class="n">id</span><span class="p">);</span><span class="w">           </span><span class="c1">// 读到 stock = 1</span>
+<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">p</span><span class="p">.</span><span class="na">stock</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="n">qty</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">                   </span><span class="c1">// 判断：1 &gt;= 1 ✓</span>
+<span class="w">    </span><span class="n">dao</span><span class="p">.</span><span class="na">updateStock</span><span class="p">(</span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">p</span><span class="p">.</span><span class="na">stock</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">qty</span><span class="p">);</span><span class="w"> </span><span class="c1">// 写回 stock = 0</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>两个并发请求交错时：</p>
+<div class="codehilite"><pre><span></span><code>请求A: 读到 stock=1 ─────────────► 判断通过 ──► 写回 stock = 1-1 = 0
+请求B:       读到 stock=1 ─────────────► 判断通过 ──► 写回 stock = 1-1 = 0
+              ▲ 两个请求读到了同一个旧值，各自&quot;算好再写回&quot;
+</code></pre></div>
+
+<p>结果：<strong>2 笔订单成交，库存却只减了 1 件 → 超卖 1 件。</strong></p>
+<p>问题本质：<strong>"读—判断—写"被拆成了多个步骤，而数据库只保证单条语句内部的原子性。</strong></p>
+<h3 id="83-update-where">8.3 正解：把判断压进 UPDATE 的 WHERE 里</h3>
+<p>本项目 <code>OrderDao.place()</code> 内部的防超卖核心（源码原文）：</p>
+<div class="codehilite"><pre><span></span><code><span class="c1">// ① 条件扣减库存（原子操作，防超卖的关键）</span>
+<span class="k">try</span><span class="w"> </span><span class="p">(</span><span class="n">PreparedStatement</span><span class="w"> </span><span class="n">ps</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">c</span><span class="p">.</span><span class="na">prepareStatement</span><span class="p">(</span>
+<span class="w">        </span><span class="s">&quot;UPDATE products SET stock = stock - ? WHERE id = ? AND stock &gt;= ?&quot;</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">ps</span><span class="p">.</span><span class="na">setInt</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">it</span><span class="p">.</span><span class="na">quantity</span><span class="p">);</span>
+<span class="w">    </span><span class="n">ps</span><span class="p">.</span><span class="na">setLong</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="n">it</span><span class="p">.</span><span class="na">productId</span><span class="p">);</span>
+<span class="w">    </span><span class="n">ps</span><span class="p">.</span><span class="na">setInt</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="n">it</span><span class="p">.</span><span class="na">quantity</span><span class="p">);</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ps</span><span class="p">.</span><span class="na">executeUpdate</span><span class="p">()</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">// 影响 0 行 = 条件不成立：区分&quot;不存在&quot;(404) 与&quot;库存不足&quot;(409)</span>
+<span class="w">        </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">BizException</span><span class="p">(</span>
+<span class="w">                </span><span class="n">exists</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="mi">409</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="mi">404</span><span class="p">,</span>
+<span class="w">                </span><span class="n">exists</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="s">&quot;库存不足: productId=&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">it</span><span class="p">.</span><span class="na">productId</span>
+<span class="w">                       </span><span class="p">:</span><span class="w"> </span><span class="s">&quot;商品不存在: productId=&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">it</span><span class="p">.</span><span class="na">productId</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>三个关键点：</p>
+<ol>
+<li><strong><code>WHERE ... AND stock &gt;= ?</code></strong>：库存够不够，交给数据库在执行更新那一刻判断——检查与扣减在同一条语句内原子完成，没有时间窗口；</li>
+<li><strong><code>executeUpdate() == 0</code></strong>：影响 0 行 = 条件不成立 = 库存不足，直接抛业务异常 → HTTP 409；</li>
+<li><strong>再查一次"是否存在"</strong>：给调用方准确的原因（409 库存不足 / 404 不存在），这是好 API 的细节。</li>
+</ol>
+<h3 id="84">8.4 这是"乐观"策略——那"悲观"呢？</h3>
+<table>
+<thead>
+<tr>
+<th>策略</th>
+<th>手段</th>
+<th>特点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>乐观</strong>（本项目）</td>
+<td>条件 UPDATE + 检查影响行数</td>
+<td>无锁开销；冲突时快速失败（拒绝或重试）</td>
+</tr>
+<tr>
+<td><strong>悲观</strong></td>
+<td><code>SELECT ... FOR UPDATE</code> 提前锁行</td>
+<td>万无一失，但持锁期间其他请求全要等待，高并发吞吐差</td>
+</tr>
+</tbody>
+</table>
+<p>秒杀、抢票、库存扣减这类"写冲突剧烈"的场合，工业界主流恰恰是<strong>乐观思路 + 数据库原子性</strong>（条件更新、版本号 CAS），而不是把人锁在门外。</p>
+<h3 id="85">8.5 小结</h3>
+<blockquote>
+<p>SQL 不只是"存取数据"的工具。把业务规则（"库存必须够"）翻译成 SQL 的<strong>条件</strong>（<code>stock &gt;= ?</code>），就免费得到了一份数据库级别的并发保护——这是 SQL 最被低估的能力之一。</p>
+</blockquote>
+<hr>
+<h2 id="9">9. 事务：把"要么全成、要么全不成"写进代码</h2>
+<h3 id="91">9.1 为什么必须有事务</h3>
+<p>「下单」= 扣库存 + 建订单 + 写明细。如果扣完库存之后程序崩了、订单没建成——钱货两空。</p>
+<blockquote>
+<p>事务 = 一组操作的"最小不可分单元"：<strong>要么全部生效，要么全部不生效（回滚）。</strong></p>
+</blockquote>
+<p>数据库事务的四大保证（ACID，面试必背但更要理解）：</p>
+<table>
+<thead>
+<tr>
+<th>特性</th>
+<th>含义</th>
+<th>靠什么实现</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>原子性</strong> Atomicity</td>
+<td>全成或全不成</td>
+<td>undo 日志 / rollback</td>
+</tr>
+<tr>
+<td><strong>一致性</strong> Consistency</td>
+<td>约束与业务规则不被破坏</td>
+<td>约束 + 正确的业务代码</td>
+</tr>
+<tr>
+<td><strong>隔离性</strong> Isolation</td>
+<td>并发事务互不干扰</td>
+<td>锁 / MVCC</td>
+</tr>
+<tr>
+<td><strong>持久性</strong> Durability</td>
+<td>提交后不丢</td>
+<td>日志（SQLite 的 WAL 就是它的一种）</td>
+</tr>
+</tbody>
+</table>
+<h3 id="92">9.2 手动挡：原生版的完整事务模板</h3>
+<p>本项目 library-api 的借书操作（<code>BookDao.borrow</code>，节选）：</p>
+<div class="codehilite"><pre><span></span><code><span class="kd">public</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="nf">borrow</span><span class="p">(</span><span class="kt">long</span><span class="w"> </span><span class="n">bookId</span><span class="p">,</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">borrower</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">Exception</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">try</span><span class="w"> </span><span class="p">(</span><span class="n">Connection</span><span class="w"> </span><span class="n">c</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Db</span><span class="p">.</span><span class="na">get</span><span class="p">())</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">c</span><span class="p">.</span><span class="na">setAutoCommit</span><span class="p">(</span><span class="kc">false</span><span class="p">);</span><span class="w">        </span><span class="c1">// ★ 关闭自动提交 = 开启事务</span>
+<span class="w">        </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="k">try</span><span class="w"> </span><span class="p">(</span><span class="n">PreparedStatement</span><span class="w"> </span><span class="n">ps</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">c</span><span class="p">.</span><span class="na">prepareStatement</span><span class="p">(</span>
+<span class="w">                    </span><span class="s">&quot;UPDATE books SET stock = stock - 1 WHERE id = ? AND stock &gt; 0&quot;</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="n">ps</span><span class="p">.</span><span class="na">setLong</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">bookId</span><span class="p">);</span>
+<span class="w">                </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ps</span><span class="p">.</span><span class="na">executeUpdate</span><span class="p">()</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                    </span><span class="n">c</span><span class="p">.</span><span class="na">rollback</span><span class="p">();</span><span class="w">      </span><span class="c1">// 扣不动：库存不足或书不存在</span>
+<span class="w">                    </span><span class="k">return</span><span class="w"> </span><span class="n">exists</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="s">&quot;NO_STOCK&quot;</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s">&quot;NOT_FOUND&quot;</span><span class="p">;</span>
+<span class="w">                </span><span class="p">}</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">            </span><span class="c1">// ② 写入借阅记录（INSERT INTO borrow_records ...）</span>
+<span class="w">            </span><span class="n">c</span><span class="p">.</span><span class="na">commit</span><span class="p">();</span><span class="w">                </span><span class="c1">// 全部成功 → 提交</span>
+<span class="w">            </span><span class="k">return</span><span class="w"> </span><span class="s">&quot;OK&quot;</span><span class="p">;</span>
+<span class="w">        </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">Exception</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">c</span><span class="p">.</span><span class="na">rollback</span><span class="p">();</span><span class="w">              </span><span class="c1">// 任何失败 → 回滚</span>
+<span class="w">            </span><span class="k">throw</span><span class="w"> </span><span class="n">e</span><span class="p">;</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<p>五步口诀：<strong>关自动提交 → 干活 → commit → 出错 rollback → try-with-resources 自动关连接。</strong></p>
+<blockquote>
+<p>你以后学 Spring 时看到的 <code>@Transactional</code>，做的事情和这个模板一模一样：方法正常返回 → commit；抛异常 → rollback。框架只是用 AOP 帮你把模板"包"了起来（第 11 章有对照）。</p>
+</blockquote>
+<h3 id="93">9.3 回滚不是"撤销打印"，而是数据库的真正回退</h3>
+<ul>
+<li>commit 之前，所有改动都躺在事务日志里"待命"，其他连接看不到（隔离性）；</li>
+<li>rollback 把待命改动整组丢弃，数据回到事务开始前的状态；</li>
+<li>所以"先扣库存、再建订单、再写明细"三步中任何一步失败，前两步都会被完整撤销。order-service 实测中「超量下单被拒绝」之后库存纹丝不动，正是这个机制在工作。</li>
+</ul>
+<h3 id="94">9.4 隔离级别：并发事务的"交通规则"</h3>
+<table>
+<thead>
+<tr>
+<th>级别</th>
+<th>脏读</th>
+<th>不可重复读</th>
+<th>幻读</th>
+<th>谁在用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>READ UNCOMMITTED</td>
+<td>✅ 可能</td>
+<td>✅</td>
+<td>✅</td>
+<td>几乎不用</td>
+</tr>
+<tr>
+<td>READ COMMITTED</td>
+<td>❌</td>
+<td>✅</td>
+<td>✅</td>
+<td>PostgreSQL / Oracle 默认</td>
+</tr>
+<tr>
+<td>REPEATABLE READ</td>
+<td>❌</td>
+<td>❌</td>
+<td>✅*</td>
+<td>MySQL InnoDB 默认（*间隙锁基本解决）</td>
+</tr>
+<tr>
+<td>SERIALIZABLE</td>
+<td>❌</td>
+<td>❌</td>
+<td>❌</td>
+<td>最严，性能开销最大</td>
+</tr>
+</tbody>
+</table>
+<p>三个名词一句话解释：</p>
+<ul>
+<li><strong>脏读</strong>：读到了别人"未提交"的数据——别人一回头回滚了，你读到的就是鬼影；</li>
+<li><strong>不可重复读</strong>：同一事务里两次读同一行，值被别人改了；</li>
+<li><strong>幻读</strong>：同一事务里两次范围查询，凭空多出（或少掉）了行。</li>
+</ul>
+<blockquote>
+<p>本项目用的 SQLite：它的<strong>写操作是全库串行的</strong>（同一时刻只允许一个写事务）——简单粗暴，但天然没有脏读/幻读问题。</p>
+</blockquote>
+<h3 id="95-sqlite">9.5 SQLite 的并发细节：连接串里的两个参数</h3>
+<p>原生版连接串（<code>Db.java</code> 原文）：</p>
+<div class="codehilite"><pre><span></span><code><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="n">String</span><span class="w"> </span><span class="n">URL</span><span class="w"> </span><span class="o">=</span>
+<span class="w">        </span><span class="s">&quot;jdbc:sqlite:order.db?journal_mode=WAL&amp;busy_timeout=5000&quot;</span><span class="p">;</span>
+</code></pre></div>
+
+<ul>
+<li><strong>WAL</strong>（Write-Ahead Logging）：写操作先追加到日志文件，<strong>读不再被写阻塞</strong>——读写可以并行；</li>
+<li><strong>busy_timeout=5000</strong>：遇到写锁被占用时，最多等 5 秒再报错，而不是立刻抛 <code>SQLITE_BUSY</code>。高并发下它把"直接失败"变成了"稍等重试"。</li>
+</ul>
+<p>对照工业级数据库：MySQL / PostgreSQL 是行级锁 + MVCC，思想一致（写者互斥、读者不挡），只是粒度细得多。<strong>你在 SQLite 上学到的并发概念，换个数据库全部适用。</strong></p>
+<h3 id="96">9.6 事务边界的三条纪律（真实项目最常犯）</h3>
+<ol>
+<li><strong>事务要短</strong>：commit 之前锁可能被占着——不要在事务里做网络调用（发短信、调支付接口）；</li>
+<li><strong>边界放业务方法</strong>：一个业务操作一个事务（本项目的 <code>place</code> / <code>cancel</code> / <code>borrow</code>），而不是"每个 SQL 各自 commit"；</li>
+<li><strong>异常必须炸出去</strong>：吞掉异常 = 框架/上层无法感知失败、无法回滚。正确姿势：抛自定义业务异常，交给上层翻译成 HTTP 状态码。</li>
+</ol>
+<hr>
+<h2 id="10">10. 幂等性工程：取消订单背后的"状态守卫"</h2>
+<h3 id="101-bug">10.1 重复请求从哪里来（不是 bug，是常态）</h3>
+<ul>
+<li>用户手抖，把"取消订单"点两次；</li>
+<li>网络超时后客户端自动重试（客户端根本不知道上一次到底成功没有）；</li>
+<li>消息队列重投递、支付回调重发……</li>
+</ul>
+<blockquote>
+<p><strong>幂等 = 同一操作执行一次与执行多次，对系统最终状态的影响相同。</strong></p>
+</blockquote>
+<p>对"取消订单"来说：第一次把订单 CREATED → CANCELED 并回滚库存；第二次必须做到"什么都不影响"——最差也必须拒绝，绝不能把库存再加一遍。</p>
+<h3 id="102">10.2 反例：库存被回滚两次会怎样</h3>
+<p>假设 cancel 只是两条无条件的 UPDATE：</p>
+<div class="codehilite"><pre><span></span><code><span class="k">UPDATE</span><span class="w"> </span><span class="n">orders</span><span class="w">   </span><span class="k">SET</span><span class="w"> </span><span class="n">status</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;CANCELED&#39;</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">?</span><span class="p">;</span>
+<span class="k">UPDATE</span><span class="w"> </span><span class="n">products</span><span class="w"> </span><span class="k">SET</span><span class="w"> </span><span class="n">stock</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="n">stock</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="o">?</span><span class="w">  </span><span class="k">WHERE</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">?</span><span class="p">;</span><span class="w">   </span><span class="c1">-- 危险</span>
+</code></pre></div>
+
+<p>点两次 → 库存加了两次 → 凭空多货。若关联退款，就是真金白银的资损。</p>
+<h3 id="103-condition-guarded-transition">10.3 正解：状态守卫（condition-guarded transition）</h3>
+<p><code>OrderDao.cancel()</code> 的核心（源码原文）：</p>
+<div class="codehilite"><pre><span></span><code><span class="c1">// ① 状态守卫：只有 CREATED → CANCELED 的这一次更新能成功</span>
+<span class="k">try</span><span class="w"> </span><span class="p">(</span><span class="n">PreparedStatement</span><span class="w"> </span><span class="n">ps</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">c</span><span class="p">.</span><span class="na">prepareStatement</span><span class="p">(</span>
+<span class="w">        </span><span class="s">&quot;UPDATE orders SET status = &#39;CANCELED&#39; WHERE id = ? AND status = &#39;CREATED&#39;&quot;</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">ps</span><span class="p">.</span><span class="na">setLong</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="n">orderId</span><span class="p">);</span>
+<span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ps</span><span class="p">.</span><span class="na">executeUpdate</span><span class="p">()</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">// 影响 0 行：要么订单不存在，要么已经不是 CREATED 状态</span>
+<span class="w">        </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">BizException</span><span class="p">(</span><span class="n">exists</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="mi">409</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="mi">404</span><span class="p">,</span>
+<span class="w">                </span><span class="n">exists</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="s">&quot;订单当前状态不可取消（可能已取消）&quot;</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s">&quot;订单不存在: id=&quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">orderId</span><span class="p">);</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+<span class="c1">// ② 库存回滚（能执行到这里，说明这一次状态迁移刚刚由&quot;我&quot;完成）</span>
+</code></pre></div>
+
+<p>真实实测（<code>run_output.txt</code> 原文）：</p>
+<div class="codehilite"><pre><span></span><code>===== 4. 取消订单2 → 库存回滚（应为 2+2=4） =====
+HTTP 200
+----- 键盘库存 -----
+{&quot;id&quot;:1,&quot;name&quot;:&quot;机械键盘&quot;,&quot;price&quot;:399.0,&quot;stock&quot;:4}
+
+===== 5. 重复取消订单2 → 应拒绝（409） =====
+{&quot;error&quot;:&quot;订单当前状态不可取消（可能已取消）&quot;}
+HTTP 409
+</code></pre></div>
+
+<p>第一次：200，库存 2 → 4；第二次：409，库存保持 4。<strong>恰好一次生效。</strong></p>
+<h3 id="104-sql">10.4 为什么这条 SQL 是幂等的关键</h3>
+<p>把订单想成状态机：</p>
+<div class="codehilite"><pre><span></span><code>CREATED ──cancel──► CANCELED
+   ▲
+   └── 重复 cancel 在这里被拦截（没有合法出边）
+</code></pre></div>
+
+<ul>
+<li><code>WHERE status = 'CREATED'</code> 让这条 UPDATE <strong>只可能成功一次</strong>——第二次执行时条件不成立，影响 0 行；</li>
+<li>库存回滚放在"守卫通过之后"，所以永远不会执行两次；</li>
+<li>这就是「状态机 + 条件更新」的工程实现：业务规则（"只有未取消的订单能取消"）被直接翻译成了 SQL 条件。</li>
+</ul>
+<h3 id="105">10.5 幂等性工具箱（按场景选用）</h3>
+<table>
+<thead>
+<tr>
+<th>手段</th>
+<th>适用场景</th>
+<th>例子</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>状态守卫</strong>（本项目）</td>
+<td>有明确状态机的操作</td>
+<td>取消订单、支付回调置"已支付"</td>
+</tr>
+<tr>
+<td><strong>幂等键</strong></td>
+<td>创建类操作</td>
+<td>支付请求携带 <code>requestId</code>，重复请求返回原结果</td>
+</tr>
+<tr>
+<td><strong>唯一约束</strong></td>
+<td>业务上天然唯一</td>
+<td>短链接 code 唯一（第 11 章项目）</td>
+</tr>
+<tr>
+<td><strong>去重表</strong></td>
+<td>消息消费</td>
+<td>消费前先插消费记录，主键冲突 = 已处理过</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>一个自检标准：<strong>"这个接口被调用两次，第二次会发生什么？"</strong>——能明确回答，说明你设计过幂等；答案是"可能多扣/不知道"，那就等着线上出事故。</p>
+</blockquote>
+<h3 id="106">10.6 小结</h3>
+<blockquote>
+<p>并发控制（第 8 章）解决"同时来"；事务（第 9 章）解决"中途挂"；幂等（本章）解决"重复来"。<strong>这三板斧构成后端写操作安全性的完整防线</strong>，在任何语言、任何框架里都成立。</p>
+</blockquote>
+<hr>
+<h2 id="11-jakarta-ee-spring-boot">11. 从 Jakarta EE 到 Spring Boot：一次完整迁移对照</h2>
+<h3 id="111">11.1 同一个业务，两次实现</h3>
+<p>javaee 分区里放着一对"镜像项目"：</p>
+<ul>
+<li><code>javaee/demos/jakarta-ee/order-service</code> —— 原生 Servlet + 手写路由 + 手动事务（<strong>看懂原理</strong>）</li>
+<li><code>javaee/demos/spring-boot/order-service</code> —— Spring Boot + 注解 + 声明式事务（<strong>现代工程</strong>）</li>
+</ul>
+<p>同一个"下单防超卖"业务，看两版代码如何逐项对应。</p>
+<h3 id="112">11.2 全景对照表</h3>
+<table>
+<thead>
+<tr>
+<th>关注点</th>
+<th>原生版（手写）</th>
+<th>Spring Boot 版（框架）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>启动</td>
+<td><code>new Tomcat()</code> + 手工注册 Servlet</td>
+<td><code>SpringApplication.run()</code> 一行</td>
+</tr>
+<tr>
+<td>路由</td>
+<td><code>getPathInfo()</code> + if/else 分发</td>
+<td><code>@GetMapping</code> / <code>@PostMapping</code> 注解</td>
+</tr>
+<tr>
+<td>组件装配</td>
+<td>手动 <code>new OrderDao()</code></td>
+<td>构造器注入（IoC 容器自动装配）</td>
+</tr>
+<tr>
+<td>事务</td>
+<td><code>setAutoCommit(false)</code> + commit/rollback</td>
+<td><code>@Transactional</code> 一行注解</td>
+</tr>
+<tr>
+<td>请求体</td>
+<td><code>readBody()</code> 手动解析 JSON</td>
+<td><code>@RequestBody</code> 自动反序列化</td>
+</tr>
+<tr>
+<td>参数校验</td>
+<td>手写 if-null 检查</td>
+<td><code>@Valid</code> + <code>@NotBlank</code> 声明式</td>
+</tr>
+<tr>
+<td>错误处理</td>
+<td>每个 Servlet try-catch 拼错误 JSON</td>
+<td><code>@RestControllerAdvice</code> 全局统一</td>
+</tr>
+<tr>
+<td>JSON 序列化</td>
+<td>Gson 手动序列化</td>
+<td>Jackson 自动完成</td>
+</tr>
+<tr>
+<td>数据访问</td>
+<td>JDBC PreparedStatement 手写</td>
+<td>JdbcTemplate（仍是手写 SQL，更省心）</td>
+</tr>
+</tbody>
+</table>
+<h3 id="113">11.3 代码级对照（挑三处最有感觉的）</h3>
+<p><strong>① 路由：手写分发 vs 注解声明</strong></p>
+<p>原生版（<code>OrderApiServlet</code>，源码原文）：</p>
+<div class="codehilite"><pre><span></span><code><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">seg</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">path</span><span class="p">.</span><span class="na">split</span><span class="p">(</span><span class="s">&quot;/&quot;</span><span class="p">);</span><span class="w"> </span><span class="c1">// [&quot;&quot;, &quot;5&quot;, &quot;cancel&quot;]</span>
+<span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">seg</span><span class="p">.</span><span class="na">length</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">3</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">seg</span><span class="o">[</span><span class="mi">2</span><span class="o">]</span><span class="p">.</span><span class="na">equals</span><span class="p">(</span><span class="s">&quot;cancel&quot;</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kt">long</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Long</span><span class="p">.</span><span class="na">parseLong</span><span class="p">(</span><span class="n">seg</span><span class="o">[</span><span class="mi">1</span><span class="o">]</span><span class="p">);</span>
+<span class="w">    </span><span class="n">write</span><span class="p">(</span><span class="n">resp</span><span class="p">,</span><span class="w"> </span><span class="mi">200</span><span class="p">,</span><span class="w"> </span><span class="n">dao</span><span class="p">.</span><span class="na">cancel</span><span class="p">(</span><span class="n">id</span><span class="p">));</span>
+<span class="w">    </span><span class="k">return</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="n">write</span><span class="p">(</span><span class="n">resp</span><span class="p">,</span><span class="w"> </span><span class="mi">400</span><span class="p">,</span><span class="w"> </span><span class="n">Map</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="s">&quot;error&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;不支持的路径: &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">path</span><span class="p">));</span>
+</code></pre></div>
+
+<p>Spring Boot 版（<code>ShopController</code>，源码原文）：</p>
+<div class="codehilite"><pre><span></span><code><span class="nd">@PostMapping</span><span class="p">(</span><span class="s">&quot;/orders&quot;</span><span class="p">)</span>
+<span class="nd">@ResponseStatus</span><span class="p">(</span><span class="n">HttpStatus</span><span class="p">.</span><span class="na">CREATED</span><span class="p">)</span>
+<span class="kd">public</span><span class="w"> </span><span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="p">,</span><span class="w"> </span><span class="n">Object</span><span class="o">&gt;</span><span class="w"> </span><span class="nf">placeOrder</span><span class="p">(</span><span class="nd">@Valid</span><span class="w"> </span><span class="nd">@RequestBody</span><span class="w"> </span><span class="n">CreateOrderRequest</span><span class="w"> </span><span class="n">req</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kt">long</span><span class="w"> </span><span class="n">orderId</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">orderService</span><span class="p">.</span><span class="na">placeOrder</span><span class="p">(</span><span class="n">req</span><span class="p">);</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">Map</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="s">&quot;orderId&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">orderId</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;status&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;PAID&quot;</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<blockquote>
+<p>同样的"解析 → 分发 → 调用 → 返回"，一个写 20 行、还容易漏 catch；一个声明 5 行、校验自动。</p>
+</blockquote>
+<p><strong>② 事务：手动模板 vs 一行注解</strong></p>
+<p>原生版在 9.2 节已经看过（setAutoCommit + commit/rollback 全套手工）；Spring Boot 版：</p>
+<div class="codehilite"><pre><span></span><code><span class="nd">@Transactional</span>
+<span class="kd">public</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="nf">placeOrder</span><span class="p">(</span><span class="n">CreateOrderRequest</span><span class="w"> </span><span class="n">req</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="p">}</span>
+</code></pre></div>
+
+<blockquote>
+<p><code>@Transactional</code> = "9.2 节的手工模板 + AOP 代理"。<strong>你理解了模板，注解就只是语法糖</strong>——而且出了事务问题，你能猜到它内部在做什么。</p>
+</blockquote>
+<p><strong>③ 错误处理：每个方法一排 catch vs 全局一处</strong></p>
+<p>原生版——每个 Servlet 方法尾部都要这样收尾：</p>
+<div class="codehilite"><pre><span></span><code><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">OrderDao</span><span class="p">.</span><span class="na">BizException</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">write</span><span class="p">(</span><span class="n">resp</span><span class="p">,</span><span class="w"> </span><span class="n">e</span><span class="p">.</span><span class="na">httpCode</span><span class="p">,</span><span class="w"> </span><span class="n">Map</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="s">&quot;error&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">e</span><span class="p">.</span><span class="na">getMessage</span><span class="p">()));</span>
+<span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">NullPointerException</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">IllegalStateException</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">write</span><span class="p">(</span><span class="n">resp</span><span class="p">,</span><span class="w"> </span><span class="mi">400</span><span class="p">,</span><span class="w"> </span><span class="n">Map</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="s">&quot;error&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;请求体缺少必要字段或格式错误&quot;</span><span class="p">));</span>
+<span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">NumberFormatException</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">...</span><span class="w"> </span><span class="p">}</span>
+</code></pre></div>
+
+<p>Spring Boot 版——全项目只写一处（<code>ApiExceptionHandler</code>）：</p>
+<div class="codehilite"><pre><span></span><code><span class="nd">@ExceptionHandler</span><span class="p">(</span><span class="n">BizException</span><span class="p">.</span><span class="na">class</span><span class="p">)</span>
+<span class="kd">public</span><span class="w"> </span><span class="n">ResponseEntity</span><span class="o">&lt;</span><span class="n">Map</span><span class="o">&lt;</span><span class="n">String</span><span class="p">,</span><span class="w"> </span><span class="n">Object</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="nf">biz</span><span class="p">(</span><span class="n">BizException</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">ResponseEntity</span><span class="p">.</span><span class="na">status</span><span class="p">(</span><span class="n">e</span><span class="p">.</span><span class="na">status</span><span class="p">())</span>
+<span class="w">            </span><span class="p">.</span><span class="na">body</span><span class="p">(</span><span class="n">Map</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="s">&quot;error&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">e</span><span class="p">.</span><span class="na">getMessage</span><span class="p">(),</span><span class="w"> </span><span class="s">&quot;type&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;BIZ_ERROR&quot;</span><span class="p">));</span>
+<span class="p">}</span>
+</code></pre></div>
+
+<h3 id="114-spring-boot-serverlog">11.4 Spring Boot 版的真实启动日志（server.log 原文，节选）</h3>
+<div class="codehilite"><pre><span></span><code>:: Spring Boot ::               (v3.5.16)
+Tomcat initialized with port 8081 (http)
+Starting Servlet engine: [Apache Tomcat/10.1.55]
+HikariPool-1 - Start completed.
+Tomcat started on port 8081 (http) with context path &#39;/&#39;
+Started OrderServiceApplication in 5.867 seconds (process running for 7.004)
+</code></pre></div>
+
+<blockquote>
+<p>注意第 2、3、5 行：<strong>Spring Boot 内部还是那台 Tomcat、那个 Servlet 引擎</strong>。它不是替代品，而是"配置与装配的自动化"。你在第 5 章学的 Servlet 生命周期、第 6 章学的 DAO 分层，在这里一字不改地适用。</p>
+</blockquote>
+<h3 id="115-shortlink-service">11.5 第二个现代案例：shortlink-service（短链接服务）</h3>
+<p><code>javaee/demos/spring-boot/shortlink-service</code>：把长网址压缩成短码，访问短链时 302 跳转 + 点击统计。麻雀虽小，五脏俱全——HTTP 状态码语义、唯一约束、并发计数全都涉及。</p>
+<p>真实实测（<code>run_output.txt</code> 原文摘录）：</p>
+<div class="codehilite"><pre><span></span><code>{&quot;originalUrl&quot;:&quot;https://github.com/.../tree/main/java&quot;,&quot;shortUrl&quot;:&quot;http://localhost:8083/YEUHkzQ&quot;,&quot;code&quot;:&quot;YEUHkzQ&quot;}
+
+HTTP/1.1 302
+Location: https://github.com/.../tree/main/java
+
+{&quot;id&quot;:5,&quot;code&quot;:&quot;YEUHkzQ&quot;,&quot;originalUrl&quot;:&quot;https://github.com/...&quot;,&quot;clicks&quot;:3,...}   ← 访问 3 次后
+</code></pre></div>
+
+<p>三个设计点（都可以在源码里找到注释）：</p>
+<ol>
+<li><strong>302 而不是 301</strong>：301 会被浏览器永久缓存，后续访问不再回源，点击统计失真；</li>
+<li><strong><code>UNIQUE(code)</code> 约束兜底</strong>：随机码撞车的概率极低，但绝不假设"不会发生"（生成失败自动重试）；</li>
+<li><strong><code>UPDATE link SET clicks = clicks + 1</code></strong>：单条 SQL 原子计数，避免"读-改-写"的丢失更新。</li>
+</ol>
+<h3 id="116">11.6 所以，学哪个？</h3>
+<ul>
+<li><strong>新项目</strong>：直接 Spring Boot，效率碾压；</li>
+<li><strong>读源码 / 排障 / 面试</strong>：靠底层功底（Servlet 生命周期、事务边界、连接管理）；</li>
+<li><strong>学习顺序</strong>：先用原生理解"为什么"，再用 Spring Boot 享受"怎么快"——本教程的顺序正是如此。</li>
+</ul>
+<hr>
+<h2 id="12">12. 工程化收口：构建、测试与真实踩坑记录</h2>
+<h3 id="121-javac-maven">12.1 从 javac 到 Maven：工程构建的进化</h3>
+<p>原生项目用的是最朴素的方式（自己下载 jar → <code>javac -cp</code> → <code>java -cp</code>），依赖一目了然，但依赖一多就累。Spring Boot 版一条命令搞定：</p>
+<div class="codehilite"><pre><span></span><code>mvn<span class="w"> </span>-q<span class="w"> </span>-DskipTests<span class="w"> </span>package<span class="w">     </span><span class="c1"># 编译 + 打成一个可执行 fat jar</span>
+java<span class="w"> </span>-jar<span class="w"> </span>target/order-service-1.0.0.jar
+</code></pre></div>
+
+<p>Maven 替我们做了：依赖下载与传递、编译、打包、版本统一管理（<code>parent</code> POM）。</p>
+<blockquote>
+<p><code>pom.xml</code> = 项目的"说明书"：我依赖谁、用什么版本、怎么打包，全写在里面。</p>
+</blockquote>
+<h3 id="122">12.2 测试策略：把证据留下来</h3>
+<p>本教程所有项目的验证都用同一套"土办法"，但它极其有效：</p>
+<div class="codehilite"><pre><span></span><code>bash<span class="w"> </span>test_api.sh<span class="w"> </span><span class="p">|</span><span class="w"> </span>tee<span class="w"> </span>run_output.txt<span class="w">      </span><span class="c1"># ① 每条接口真实调用 + 真实状态码，输出存档</span>
+python3<span class="w"> </span>stress_test.py<span class="w"> </span><span class="m">15</span><span class="w"> </span><span class="m">3</span><span class="w"> </span><span class="m">1</span><span class="w">              </span><span class="c1"># ② 多线程真并发，输出存档</span>
+</code></pre></div>
+
+<blockquote>
+<p>教程里出现的每一段"实测输出"，都来自这些文件——<strong>用数据说话，而不是"应该能跑"</strong>。</p>
+</blockquote>
+<h3 id="123">12.3 真实踩坑记录（三个坑都踩在本教程开发过程中）</h3>
+<p><strong>坑 1：嵌入式 Tomcat 启动看似正常，所有请求却返回 HTTP 000</strong></p>
+<ul>
+<li>现象：服务日志显示已启动，但所有接口连接被重置（curl 报告 <code>HTTP 000</code>）；</li>
+<li>排查：打开 <code>server.log</code> → <code>NoClassDefFoundError: jakarta/annotation/Resource</code>；</li>
+<li>原因：Tomcat 10.1 的 <code>tomcat-embed-core</code> 不自带 <code>jakarta.annotation-api</code>（它假设身处完整容器）；</li>
+<li>解决：把 <code>jakarta.annotation-api-2.1.1.jar</code> 加入 classpath。</li>
+</ul>
+<blockquote>
+<p>教训：<strong>接口全挂先看日志，别猜代码。</strong></p>
+</blockquote>
+<p><strong>坑 2：Gson 把 <code>=</code> 序列化成 <code>\u003d</code></strong></p>
+<ul>
+<li>现象：错误响应变成 <code>{"error":"库存不足: productId\u003d1"}</code>；</li>
+<li>原因：Gson 默认开启 HTML 转义（防注入），<code>=</code>、<code>&lt;</code>、<code>&gt;</code> 都会被转义；</li>
+<li>解决：<code>new GsonBuilder().disableHtmlEscaping().create()</code>。</li>
+</ul>
+<blockquote>
+<p>教训：了解工具的默认行为，才能避免"看起来像天书"的输出。</p>
+</blockquote>
+<p><strong>坑 3（重点）：SQLite 高并发下的 12 个 500 —— 一次完整的排障现场</strong></p>
+<p>背景：Spring Boot 版开发完成、单线程自测全绿后，进行 15 并发压测——</p>
+<div class="codehilite"><pre><span></span><code>成功下单(201): 3 | 库存不足(400): 0 | 其他错误: 12      ← 不对劲！
+</code></pre></div>
+
+<p><strong>第 1 步 · 看日志定性</strong>（排障永远从日志开始）：</p>
+<div class="codehilite"><pre><span></span><code>[SQLITE_BUSY] The database file is locked (database is locked)
+</code></pre></div>
+
+<p>12 条全是 <code>SQLITE_BUSY</code>：SQLite 同一时刻只允许一个写事务，其余写操作直接失败。</p>
+<p><strong>第 2 步 · 第一轮修复：连接串加参数</strong>（与原生版看齐）：</p>
+<div class="codehilite"><pre><span></span><code><span class="nt">url</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">jdbc:sqlite:data/order.db?journal_mode=WAL&amp;busy_timeout=5000</span>
+</code></pre></div>
+
+<p>WAL（读写并行）+ busy_timeout（写锁冲突时等待 5 秒）。重建、重启、再压测——</p>
+<div class="codehilite"><pre><span></span><code>成功下单(201): 3 | 库存不足(400): 1 | 其他错误: 11      ← 还是失败！
+</code></pre></div>
+
+<p><strong>第 3 步 · 定位真正根因："先读后写"的快照冲突</strong></p>
+<p>看 <code>placeOrder</code> 的语句顺序：先 <code>SELECT</code>（读商品）再 <code>UPDATE</code>（扣库存）。</p>
+<p>WAL 模式下，事务以<strong>读快照</strong>开始；期间若其他写事务提交，本事务再想升级为写操作时，快照已过期，直接失败——<strong>busy_timeout 对锁等待有效，但对"快照过期"救不了</strong>（等再久快照也不会变新）。</p>
+<p><strong>第 4 步 · 终极修复：让写操作先行</strong>（与原生版语句顺序对齐）：</p>
+<div class="codehilite"><pre><span></span><code><span class="c1">// 先 UPDATE 扣库存（写操作先行），再 SELECT 读单价</span>
+<span class="kt">int</span><span class="w"> </span><span class="n">affected</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">products</span><span class="p">.</span><span class="na">decreaseStock</span><span class="p">(</span><span class="n">it</span><span class="p">.</span><span class="na">productId</span><span class="p">(),</span><span class="w"> </span><span class="n">it</span><span class="p">.</span><span class="na">quantity</span><span class="p">());</span>
+</code></pre></div>
+
+<p>重建、重启、再压测——</p>
+<div class="codehilite"><pre><span></span><code>成功下单(201): 3 | 库存不足(400): 12 | 其他错误: 0      ✅
+busy_count = 0
+</code></pre></div>
+
+<p><strong>这个坑的宝贵之处</strong>：同样的业务逻辑，"语句顺序"这样一个细节就能决定高并发下的生死。而原生版恰好一直是"写先行"（它的 <code>place()</code> 从条件扣减开始），所以从未踩到。<strong>先学原理再上框架，就是这种时刻在帮你兜底。</strong></p>
+<blockquote>
+<p>复盘三句话：
+1. 并发问题只有<strong>压测</strong>才会暴露（单线程自测永远全绿）；
+2. 排障闭环 = 日志定位 → 假设 → 修复 → <strong>再压测验证</strong>（用数据说话）；
+3. 数据库的并发语义（锁、快照、隔离级别）值得真正理解——换 MySQL / PostgreSQL 时，这些知识全部迁移。</p>
+</blockquote>
+<h3 id="124">12.4 上线前自查清单（写操作安全版）</h3>
+<ul>
+<li>[ ] 防超卖/防超扣：条件更新 + 检查影响行数；</li>
+<li>[ ] 事务边界：业务方法粒度、异常能触发回滚；</li>
+<li>[ ] 幂等：重复请求被拦截（状态守卫 / 唯一约束 / 幂等键）；</li>
+<li>[ ] 并发参数：连接池大小、WAL / busy_timeout（SQLite）、隔离级别（MySQL/PG）；</li>
+<li>[ ] 压测证据：并发脚本 + 输出存档；</li>
+<li>[ ] 错误响应：4xx / 5xx 语义清晰，日志可定位。</li>
+</ul>
+<hr>
+<h2 id="13">13. 收官：四个项目全家福与下一站路线</h2>
+<p>到这里，0~12 章已经把"企业级开发"的全部核心概念走完了——从语言与工具准备（第 3~4 章），到 Servlet 原理、事务、并发、幂等，再到 Spring Boot 迁移与工程化排障。最后一章做三件事：<strong>把四个项目跑起来 → 回看知识地图 → 拿到进阶路线。</strong></p>
+<h3 id="131">13.1 四个项目全家福（启动速查）</h3>
+<blockquote>
+<p>以下路径均相对本分区根目录（<code>javaee/</code>）。</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>项目</th>
+<th>目录</th>
+<th style="text-align: center;">端口</th>
+<th>一句话</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>library-api</td>
+<td><code>demos/jakarta-ee/library-api</code></td>
+<td style="text-align: center;">8081</td>
+<td>图书借阅：Servlet 路由 + DAO 分层 + 事务借还</td>
+</tr>
+<tr>
+<td>order-service（原生）</td>
+<td><code>demos/jakarta-ee/order-service</code></td>
+<td style="text-align: center;">8082</td>
+<td>迷你订单：防超卖 + 状态守卫 + 并发压测</td>
+</tr>
+<tr>
+<td>order-service（Spring Boot）</td>
+<td><code>demos/spring-boot/order-service</code></td>
+<td style="text-align: center;">8081</td>
+<td>同业务现代实现：注解 + IoC + 声明式事务</td>
+</tr>
+<tr>
+<td>shortlink-service</td>
+<td><code>demos/spring-boot/shortlink-service</code></td>
+<td style="text-align: center;">8083</td>
+<td>短链接：302 跳转 + 唯一约束 + 原子计数</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>⚠️ 两个 order-service 都用 8081（它们本来就是"同一业务、两版实现"）——对照学习时<strong>不要同时启动</strong>。</p>
+</blockquote>
+<p><strong>① 原生版（纯 javac，先懂原理）</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="nb">cd</span><span class="w"> </span>demos/jakarta-ee/order-service
+bash<span class="w"> </span>download-deps.sh<span class="w">                      </span><span class="c1"># 首次：下载依赖 jar 到 lib/</span>
+javac<span class="w"> </span>-encoding<span class="w"> </span>UTF-8<span class="w"> </span>-cp<span class="w"> </span><span class="s2">&quot;lib/*&quot;</span><span class="w"> </span>-d<span class="w"> </span>out<span class="w"> </span>src/com/demo/order/*.java
+java<span class="w"> </span>-Dfile.encoding<span class="o">=</span>UTF-8<span class="w"> </span>-cp<span class="w"> </span><span class="s2">&quot;out:lib/*&quot;</span><span class="w"> </span>com.demo.order.Main<span class="w">    </span><span class="c1"># 端口 8082</span>
+</code></pre></div>
+
+<div class="codehilite"><pre><span></span><code><span class="c1"># 另开一个终端：</span>
+bash<span class="w"> </span>test_api.sh<span class="w"> </span><span class="p">|</span><span class="w"> </span>tee<span class="w"> </span>run_output.txt<span class="w">      </span><span class="c1"># 冒烟测试 + 完整业务演示</span>
+python3<span class="w"> </span>stress_test.py<span class="w"> </span><span class="m">15</span><span class="w"> </span><span class="m">3</span><span class="w"> </span><span class="m">1</span><span class="w">              </span><span class="c1"># 15 并发抢 3 件库存，验证防超卖</span>
+</code></pre></div>
+
+<p>library-api 同理，把 <code>order</code> 换成 <code>library</code>（端口 8081）即可，详见项目内的 README。</p>
+<p><strong>② Spring Boot 版（现代工程，再求效率）</strong></p>
+<div class="codehilite"><pre><span></span><code><span class="nb">cd</span><span class="w"> </span>demos/spring-boot/order-service
+mvn<span class="w"> </span>-q<span class="w"> </span>-DskipTests<span class="w"> </span>package
+java<span class="w"> </span>-jar<span class="w"> </span>target/order-service-1.0.0.jar<span class="w">   </span><span class="c1"># 端口 8081</span>
+</code></pre></div>
+
+<div class="codehilite"><pre><span></span><code><span class="c1"># 另开一个终端：</span>
+bash<span class="w"> </span>test_api.sh<span class="w"> </span><span class="p">|</span><span class="w"> </span>tee<span class="w"> </span>run_output.txt
+python3<span class="w"> </span>stress_test.py<span class="w"> </span><span class="m">15</span><span class="w"> </span><span class="m">3</span><span class="w"> </span><span class="m">1</span>
+</code></pre></div>
+
+<div class="codehilite"><pre><span></span><code><span class="c1"># 短链接服务（端口 8083）：</span>
+<span class="nb">cd</span><span class="w"> </span>demos/spring-boot/shortlink-service
+mvn<span class="w"> </span>-q<span class="w"> </span>-DskipTests<span class="w"> </span>package
+java<span class="w"> </span>-jar<span class="w"> </span>target/shortlink-service-1.0.0.jar
+bash<span class="w"> </span>test_api.sh<span class="w"> </span><span class="p">|</span><span class="w"> </span>tee<span class="w"> </span>run_output.txt
+</code></pre></div>
+
+<h3 id="132">13.2 知识地图：你现在会了什么</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align: center;">章节</th>
+<th>如果你真的读懂了</th>
+<th>对应代码位置</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: center;">0~1</td>
+<td>Java EE / Jakarta EE 是什么、从哪来</td>
+<td>—</td>
+</tr>
+<tr>
+<td style="text-align: center;">2</td>
+<td>规范 vs 现代技术栈全景对照</td>
+<td>—</td>
+</tr>
+<tr>
+<td style="text-align: center;">3</td>
+<td>现代语法：var / 文本块 / switch 表达式 / record</td>
+<td><code>OrderApiServlet</code>、<code>Db.java</code>、<code>BookApiServlet</code>、<code>Product</code></td>
+</tr>
+<tr>
+<td style="text-align: center;">4</td>
+<td>外部库：四个 jar 各司其职 + 两种依赖管理</td>
+<td><code>lib/</code>、<code>download-deps.sh</code>、<code>pom.xml</code></td>
+</tr>
+<tr>
+<td style="text-align: center;">5</td>
+<td>Servlet 生命周期、路由与 JSON 响应</td>
+<td><code>BookApiServlet</code> / <code>OrderApiServlet</code></td>
+</tr>
+<tr>
+<td style="text-align: center;">6</td>
+<td>DAO 分层、事务边界、连接管理</td>
+<td><code>BookDao.borrow()</code> 手写事务模板</td>
+</tr>
+<tr>
+<td style="text-align: center;">7</td>
+<td>REST 语义：201 / 400 / 404 / 409</td>
+<td>四个项目的接口层</td>
+</tr>
+<tr>
+<td style="text-align: center;">8</td>
+<td>并发防超卖：条件更新 + 影响行数检查</td>
+<td><code>decreaseStock</code> 条件 UPDATE</td>
+</tr>
+<tr>
+<td style="text-align: center;">9</td>
+<td>事务 ACID、隔离级别、SQLite 并发参数</td>
+<td><code>place</code> / <code>cancel</code> / WAL + busy_timeout</td>
+</tr>
+<tr>
+<td style="text-align: center;">10</td>
+<td>幂等：状态守卫防重复操作</td>
+<td><code>cancel()</code> 的 <code>WHERE status='CREATED'</code></td>
+</tr>
+<tr>
+<td style="text-align: center;">11</td>
+<td>Jakarta EE → Spring Boot 逐行迁移</td>
+<td>两版 order-service 对照阅读</td>
+</tr>
+<tr>
+<td style="text-align: center;">12</td>
+<td>工程化：Maven、测试脚本、踩坑排障</td>
+<td><code>application.yml</code> 并发参数 + 实测输出存档</td>
+</tr>
+</tbody>
+</table>
+<h3 id="133">13.3 下一站：五条进阶路线</h3>
+<blockquote>
+<p>原则：<strong>从你手里已有的代码出发</strong>，不要另起炉灶。</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>方向</th>
+<th>为什么现在学</th>
+<th>从哪行代码接上</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>MyBatis / JPA</td>
+<td>手写 JDBC 的规模化替代</td>
+<td>把 <code>BookDao</code> 的手写 SQL 换成 Mapper，体会"映射框架省了什么"</td>
+</tr>
+<tr>
+<td>Spring Security + JWT</td>
+<td>真实系统必须有认证授权</td>
+<td>给四个项目加登录，把"裸奔 API"变成有门禁的系统</td>
+</tr>
+<tr>
+<td>Redis</td>
+<td>缓存与原子操作的第二条路</td>
+<td>用 Redis 原子扣减 / 分布式锁，与条件更新对比</td>
+</tr>
+<tr>
+<td>消息队列（RabbitMQ / Kafka）</td>
+<td>解耦与削峰</td>
+<td>下单成功后异步发通知，把同步链路拆成生产者/消费者</td>
+</tr>
+<tr>
+<td>Docker + CI/CD</td>
+<td>部署标准化</td>
+<td>给 Spring Boot 项目写 Dockerfile，让环境问题成为历史</td>
+</tr>
+</tbody>
+</table>
+<p>再往远看还有 <strong>分布式事务、Spring Cloud 微服务</strong>——建议等上面几样真正用进项目之后再出发，不急。</p>
+<h3 id="134">13.4 给"动手派"的三个建议</h3>
+<ol>
+<li><strong>改坏它</strong>：把 <code>decreaseStock</code> 条件里的 <code>AND stock &gt;= ?</code> 删掉，重新压测——亲眼看到超卖发生，这个知识就再也忘不掉了；</li>
+<li><strong>看日志</strong>：任何"结果不对劲"，先读日志再改代码（第 12 章 <code>SQLITE_BUSY</code> 就是四步排障的范例：错误分类 → 定位根因 → 修复 → <strong>再压测验证</strong>）；</li>
+<li><strong>用 Git 管理实验</strong>：每改一个点提交一次，出错时能精确回到"上一次能跑"的状态。</li>
+</ol>
+<hr>
+<p><strong>从 Servlet 到 Spring Boot，从单线程到 15 并发，从"能跑"到"敢上线"</strong>——这四个项目就是你继续前进的全部地基。</p>
+<blockquote>
+<p>📌 配套项目的完整命令与导航，见 <a href="../README.md">JavaEE 分区 README</a>。
+—— 教程全文完 ——</p>
+</blockquote>
+    <div class="pager"><a href="04.html"><div class="dir">← 上一章</div><div class="ttl">学习报告：Java · 数据库 · AI Agent</div></a><a href="06.html" style="text-align:right"><div class="dir">下一章 →</div><div class="ttl">Java 上位机开发实战</div></a></div>
+  </main>
+</div>
+</body>
+</html>
