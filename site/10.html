@@ -597,16 +597,16 @@ curl -s -o /dev/null -w "%{http_code}\n" https://user-unknowed.github.io/studyin
 # 期望输出：200
 
 # ② 编辑器组件已渲染（可编辑的 textarea 存在）
-curl -s https://user-unknowed.github.io/studying-for-building/10.html | grep -c 'id="sce-code"'
+curl -s https://user-unknowed.github.io/studying-for-building/10.html | grep -c '<textarea id="sce-code"'
 # 期望输出：1
 
 # ③ 三份源码以文本形式内嵌在页面里
-curl -s https://user-unknowed.github.io/studying-for-building/10.html | grep -o 'data-file="[^"]*"'
-# 期望输出：data-file="worker.js" / deploy.py / editor.js 各一行
+curl -s https://user-unknowed.github.io/studying-for-building/10.html | grep -o 'data-file="worker.js"\|data-file="deploy.py"\|data-file="editor.js"' | sort -u
+# 期望输出：data-file="deploy.py" / editor.js / worker.js 三行（sort 后按字母序）
 
 # ④ 详尽注释确实存在（统计注释与讲解标记）
-curl -s https://user-unknowed.github.io/studying-for-building/10.html | grep -c "讲解"
-# 期望输出：大于 20</code></pre></div>
+curl -s https://user-unknowed.github.io/studying-for-building/10.html | grep -o '注释\|讲解' | wc -l
+# 期望输出：大于 30</code></pre></div>
 <blockquote>
 <p>提示：本站当前通过 GitHub Pages（gh-pages 分支）发布，也兼容 Cloudflare Pages（deploy.py 流程）；若浏览器仍显示旧版，强制刷新（Ctrl+Shift+R）即可。<br>
 本章构建记录：构建时间 2026-10-04 · 生成脚本 <code>build_chapter10.py</code> · 编辑器内容与源码清单来自同一份源码字符串（逐字节一致）。</p>
