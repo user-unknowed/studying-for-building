@@ -41,10 +41,11 @@
 <li><a href="#42-stpmstp">4.2 STP/MSTP：防止环路又保留冗余</a></li>
 <li><a href="#43-ospf">4.3 OSPF：动态路由协议的主力</a></li>
 <li><a href="#44">4.4 静态路由与默认路由</a></li>
-<li><a href="#45-acl">4.5 ACL：访问控制列表</a></li>
-<li><a href="#46-nat">4.6 NAT：网络地址转换</a></li>
-<li><a href="#47-vpn">4.7 网络安全：防火墙与 VPN</a></li>
-<li><a href="#48-wlan">4.8 WLAN：无线局域网</a></li>
+<li><a href="#45-bgphcip">4.5 BGP：边界网关协议（HCIP 拔高）</a></li>
+<li><a href="#46-acl">4.6 ACL：访问控制列表</a></li>
+<li><a href="#47-nat">4.7 NAT：网络地址转换</a></li>
+<li><a href="#48-vpn">4.8 网络安全：防火墙与 VPN</a></li>
+<li><a href="#49-wlan">4.9 WLAN：无线局域网</a></li>
 </ul>
 </li>
 <li><a href="#5-ensp">5. 实验环境：eNSP 入门</a><ul>
@@ -501,6 +502,24 @@ interface GigabitEthernet 0/0/1
 quit
 </code></pre></div>
 
+<p><strong>Trunk 端口配置（交换机互联）</strong>：</p>
+<div class="codehilite"><pre><span></span><code>interface GigabitEthernet 0/0/24
+ port link-type trunk
+ port trunk allow-pass vlan 10 20 30   # 允许哪些 VLAN 通过
+ port trunk pvid vlan 10                # 本征 VLAN（不带标签的 VLAN）
+quit
+</code></pre></div>
+
+<p><strong>VLANIF 接口（三层交换机做 VLAN 间路由）</strong>：</p>
+<div class="codehilite"><pre><span></span><code>interface Vlanif 10
+ ip address 192.168.10.1 255.255.255.0
+quit
+interface Vlanif 20
+ ip address 192.168.20.1 255.255.255.0
+quit
+# 此时 VLAN10 和 VLAN20 的设备可以通过三层交换机互通
+</code></pre></div>
+
 <h3 id="42-stpmstp">4.2 STP/MSTP：防止环路又保留冗余</h3>
 <p><strong>问题</strong>：交换机之间接两条线做冗余，会形成环路，导致广播风暴、MAC 地址表震荡。</p>
 <p><strong>STP（生成树协议）</strong>：逻辑上阻断一条链路，物理上保留冗余；当主链路故障时，自动放开备份链路。</p>
@@ -510,9 +529,14 @@ quit
 <p><strong>OSPF（开放式最短路径优先）</strong>是链路状态路由协议，用 SPF 算法计算最短路径。比赛中单区域 OSPF 是必考点。</p>
 <p><strong>核心概念</strong>：
 - <strong>Router ID</strong>：路由器在 OSPF 域中的唯一标识（通常用环回口 IP）
-- <strong>区域 Area</strong>：单区域用 Area 0（骨干区域）
+- <strong>区域 Area</strong>：单区域用 Area 0（骨干区域）；多区域时所有区域必须连接 Area 0
 - <strong>邻居关系</strong>：通过 Hello 包发现邻居，建立邻接后同步 LSDB（链路状态数据库）
-- <strong>度量值 Cost</strong>：基于带宽，越小越优</p>
+- <strong>度量值 Cost</strong>：基于带宽，越小越优；<code>cost = 100000000 / 带宽(bps)</code>
+- <strong>DR/BDR 选举</strong>：在广播网络（如以太网）中选举指定路由器（DR）和备份指定路由器（BDR），减少 LSA 泛洪数量。选举依据：Router Priority（默认 1）→ Router ID</p>
+<p><strong>OSPF 多区域基础（HCIP 级别，比赛常考）</strong>：
+- <strong>骨干区域 Area 0</strong>：所有其他区域必须与 Area 0 相连
+- <strong>ABR（区域边界路由器）</strong>：连接多个区域的路由器
+- <strong>LSA 类型</strong>：Type 1（Router LSA）、Type 2（Network LSA）、Type 3（Network Summary LSA，ABR 产生）</p>
 <div class="codehilite"><pre><span></span><code># 华为 VRP 配置示例：单区域 OSPF
 system-view
 interface LoopBack 0
@@ -524,6 +548,11 @@ ospf 1 router-id 1.1.1.1
   network 1.1.1.1 0.0.0.0
  quit
 quit
+
+# 查看 OSPF 邻居是否建立
+display ospf peer brief
+# 查看 OSPF 路由
+display ospf routing
 </code></pre></div>
 
 <h3 id="44">4.4 静态路由与默认路由</h3>
@@ -533,7 +562,34 @@ quit
 </code></pre></div>
 
 <p><strong>默认路由</strong>：<code>0.0.0.0 0.0.0.0</code>，当路由表没有更精确的匹配时使用，常用于连接 ISP 的出口。</p>
-<h3 id="45-acl">4.5 ACL：访问控制列表</h3>
+<h3 id="45-bgphcip">4.5 BGP：边界网关协议（HCIP 拔高）</h3>
+<p><strong>BGP（Border Gateway Protocol）</strong>是互联网的核心路由协议，用于在不同自治系统（AS）之间交换路由信息。比赛中常考 IBGP（同 AS 内）和 EBGP（不同 AS 间）的基本配置。</p>
+<p><strong>核心概念</strong>：
+- <strong>AS（自治系统）</strong>：一个机构管理的网络集合，用 AS 号标识（如 AS 100）
+- <strong>EBGP</strong>：不同 AS 之间的 BGP 邻居关系
+- <strong>IBGP</strong>：同一 AS 内的 BGP 邻居关系
+- <strong>路由属性</strong>：AS_Path（越短越优）、Local Preference（本地优先级，越大越优）、Next Hop</p>
+<div class="codehilite"><pre><span></span><code># BGP 配置示例：R1(AS 100) 与 R2(AS 200) 建立 EBGP 邻居
+# R1 上配置：
+system-view
+bgp 100
+ peer 192.168.12.2 as-number 200       # 指定对端 IP 和 AS 号
+ network 10.0.0.0 255.255.255.0         # 宣告自己的网段
+quit
+
+# R2 上配置：
+bgp 200
+ peer 192.168.12.1 as-number 100
+ network 20.0.0.0 255.255.255.0
+quit
+
+# 查看 BGP 邻居
+display bgp peer
+# 查看 BGP 路由表
+display bgp routing-table
+</code></pre></div>
+
+<h3 id="46-acl">4.6 ACL：访问控制列表</h3>
 <p><strong>基本 ACL（2000-2999）</strong>：只匹配源 IP 地址
 <strong>高级 ACL（3000-3999）</strong>：匹配源/目的 IP、协议、端口号</p>
 <div class="codehilite"><pre><span></span><code># 高级 ACL：禁止 192.168.1.0 网段访问服务器的 80 端口
@@ -546,7 +602,7 @@ interface GigabitEthernet 0/0/1
 quit
 </code></pre></div>
 
-<h3 id="46-nat">4.6 NAT：网络地址转换</h3>
+<h3 id="47-nat">4.7 NAT：网络地址转换</h3>
 <p>让内网多个设备共享一个公网 IP 上网。</p>
 <table>
 <thead>
@@ -570,17 +626,51 @@ quit
 </tr>
 </tbody>
 </table>
-<h3 id="47-vpn">4.7 网络安全：防火墙与 VPN</h3>
+<h3 id="48-vpn">4.8 网络安全：防火墙与 VPN</h3>
 <ul>
 <li><strong>华为防火墙（USG 系列）</strong>：安全区域（Trust/Untrust/DMZ）、安全策略、会话表</li>
 <li><strong>IPSec VPN</strong>：用加密隧道在公网上安全传输数据，适合站点间互联</li>
 <li><strong>SSL VPN</strong>：远程接入，用浏览器即可，适合移动办公</li>
 </ul>
-<h3 id="48-wlan">4.8 WLAN：无线局域网</h3>
+<h3 id="49-wlan">4.9 WLAN：无线局域网</h3>
 <p><strong>组网架构</strong>：AC（无线控制器）+ Fit AP（瘦 AP）
 - AC 负责集中管理、配置下发、用户认证
 - AP 负责射频信号收发</p>
-<p>关键配置：AP 上线、SSID 创建、安全模板（WPA2/WPA3）、VLAN 绑定。</p>
+<p><strong>关键配置流程</strong>：</p>
+<div class="codehilite"><pre><span></span><code># AC 上配置：让 AP 上线
+system-view
+wlan
+ # 创建 AP 组
+ ap-group name ap-group1
+  quit
+ # 配置 AC 的源接口（AP 通过此地址发现 AC）
+ capwap source interface vlanif 100
+ quit
+
+# 配置 SSID（WiFi 名称）和安全模板
+wlan
+ security-profile name wlan-sec
+  security wpa-wpa2 psk pass-phrase Huawei@123 aes
+  quit
+ ssid-profile name wlan-ssid
+  ssid Huawei-WLAN
+  quit
+ vap-profile name wlan-vap
+  forward-mode tunnel
+  service-vlan vlan-id 100
+  ssid-profile wlan-ssid
+  security-profile wlan-sec
+  quit
+ ap-group name ap-group1
+  vap-profile wlan-vap wlan 1 radio 0
+  vap-profile wlan-vap wlan 1 radio 1
+  quit
+quit
+</code></pre></div>
+
+<blockquote>
+<p>比赛中 WLAN 占比不高，但 AC+AP 上线、SSID 配置是基础必会项。</p>
+</blockquote>
 <hr>
 <h2 id="5-ensp">5. 实验环境：eNSP 入门</h2>
 <h3 id="51-ensp">5.1 eNSP 是什么</h3>
@@ -652,6 +742,48 @@ display acl all                  # 查看所有 ACL
 <blockquote>
 <p>比赛拉开差距的不是"会不会配"，而是"配不通时能不能快速定位原因"。</p>
 </blockquote>
+<p><strong>常见故障排查案例</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>故障现象</th>
+<th>可能原因</th>
+<th>排查命令</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PC  ping 不通网关</td>
+<td>VLAN 配置错误 / 端口类型不对</td>
+<td><code>display port vlan</code>、<code>display vlan</code></td>
+</tr>
+<tr>
+<td>OSPF 邻居起不来</td>
+<td>Router ID 冲突 / 网段宣告错误 / 区域不一致</td>
+<td><code>display ospf peer</code>、<code>display current-configuration interface</code></td>
+</tr>
+<tr>
+<td>同 VLAN 不通</td>
+<td>接口 shutdown / 网线接错</td>
+<td><code>display interface brief</code></td>
+</tr>
+<tr>
+<td>跨 VLAN 不通</td>
+<td>没有 VLANIF / 路由缺失</td>
+<td><code>display ip routing-table</code></td>
+</tr>
+<tr>
+<td>ACL 不生效</td>
+<td>应用方向错 / 规则顺序错</td>
+<td><code>display acl</code>、<code>display traffic-filter applied-record</code></td>
+</tr>
+<tr>
+<td>NAT 不通</td>
+<td>没有配置 NAT 出接口 / ACL 没匹配</td>
+<td><code>display nat session</code></td>
+</tr>
+</tbody>
+</table>
 <hr>
 <h2 id="6">6. 备赛最大难点与突破策略</h2>
 <h3 id="61">6.1 最大难点：广度与深度的矛盾</h3>
@@ -703,28 +835,111 @@ display acl all                  # 查看所有 ACL
 <hr>
 <h2 id="7">7. 分阶段备赛计划</h2>
 <h3 id="4-6">第一阶段：打基础（4-6 周）</h3>
-<ul>
-<li>对照 HCIA-Datacom 大纲，逐个过知识点</li>
-<li>每个知识点配 eNSP 小实验</li>
-<li>产出：一张完整的知识网络图 + 每个核心协议的配置模板</li>
-</ul>
+<table>
+<thead>
+<tr>
+<th>周次</th>
+<th>学习内容</th>
+<th>实验任务</th>
+<th>产出</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>第1周</td>
+<td>网络模型、VRP 基础、IP 编址</td>
+<td>设备启动、基本命令、IP 配置</td>
+<td>命令速查表</td>
+</tr>
+<tr>
+<td>第2周</td>
+<td>交换机基础、MAC 地址表、VLAN</td>
+<td>VLAN 划分、Access/Trunk 配置</td>
+<td>VLAN 配置模板</td>
+</tr>
+<tr>
+<td>第3周</td>
+<td>STP/MSTP、链路聚合 Eth-Trunk</td>
+<td>冗余链路实验、MSTP 负载分担</td>
+<td>STP 状态判断表</td>
+</tr>
+<tr>
+<td>第4周</td>
+<td>静态路由、默认路由、单臂路由</td>
+<td>静态路由全网互通实验</td>
+<td>路由配置模板</td>
+</tr>
+<tr>
+<td>第5周</td>
+<td>OSPF 单区域、DR/BDR</td>
+<td>OSPF 邻居建立、路由学习</td>
+<td>OSPF 配置模板</td>
+</tr>
+<tr>
+<td>第6周</td>
+<td>ACL、NAT、DHCP</td>
+<td>ACL 过滤实验、NAT 上网实验</td>
+<td>安全配置模板</td>
+</tr>
+</tbody>
+</table>
+<p><strong>阶段目标</strong>：对照 HCIA-Datacom 大纲逐个过知识点，每个知识点配 eNSP 小实验，做到"理解 + 会配"。</p>
 <h3 id="4-6_1">第二阶段：专项突破（4-6 周）</h3>
-<ul>
-<li>按团队分工，每人主攻一个方向</li>
-<li>做 HCIP 级别的进阶内容（OSPF 多区域、BGP、路由策略、IPSec VPN）</li>
-<li>每周一次团队整合实验</li>
-</ul>
+<table>
+<thead>
+<tr>
+<th>周次</th>
+<th>主攻方向</th>
+<th>进阶内容</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>第7周</td>
+<td>数通路由拔高</td>
+<td>OSPF 多区域、LSA 类型、路由策略</td>
+</tr>
+<tr>
+<td>第8周</td>
+<td>数通路由拔高</td>
+<td>BGP 基础、IBGP/EBGP、路由引入</td>
+</tr>
+<tr>
+<td>第9周</td>
+<td>交换与 DCN</td>
+<td>VLAN 聚合、MSTP 多实例、CE 交换机</td>
+</tr>
+<tr>
+<td>第10周</td>
+<td>网络安全</td>
+<td>华为防火墙、安全策略、NAT Server</td>
+</tr>
+<tr>
+<td>第11周</td>
+<td>VPN</td>
+<td>IPSec VPN 站点互联、SSL VPN 远程接入</td>
+</tr>
+<tr>
+<td>第12周</td>
+<td>WLAN</td>
+<td>AC+AP 上线、SSID 配置、漫游基础</td>
+</tr>
+</tbody>
+</table>
+<p><strong>阶段目标</strong>：3 人按方向分工（路由 / 交换+DCN / 安全+WLAN），每人主攻方向练到 HCIP 水平，每周一次团队整合实验。</p>
 <h3 id="4_1">第三阶段：整网实战（4 周）</h3>
 <ul>
-<li>用往届真题和模拟题做完整实验</li>
+<li>用往届真题和模拟题做完整实验（从拓扑设计到完整配置）</li>
 <li>每次实验严格限时，赛后详细复盘</li>
-<li>建立排障手册：常见故障现象 → 排查命令 → 解决方法</li>
+<li>建立<strong>排障手册</strong>：常见故障现象 → 排查命令 → 解决方法</li>
+<li>每周至少 2 套完整实验 + 1 次排障专项训练</li>
 </ul>
 <h3 id="2-3">第四阶段：冲刺模拟（2-3 周）</h3>
 <ul>
-<li>完全模拟全球总决赛节奏：8 小时、全英文题、只允许官方文档</li>
+<li>完全模拟全球总决赛节奏：<strong>8 小时、全英文题、只允许官方文档</strong></li>
 <li>打磨团队协作 SOP，形成肌肉记忆</li>
 <li>查漏补缺，回归基础知识点</li>
+<li>最后 3 天：只看自己整理的笔记和配置模板，不再学新内容</li>
 </ul>
 <hr>
 <h2 id="8">8. 参考资料与官方资源</h2>
