@@ -2,18 +2,35 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#1e3a8a">
 <title>09 华为ICT大赛·云赛道备赛实战 · Java · SQL · Python AI 教程</title>
 <link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
 <header class="topnav">
+  <button class="nav-toggle" type="button" aria-label="打开导航目录" aria-expanded="false" aria-controls="sidebar">☰</button>
   <div class="brand">Java · SQL · Python AI 教程<small>从原理到实战</small></div>
   <nav><a href="01.html" class="">01 JavaSE 基础知</a><a href="02.html" class="">02 Java 与 SQL</a><a href="03.html" class="">03 SQL 数据库深度讲</a><a href="04.html" class="">04 学习报告：Java </a><a href="05.html" class="">05 JavaEE 企业级</a><a href="06.html" class="">06 Java 上位机开发</a><a href="07.html" class="">07 JavaEE 上位机</a><a href="08.html" class="">08 Python 与 A</a><a href="09.html" class="active">09 华为ICT大赛·云赛道</a></nav>
-  <a class="src" href="https://github.com/user-unknowed/studying-for-building" target="_blank">📦 源码仓库</a>
+  <a class="src" href="https://github.com/user-unknowed/studying-for-building" target="_blank" rel="noopener">📦 源码仓库</a>
 </header>
+<div class="drawer-backdrop" aria-hidden="true"></div>
 <div class="layout">
-  <aside class="sidebar">
+  <aside class="sidebar" id="sidebar">
+    <div class="sb-head"><b>📑 导航目录</b><button class="sb-close" type="button" aria-label="关闭目录">✕</button></div>
+    <div class="chapters-m">
+      <h4>全部章节</h4>
+      <ul><li><a href="index.html">🏠 课程总览（首页）</a></li>
+<li><a href="01.html">☕ 第 01 章 · JavaSE 基础知识点</a></li>
+<li><a href="02.html">🔗 第 02 章 · Java 与 SQL 数据库深度融合</a></li>
+<li><a href="03.html">🗄️ 第 03 章 · SQL 数据库深度讲解（工业实践版）</a></li>
+<li><a href="04.html">🧭 第 04 章 · 学习报告：Java · 数据库 · AI Agent</a></li>
+<li><a href="05.html">🏢 第 05 章 · JavaEE 企业级开发（现代实战）</a></li>
+<li><a href="06.html">🛠️ 第 06 章 · Java 上位机开发实战</a></li>
+<li><a href="07.html">🌐 第 07 章 · JavaEE 上位机：网页监控看板</a></li>
+<li><a href="08.html">🐍 第 08 章 · Python 与 AI 大模型：从原理到 Transformer</a></li>
+<li class="active"><a href="09.html">☁️ 第 09 章 · 华为ICT大赛·云赛道备赛实战</a></li></ul>
+    </div>
     <h4>本节目录</h4>
     <ul><ul>
 <li><a href="#0">0. 导读：这篇教程帮你解决什么问题</a></li>
@@ -1239,5 +1256,25 @@ kubectl<span class="w"> </span>logs<span class="w"> </span>web-xxx<span class="w
     <div class="pager"><a href="08.html"><div class="dir">← 上一章</div><div class="ttl">Python 与 AI 大模型：从原理到 Transformer</div></a></div>
   </main>
 </div>
+
+<script>
+(function(){
+  var body=document.body,toggle=document.querySelector('.nav-toggle');
+  function setOpen(open){
+    body.classList.toggle('drawer-open',open);
+    if(toggle)toggle.setAttribute('aria-expanded',open?'true':'false');
+  }
+  function close(){setOpen(false)}
+  if(toggle)toggle.addEventListener('click',function(){
+    setOpen(!body.classList.contains('drawer-open'));
+  });
+  var bk=document.querySelector('.drawer-backdrop');
+  if(bk)bk.addEventListener('click',close);
+  var xc=document.querySelector('.sb-close');
+  if(xc)xc.addEventListener('click',close);
+  document.addEventListener('keydown',function(e){if(e.key==='Escape')close()});
+})();
+</script>
+
 </body>
 </html>
