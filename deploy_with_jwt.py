@@ -11,7 +11,13 @@ import os, sys, json, hashlib, base64, mimetypes, urllib.request, urllib.error
 
 JWT = os.environ.get("CF_JWT", "").strip()
 if not JWT:
-    sys.exit("Please set CF_JWT env var")
+    # Try reading from file
+    jwt_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), ".cf_jwt")
+    if os.path.exists(jwt_file):
+        with open(jwt_file) as f:
+            JWT = f.read().strip()
+if not JWT:
+    sys.exit("Please set CF_JWT env var or create .cf_jwt file")
 
 ACCOUNT_ID = "2450b16d188a6686db33d4e1b31aff1a"
 PROJECT = "java-sql-ai-tutorial"
